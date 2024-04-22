@@ -50,7 +50,7 @@ const AboutSection = (props) => {
       <h1 className="text-4xl md:text-6xl font-extrabold leading-snug mt-8 md:mt-0">
         Hi, I'm
         <br />
-        <span className="bg-white px-1 italic">Wawa Sensei</span>
+        <span className="bg-white px-1 italic">Arhan Ansari</span>
       </h1>
       <motion.p
         className="text-lg text-gray-600 mt-4"
@@ -67,7 +67,7 @@ const AboutSection = (props) => {
           delay: 1.5,
         }}
       >
-        I make YouTube videos to help developers
+        I make websites to help developers
         <br />
         learn how to build 3D apps
       </motion.p>
@@ -108,6 +108,10 @@ const skills = [
     level: 90,
   },
   {
+    title: "Programming",
+    level: 90;
+  },
+  {
     title: "Typescript",
     level: 60,
   },
@@ -118,16 +122,16 @@ const skills = [
 ];
 const languages = [
   {
-    title: "🇫🇷 French",
+    title: "🇮🇳 Hindi",
     level: 100,
   },
   {
     title: "🇺🇸 English",
-    level: 80,
+    level: 90,
   },
   {
-    title: "🇯🇵 Japanese",
-    level: 20,
+    title: "🇮🇳 Marathi",
+    level: 75,
   },
 ];
 
