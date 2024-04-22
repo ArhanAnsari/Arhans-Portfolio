@@ -1,0 +1,18 @@
+run = "npm run start"
+modules = ["nodejs-20:v8-20230920-bd784b9"]
+hidden = [".config", "package-lock.json"]
+
+[nix]
+channel = "stable-23_05"
+
+[unitTest]
+language = "nodejs"
+
+[deployment]
+deploymentTarget = "static"
+publicDir = "dist"
+run = ["sh", "-c", "npm run start"]
+
+[[ports]]
+localPort = 5173
+externalPort = 80
