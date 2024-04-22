@@ -19,6 +19,12 @@ export const projects = [
 		image: "projects/carGame.jpg",
 		description: "A car game made in ThreeJS",
 	},
+	{
+		title: "vCard Personal Portfolio",
+		url: "https://arhanansari.github.io/vcard-personal-portfolio/",
+		image: "projects/vCard.png",
+		description: "A personal portfolio",
+	},
 ];
 
 const Project = (props) => {
