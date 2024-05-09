@@ -28,7 +28,7 @@ export const projects = [
 	{
 		title: "Task Manager App",
 		url: "https://arhanansari.github.io/Task-Manager-App/",
-		image: "projects/taskmaster.jpg",
+		image: "projects/taskManager.jpg",
 		description: "A task manager app",
 	},
 ];
