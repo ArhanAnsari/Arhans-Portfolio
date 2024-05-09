@@ -25,6 +25,12 @@ export const projects = [
 		image: "projects/vCard.png",
 		description: "A personal portfolio",
 	},
+	{
+		title: "Task Manager App",
+		url: "https://arhanansari.github.io/Task-Manager-App/",
+		image: "projects/taskmaster.jpg",
+		description: "A task manager app",
+	},
 ];
 
 const Project = (props) => {
