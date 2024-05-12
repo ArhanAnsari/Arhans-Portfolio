@@ -34,7 +34,7 @@ export const projects = [
 	{
 		title: "CodeWithArhan",
 		url: "https://codewitharhan.infinityfreeapp.com/",
-		image: "projects/CodeWithArhan.jpg",
+		image: "projects/CodeWithArhan.png",
 		description: "My own website",
 	},
 ];
