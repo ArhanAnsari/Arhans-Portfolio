@@ -31,6 +31,12 @@ export const projects = [
 		image: "projects/taskManager.jpg",
 		description: "A task manager app",
 	},
+	{
+		title: "CodeWithArhan",
+		url: "https://codewitharhan.infinityfreeapp.com/",
+		image: "projects/CodeWithArhan.jpg",
+		description: "My own website",
+	},
 ];
 
 const Project = (props) => {
