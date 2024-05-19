@@ -40,7 +40,7 @@ export const projects = [
 	{
 		title: "Birthday Web",
 		url: "https://birthday-web-pi.vercel.app/",
-		image: "projects/Birthday-Web",
+		image: "projects/Birthday-Web.jpg",
 		description: "A Birthday Web",
 	},
 ];
