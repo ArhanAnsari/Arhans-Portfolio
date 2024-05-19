@@ -37,6 +37,12 @@ export const projects = [
 		image: "projects/CodeWithArhan.png",
 		description: "My own website",
 	},
+	{
+		title: "Birthday Web",
+		url: "https://birthday-web-pi.vercel.app/",
+		image: "projects/Birthday-Web",
+		description: "A Birthday Web",
+	},
 ];
 
 const Project = (props) => {
