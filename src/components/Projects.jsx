@@ -49,6 +49,12 @@ export const projects = [
 		image: "projects/NoInternetSpidermanGame.jpg",
 		description: "A Spiderman Game",
 	},
+	{
+		title: "AI ChatBot",
+		url: "https://ai-chatbot-six-nu.vercel.app/",
+		image: "projects/AI-ChatBot.jpg",
+		description: "An open-source AI chatbot app template built with Next.js, the Vercel AI SDK, OpenAI, and Vercel KV.",
+	},
 ];
 
 const Project = (props) => {
