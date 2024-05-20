@@ -43,6 +43,12 @@ export const projects = [
 		image: "projects/Birthday-Web.jpg",
 		description: "A Birthday Web",
 	},
+	{
+		title: "No Internet Spiderman Game",
+		url: "https://no-internet-spiderman-game.vercel.app/",
+		image: "projects/NoInternetSpidermanGame.jpg",
+		description: "A Spiderman Game",
+	},
 ];
 
 const Project = (props) => {
