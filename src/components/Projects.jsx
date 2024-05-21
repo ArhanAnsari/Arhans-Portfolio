@@ -55,6 +55,12 @@ export const projects = [
 		image: "projects/AI-ChatBot.jpg",
 		description: "An open-source AI chatbot app template built with Next.js, the Vercel AI SDK, OpenAI, and Vercel KV.",
 	},
+	{
+		title: "E-commerce Website",
+		url: "https://e-commerce-emporium-xrw1em4.gamma.site/",
+		image: "projects/ECommerce.jpg",
+		description: "An e-commerce website",
+	},
 ];
 
 const Project = (props) => {
