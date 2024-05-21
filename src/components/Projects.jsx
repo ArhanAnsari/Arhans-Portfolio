@@ -51,7 +51,7 @@ export const projects = [
 	},
 	{
 		title: "AI ChatBot",
-		url: "https://ai-chatbot-six-nu.vercel.app/",
+		url: "https://nextjs-chat-blue-beta-36.vercel.app/",
 		image: "projects/AI-ChatBot.jpg",
 		description: "An open-source AI chatbot app template built with Next.js, the Vercel AI SDK, OpenAI, and Vercel KV.",
 	},
