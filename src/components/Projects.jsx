@@ -61,6 +61,18 @@ export const projects = [
 		image: "projects/ECommerce.jpg",
 		description: "An e-commerce website",
 	},
+	{
+		title: "ChatGPT Clone",
+		url: "https://chatgpt-clone-delta-pied.vercel.app/",
+		image: "projects/ChatGPT.jpg",
+		description: "A ChatGPT clone",
+	},
+	{
+		title: "ChatBot using JavaScript",
+		url: "https://chatbot-dun-omega.vercel.app/",
+		image: "projects/ChatBot.png",
+		description: "A ChatBot using JavaScript",
+	},
 ];
 
 const Project = (props) => {
