@@ -1,3 +1,5 @@
+import React, { useRef } from 'react';
+import emailjs from '@emailjs/browser';
 import { ValidationError, useForm } from "@formspree/react";
 import { motion } from "framer-motion";
 import { useAtom } from "jotai";
@@ -268,6 +270,23 @@ const ProjectsSection = () => {
 
 const ContactSection = () => {
   const [state, handleSubmit] = useForm("mayzgjbd");
+  const form = useRef();
+  const sendEmail = (e) => {
+    e.preventDefault();
+
+    emailjs
+      .sendForm('service_oxjis4c', 'template_ho0bwum', form.current, {
+        publicKey: '7i7_YEAdQWQzN_UBZ',
+      })
+      .then(
+        () => {
+          console.log('SUCCESS!');
+        },
+        (error) => {
+          console.log('FAILED...', error.text);
+        },
+      );
+  };
   return (
     <Section>
       <h2 className="text-3xl md:text-5xl font-bold">Contact me</h2>
@@ -275,13 +294,13 @@ const ContactSection = () => {
         {state.succeeded ? (
           <p className="text-gray-900 text-center">Thanks for your message !</p>
         ) : (
-          <form onSubmit={handleSubmit}>
+          <form ref = {form} onSubmit={sendEmail}>
             <label for="name" className="font-medium text-gray-900 block mb-1">
               Name
             </label>
             <input
               type="text"
-              name="name"
+              name="user_name"
               id="name"
               className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
             />
@@ -293,7 +312,7 @@ const ContactSection = () => {
             </label>
             <input
               type="email"
-              name="email"
+              name="user_email"
               id="email"
               className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
             />
