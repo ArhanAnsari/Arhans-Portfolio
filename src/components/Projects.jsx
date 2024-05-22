@@ -11,37 +11,37 @@ export const projects = [
 		title: "Arhan Sales",
 		url: "https://arhansales.000webhostapp.com",
 		image: "projects/arhansales.png",
-		description: "Website of my client",
+		description: "Website of my clien.",
 	},
 	{
 		title: "Car Game",
 		url: "https://arhanansari.github.io/carGameThreeJS/",
 		image: "projects/carGame.jpg",
-		description: "A car game made in ThreeJS",
+		description: "A car game made in ThreeJS.",
 	},
 	{
 		title: "vCard Personal Portfolio",
 		url: "https://arhanansari.github.io/vcard-personal-portfolio/",
 		image: "projects/vCard.png",
-		description: "A personal portfolio",
+		description: "A personal portfolio.",
 	},
 	{
 		title: "Task Manager App",
 		url: "https://arhanansari.github.io/Task-Manager-App/",
 		image: "projects/taskManager.jpg",
-		description: "A task manager app",
+		description: "A task manager app.",
 	},
 	{
 		title: "CodeWithArhan",
 		url: "https://codewitharhan.infinityfreeapp.com/",
 		image: "projects/CodeWithArhan.png",
-		description: "My own website",
+		description: "My own website.",
 	},
 	{
 		title: "Birthday Web",
 		url: "https://birthday-web-pi.vercel.app/",
 		image: "projects/Birthday-Web.jpg",
-		description: "A Birthday Web",
+		description: "A Birthday Web.",
 	},
 	{
 		title: "No Internet Spiderman Game",
@@ -59,20 +59,33 @@ export const projects = [
 		title: "E-commerce Website",
 		url: "https://e-commerce-emporium-xrw1em4.gamma.site/",
 		image: "projects/ECommerce.jpg",
-		description: "An e-commerce website",
+		description: "An e-commerce website.",
 	},
 	{
 		title: "ChatGPT Clone",
 		url: "https://chatgpt-clone-delta-pied.vercel.app/",
 		image: "projects/ChatGPT.jpg",
-		description: "A ChatGPT clone",
+		description: "A ChatGPT clone.",
 	},
 	{
 		title: "ChatBot using JavaScript",
 		url: "https://chatbot-dun-omega.vercel.app/",
 		image: "projects/ChatBot.png",
-		description: "A ChatBot using JavaScript",
+		description: "A ChatBot using JavaScript.",
 	},
+	{
+		title: "LeetCode Clone",
+		url: "https://leetcode-clone-chi.vercel.app/",
+		image: "projects/leetcode.jpg",
+		description: "A Full Stack LeetCode Clone.",
+	},
+	{
+		title: "Game Hub",
+		url: "https://game-hub-iota-orpin.vercel.app/",
+		image: "projects/gamehub.jpg",
+		description: "A Gaming Website.",
+	},
+	
 ];
 
 const Project = (props) => {
