@@ -102,6 +102,10 @@ const skills = [
     level: 80,
   },
   {
+    title: "Full Stack Web Development", 
+    level: 90,
+  },
+  {
     title: "React / React Native",
     level: 90,
   },
