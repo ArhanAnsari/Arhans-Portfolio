@@ -85,7 +85,18 @@ export const projects = [
 		image: "projects/gamehub.jpg",
 		description: "A Gaming Website.",
 	},
-	
+	{
+		title: "Captcha App",
+		url: "https://captcha-mu-five.vercel.app/",
+		image: "projects/captcha.jpg",
+		description: "A Captcha App.",
+	},
+	{
+		title: "ChatBot using JavaScript",
+		url: "https://javascript-chatbot-seven.vercel.app/",
+		image: "projects/js-chatbot.jpg",
+		description: "A ChatBot using JavaScript.",
+	},
 ];
 
 const Project = (props) => {
