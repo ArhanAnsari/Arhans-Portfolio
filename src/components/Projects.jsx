@@ -88,7 +88,7 @@ export const projects = [
 	{
 		title: "Captcha App",
 		url: "https://captcha-mu-five.vercel.app/",
-		image: "projects/captcha.jpg",
+		image: "projects/Captcha.jpg",
 		description: "A Captcha App.",
 	},
 	{
