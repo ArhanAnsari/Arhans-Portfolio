@@ -97,6 +97,12 @@ export const projects = [
 		image: "projects/js-chatbot.jpg",
 		description: "A ChatBot using JavaScript.",
 	},
+	{
+		title: "Code Editor",
+		url: "https://code-editor-gilt-eta.vercel.app/",
+		image: "projects/codeeditor.jpg",
+		description: "A Code Editor that support multiple languages",
+	},
 ];
 
 const Project = (props) => {
