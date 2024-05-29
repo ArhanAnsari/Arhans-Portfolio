@@ -103,6 +103,12 @@ export const projects = [
 		image: "projects/codeeditor.jpg",
 		description: "A Code Editor that support multiple languages",
 	},
+	{
+		title: "Zoom Clone (Yoom)",
+		url: "https://zoom-clone-seven-delta.vercel.app/",
+		image: "projects/Zoom-Clone(Yoom).jpg",
+		description: "Yoom aka Zoom Clone is a full stack app.",
+	},
 ];
 
 const Project = (props) => {
