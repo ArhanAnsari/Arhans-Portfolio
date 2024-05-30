@@ -121,6 +121,12 @@ export const projects = [
 		image: "projects/Instagram-Clone.jpg",
 		description: "A Full Stack Instagram Clone.",
 	},
+	{
+		title: "YouTube Clone",
+		url: "https://youtube-clone-alpha-black.vercel.app/",
+		image: "projects/Youtube.jpg",
+		description: "A Youtube Clone made with React JS, Rapid API & Tailwind CSS.",
+	},
 ];
 
 const Project = (props) => {
