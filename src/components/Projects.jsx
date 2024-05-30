@@ -115,6 +115,12 @@ export const projects = [
 		image: "projects/WhatsApp-Clone.jpg",
 		description: "A Full Stack WhatsApp.",
 	},
+	{
+		title: "Instagram Clone",
+		url: "https://instagram-clone-fifteen.vercel.app/",
+		image: "projects/Instagram-Clone.jpg",
+		description: "A Full Stack Instagram Clone.",
+	},
 ];
 
 const Project = (props) => {
