@@ -109,6 +109,12 @@ export const projects = [
 		image: "projects/Zoom-Clone(Yoom).jpg",
 		description: "Yoom aka Zoom Clone is a full stack app.",
 	},
+	{
+		title: "WhatsApp Clone",
+		url: "https://whatsapp-clone-next14-two.vercel.app/",
+		image: "projects/WhatsApp-Clone.jpg",
+		description: "A Full Stack WhatsApp.",
+	},
 ];
 
 const Project = (props) => {
