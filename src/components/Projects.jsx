@@ -127,6 +127,12 @@ export const projects = [
 		image: "projects/Youtube.jpg",
 		description: "A Youtube Clone made with React JS, Rapid API & Tailwind CSS.",
 	},
+	{
+		title: "Among Us",
+		url: "https://among-us-gules.vercel.app/",
+		image: "projects/AmongUs.png",
+		description: "A Fan Made Among Us game made with HTML,CSS,JS,Socket.io.",
+	},
 ];
 
 const Project = (props) => {
