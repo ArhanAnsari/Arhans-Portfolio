@@ -187,6 +187,12 @@ export const projects = [
 		image: "projects/live-form-selection.jpg",
 		description: "A Live Form Selection that supports real time users.",
 	},
+	{
+		title: "Video Comment",
+		url: "https://2sypdd-3000.csb.app/",
+		image: "projects/video-comment.jpg",
+		description: "A Video Comment that supports real time users and comments.",
+	},
 ];
 
 const Project = (props) => {
