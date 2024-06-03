@@ -175,6 +175,12 @@ export const projects = [
 		image: "projects/spreadsheet.jpg",
 		description: "A Collaborative Spreadsheet that supports real time collaboration.",
 	},
+	{
+		title: "Comments Primitives",
+		url: "https://pwxgj8-3000.csb.app/",
+		image: "projects/commentspri.jpg",
+		description: "A Comments Primitive that supports real time comments.",
+	},
 ];
 
 const Project = (props) => {
