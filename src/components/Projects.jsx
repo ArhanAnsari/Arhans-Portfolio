@@ -163,6 +163,18 @@ export const projects = [
 		image: "projects/multiplayer-3d-builder.jpg",
 		description: "A Multiplayer 3D Builder that supports real time users.",
 	},
+	{
+		title: "Live Cursors",
+		url: "https://3vsmww-5173.csb.app/",
+		image: "projects/live-cursor.jpg",
+		description: "A Live Cursor that is made with Vue.js that supports real time users.",
+	},
+	{
+		title: "Collaborative Spreadsheet",
+		url: "https://ykqxd7-3000.csb.app/",
+		image: "projects/spreadsheet.jpg",
+		description: "A Collaborative Spreadsheet that supports real time collaboration.",
+	},
 ];
 
 const Project = (props) => {
