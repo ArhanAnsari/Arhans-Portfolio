@@ -154,7 +154,7 @@ export const projects = [
 	{
 		title: "Multiplayer 3D Builder",
 		url: "https://z37ys9-3000.csb.app/",
-		image: "projects/multiplayer-3d-buider.jpg",
+		image: "projects/multiplayer-3d-builder.jpg",
 		description: "A Multiplayer 3D Builder that supports real time users.",
 	},
 ];
