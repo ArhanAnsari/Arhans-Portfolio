@@ -196,7 +196,7 @@ export const projects = [
 	{
 		title: "Connection Status",
 		url: "https://xv8mdp-3000.csb.app/",
-		image: "connection-status.jpg",
+		image: "projects/connection-status.jpg",
 		description: "A Connection Status that supports real time users.",
 	},
 ];
