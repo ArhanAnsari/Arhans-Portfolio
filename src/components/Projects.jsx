@@ -128,6 +128,12 @@ export const projects = [
 		description: "A Youtube Clone made with React JS, Rapid API & Tailwind CSS.",
 	},
 	{
+		title: "Figma Clone",
+		url: "https://figma-clone-phi-eight.vercel.app/",
+		image: "projects/figma-clone.jpg",
+		description: "A minimalistic Figma clone to show how to add real-world features like live collaboration with cursor chat, comments, reactions, and drawing designs (shapes, image upload) on the canvas using fabric.js.",
+	},
+	{
 		title: "Among Us",
 		url: "https://among-us-gules.vercel.app/",
 		image: "projects/AmongUs.png",
