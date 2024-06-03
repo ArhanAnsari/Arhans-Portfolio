@@ -133,6 +133,18 @@ export const projects = [
 		image: "projects/AmongUs.png",
 		description: "A Fan Made Among Us game made with HTML,CSS,JS,Socket.io.",
 	},
+	{
+		title: "Collaborative Code Editor",
+		url: "https://spgr5d-3000.csb.app/",
+		image: "projects/collaborative-code-editor.jpg",
+		description: "A Collaborative Code Editor that supports real time collaboration.",
+	},
+	{
+		title: "Collaborative To-do List",
+		url: "https://75f3l4-3000.csb.app/",
+		image: "projects/Collaborative-ToDo-List.jpg",
+		description: "A Collaborative To-do List that supports real time collaboration.",
+	},
 ];
 
 const Project = (props) => {
