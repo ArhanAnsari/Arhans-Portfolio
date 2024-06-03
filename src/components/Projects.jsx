@@ -193,6 +193,12 @@ export const projects = [
 		image: "projects/video-comment.jpg",
 		description: "A Video Comment that supports real time users and comments.",
 	},
+	{
+		title: "Connection Status",
+		url: "https://xv8mdp-3000.csb.app/",
+		image: "connection-status.jpg",
+		description: "A Connection Status that supports real time users.",
+	},
 ];
 
 const Project = (props) => {
