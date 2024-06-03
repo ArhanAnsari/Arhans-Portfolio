@@ -145,6 +145,18 @@ export const projects = [
 		image: "projects/Collaborative-ToDo-List.jpg",
 		description: "A Collaborative To-do List that supports real time collaboration.",
 	},
+	{
+		title: "Collaborative Whiteboard",
+		url: "https://3n77d7-3000.csb.app/",
+		image: "projects/collaborative-whiteboard.jpg",
+		description: "A Collaborative Whiteboard that supports real time collaboration.",
+	},
+	{
+		title: "Multiplayer 3D Builder",
+		url: "https://z37ys9-3000.csb.app/",
+		image: "projects/multiplayer-3d-buider.jpg",
+		description: "A Multiplayer 3D Builder that supports real time users.",
+	},
 ];
 
 const Project = (props) => {
