@@ -199,6 +199,24 @@ export const projects = [
 		image: "projects/connection-status.jpg",
 		description: "A Connection Status that supports real time users.",
 	},
+	{
+		title: "Discord Clone",
+		url: "https://pll9ft-3000.csb.app/",
+		image: "projects/discord.jpg",
+		description: "A Discord Clone that has already users profile that you can use it and it also has notification."
+	},
+	{
+		title: "Collaborative Rich Text Editor",
+		url: "https://xd6zzf-3000.csb.app/",
+		image: "projects/rich-text-editor.jpg",
+		description: "A Collaborative Rich Text Editor that supports real time users."
+	},
+	{
+		title: "Text Editor Comments",
+		url: "https://833gmf-3000.csb.app/",
+		image: "projects/text-editor-comments.jpg",
+		description: "A Text Editor Comments that supports real time users.",
+	},
 ];
 
 const Project = (props) => {
