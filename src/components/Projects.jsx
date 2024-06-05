@@ -134,6 +134,12 @@ export const projects = [
 		description: "A minimalistic Figma clone to show how to add real-world features like live collaboration with cursor chat, comments, reactions, and drawing designs (shapes, image upload) on the canvas using fabric.js.",
 	},
 	{
+		title: "Rediscord",
+		url: "https://rediscord-six.vercel.app/",
+		image: "projects/discord-clone.jpg",
+		description: "Rediscord is a study of Discord UI built in NextJS and TailwindCSS using some shadcn concepts and components showing how powerful are these libs and how they can replicate a specific design and complex UI.",
+	},
+	{
 		title: "Among Us",
 		url: "https://among-us-gules.vercel.app/",
 		image: "projects/AmongUs.png",
