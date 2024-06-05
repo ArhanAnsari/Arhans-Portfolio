@@ -113,7 +113,7 @@ export const projects = [
 		title: "WhatsApp Clone",
 		url: "https://react-whatsapp-clone-three.vercel.app/",
 		image: "projects/WhatsApp-Clone.jpg",
-		description: "A Frontend WhatsApp Clone.",
+		description: "A Frontend WhatsApp Clone made with React.",
 	},
 	{
 		title: "Instagram Clone",
