@@ -140,6 +140,12 @@ export const projects = [
 		description: "Rediscord is a study of Discord UI built in NextJS and TailwindCSS using some shadcn concepts and components showing how powerful are these libs and how they can replicate a specific design and complex UI.",
 	},
 	{
+		title: "Cookmom",
+		url: "https://recipe-app-phi-two.vercel.app/",
+		image: "projects/cookmom.jpg",
+		description: "Cookmom is a recipe app for finding recipe of your favorite food.",
+	},
+	{
 		title: "Among Us",
 		url: "https://among-us-gules.vercel.app/",
 		image: "projects/AmongUs.png",
