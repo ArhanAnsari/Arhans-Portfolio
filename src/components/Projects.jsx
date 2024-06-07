@@ -229,6 +229,12 @@ export const projects = [
 		image: "projects/text-editor-comments.jpg",
 		description: "A Text Editor Comments that supports real time users.",
 	},
+	{
+		title: "Stopwatch",
+		url: "https://arhanansari.github.io/stopwatch/",
+		image: "projects/stopwatch.jpg",
+		description: "A Simple Stopwatch made with HTML,CSS,JS.",
+	},
 ];
 
 const Project = (props) => {
