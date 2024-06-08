@@ -259,6 +259,12 @@ export const projects = [
 		image: "projects/multiplayer-pirate-card-game.jpg",
 		description: "A Card Game using JavaScript w/ React Three Fibre and Playroom Stream Room.",
 	},
+	{
+		title: "Arhan Guys",
+		url: "https://arhan-guys.vercel.app/",
+		image: "projects/Arhan-Guys.jpg",
+		description: "Arhan Guys is Fall Guys Game Clone made with React Three Fibre/ThreeJS.",
+	},
 ];
 
 const Project = (props) => {
