@@ -250,7 +250,7 @@ export const projects = [
 	{
 		title: "Drawing App",
 		url: "https://arhanansari.github.io/drawing-app/",
-		image: "projects/drawing.jpg",
+		image: "projects/drawing-app.jpg",
 		description: "A simple drawing app using HTML,CSS,JS.",
 	},
 	{
