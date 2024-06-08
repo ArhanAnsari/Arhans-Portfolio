@@ -277,6 +277,12 @@ export const projects = [
 		image: "projects/emoji-dice-roller.jpg",
 		description: "A simple Emoji Dice Roller using HTML,CSS,JS.",
 	},
+	{
+		title: "Arhan Laptop.in",
+		url: "https://arhanansari.github.io/Arhan-Laptop.in/",
+		image: "projects/ArhanLaptop.in.jpg",
+		description: "A simple shopping website made with HTML,CSS,JS.",
+	},
 ];
 
 const Project = (props) => {
