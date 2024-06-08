@@ -241,6 +241,12 @@ export const projects = [
 		image: "projects/rk-marketing.jpg",
 		description: "This is a website of my client.",
 	},
+	{
+		title: "Dictionary App",
+		url: "https://dictionary-app-indol-one.vercel.app/",
+		image: "projects/dictionary.jpg",
+		description: "A simple dictionary app using HTML,CSS,JS and Dictionary API.",
+	},
 ];
 
 const Project = (props) => {
