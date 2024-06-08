@@ -11,7 +11,7 @@ export const projects = [
 		title: "Arhan Sales",
 		url: "https://arhansales.000webhostapp.com",
 		image: "projects/arhansales.png",
-		description: "Website of my clien.",
+		description: "Website of my client.",
 	},
 	{
 		title: "Car Game",
@@ -234,6 +234,12 @@ export const projects = [
 		url: "https://arhanansari.github.io/stopwatch/",
 		image: "projects/stopwatch.jpg",
 		description: "A Simple Stopwatch made with HTML,CSS,JS.",
+	},
+	{
+		title: "RK Marketing",
+		url: "https://rk-marketing.vercel.app/",
+		image: "projects/rk-marketing.jpg",
+		description: "This is a website of my client.",
 	},
 ];
 
