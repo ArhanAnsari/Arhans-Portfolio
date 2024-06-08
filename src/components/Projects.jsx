@@ -271,6 +271,12 @@ export const projects = [
 		image: "projects/Crud.jpg",
 		description: "This is a simple CRUD Operation App made with using HTML,CSS,JS.",
 	},
+	{
+		title: "Emoji Dice Roller",
+		url: "https://arhanansari.github.io/Emoji_Dice_Roller/",
+		image: "projects/emoji-dice-roller.jpg",
+		description: "A simple Emoji Dice Roller using HTML,CSS,JS.",
+	},
 ];
 
 const Project = (props) => {
