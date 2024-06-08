@@ -247,6 +247,18 @@ export const projects = [
 		image: "projects/dictionary.jpg",
 		description: "A simple dictionary app using HTML,CSS,JS and Dictionary API.",
 	},
+	{
+		title: "Drawing App",
+		url: "https://arhanansari.github.io/drawing-app/",
+		image: "projects/drawing.jpg",
+		description: "A simple drawing app using HTML,CSS,JS.",
+	},
+	{
+		title: "Multiplayer Pirate Card Game",
+		url: "https://multiplayer-pirate-card-game.vercel.app/#r=RHCFL",
+		image: "projects/multiplayer-pirate-card-game.jpg",
+		description: "A Card Game using JavaScript w/ React Three Fibre and Playroom Stream Room.",
+	},
 ];
 
 const Project = (props) => {
