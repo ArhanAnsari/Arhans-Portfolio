@@ -265,6 +265,12 @@ export const projects = [
 		image: "projects/Arhan-Guys.jpg",
 		description: "Arhan Guys is Fall Guys Game Clone made with React Three Fibre/ThreeJS.",
 	},
+	{
+		title: "Crud Operation",
+		url: "https://arhanansari.github.io/Crud/",
+		image: "projects/Crud.jpg",
+		description: "This is a simple CRUD Operation App made with using HTML,CSS,JS.",
+	},
 ];
 
 const Project = (props) => {
