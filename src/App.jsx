@@ -11,7 +11,6 @@ import { Menu } from "./components/Menu";
 import { ScrollManager } from "./components/ScrollManager";
 import { framerMotionConfig } from "./config";
 import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
 
 function App() {
   const [section, setSection] = useState(0);
@@ -55,7 +54,6 @@ function App() {
       </MotionConfig>
       <Leva hidden />
       <Analytics />
-      <SpeedInsights />
     </>
   );
 }
