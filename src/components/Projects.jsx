@@ -239,7 +239,7 @@ export const projects = [
 		title: "RK Marketing",
 		url: "https://rk-marketing.vercel.app/",
 		image: "projects/rk-marketing.jpg",
-		description: "This is a website of my client.",
+		description: "This is a website of my client. This is a Shopping Website made with HTML,CSS,JS.",
 	},
 	{
 		title: "Dictionary App",
@@ -294,6 +294,12 @@ export const projects = [
 		url: "https://paytm-clone-brown-rho.vercel.app/",
 		image: "projects/paytmclone.png",
 		description: "This Paytm Home Page Clone project replicates the user interface and design of the Paytm company's homepage. Utilizing a combination of HTML, CSS, and Bootstrap, the project aims to recreate the visual aesthetics of the original Paytm homepage. Notably, the implementation is designed to be responsive, ensuring a seamless and consistent user experience across various devices and screen sizes.",
+	},
+	{
+		title: "Aaiza Cosmetics",
+		url: "https://aaizacosmetics.vercel.app/",
+		image: "projects/Aaiza-Cosmetics.jpg",
+		description: "This is a website of my client. This is a Shopping Website made with HTML,CSS,JS.",
 	},
 ];
 
