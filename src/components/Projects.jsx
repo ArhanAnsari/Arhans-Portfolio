@@ -291,7 +291,7 @@ export const projects = [
 	},
 	{
 		title: "Paytm Clone",
-		url: "https://paytm-clone-brown-rho.vercel.app/",
+		url: "https://arhanansari.github.io/Paytm-Clone/",
 		image: "projects/paytmclone.png",
 		description: "This Paytm Home Page Clone project replicates the user interface and design of the Paytm company's homepage. Utilizing a combination of HTML, CSS, and Bootstrap, the project aims to recreate the visual aesthetics of the original Paytm homepage. Notably, the implementation is designed to be responsive, ensuring a seamless and consistent user experience across various devices and screen sizes.",
 	},
