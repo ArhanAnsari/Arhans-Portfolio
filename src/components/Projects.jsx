@@ -301,6 +301,12 @@ export const projects = [
 		image: "projects/Aaiza-Cosmetics.jpg",
 		description: "This is a website of my client. This is a Shopping Website made with HTML,CSS,JS.",
 	},
+	{
+		title: "Father's Day",
+		url: "https://fathers-day-tau.vercel.app/",
+		image: "projects/Fathers-Day.png",
+		description: "This is a professional Father's Day wishing website designed with HTML, CSS, and JavaScript.The clean and modern design ensures a delightful user experience, making it a perfect way to celebrate and honor fathers. The responsive layout ensures compatibility across various devices, while the simple JavaScript functionality adds a touch of interactivity.",
+	},
 ];
 
 const Project = (props) => {
