@@ -135,7 +135,7 @@ export const projects = [
 	},
 	{
 		title: "Rediscord",
-		url: "https://rediscord-six.vercel.app/",
+		url: "https://rediscord-eight.vercel.app/",
 		image: "projects/discord-clone.jpg",
 		description: "Rediscord is a study of Discord UI built in NextJS and TailwindCSS using some shadcn concepts and components showing how powerful are these libs and how they can replicate a specific design and complex UI.",
 	},
