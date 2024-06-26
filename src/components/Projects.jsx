@@ -307,6 +307,12 @@ export const projects = [
 		image: "projects/Fathers-Day.png",
 		description: "This is a professional Father's Day wishing website designed with HTML, CSS, and JavaScript.The clean and modern design ensures a delightful user experience, making it a perfect way to celebrate and honor fathers. The responsive layout ensures compatibility across various devices, while the simple JavaScript functionality adds a touch of interactivity.",
 	},
+	{
+		title: "Password Generator",
+		url: "https://arhanansari.github.io/Password-Generator-YT/",
+		image: "projects/Password-Generator",
+		description: "A simple and beautiful Password Generator built with HTML,CSS,JS. ",
+	},
 ];
 
 const Project = (props) => {
