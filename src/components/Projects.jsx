@@ -310,7 +310,7 @@ export const projects = [
 	{
 		title: "Password Generator",
 		url: "https://arhanansari.github.io/Password-Generator-YT/",
-		image: "projects/Password-Generator",
+		image: "projects/Password-Generator.jpg",
 		description: "A simple and beautiful Password Generator built with HTML,CSS,JS. ",
 	},
 ];
