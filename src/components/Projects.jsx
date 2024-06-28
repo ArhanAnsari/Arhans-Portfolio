@@ -313,6 +313,12 @@ export const projects = [
 		image: "projects/Password-Generator.jpg",
 		description: "A simple and beautiful Password Generator built with HTML,CSS,JS. ",
 	},
+	{
+		title: "Password Validator",
+		url: "https://password-validator-yt.vercel.app/",
+		image: "projects/Password-Validator.jpg",
+		description: "A simple and beautiful Password Validator built with HTML,CSS,JS. ",
+	},
 ];
 
 const Project = (props) => {
