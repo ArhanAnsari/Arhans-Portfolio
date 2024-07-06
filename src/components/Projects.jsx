@@ -317,7 +317,13 @@ export const projects = [
 		title: "Password Validator",
 		url: "https://password-validator-yt.vercel.app/",
 		image: "projects/Password-Validator.jpg",
-		description: "A simple and beautiful Password Validator built with HTML,CSS,JS. ",
+		description: "A simple and beautiful Password Validator built with HTML,CSS,JS.",
+	},
+	{
+		title: "Kanban Task Management",
+		url: "https://kanban-task-management-project.vercel.app/",
+		image: "projects/Karban-Task-Management.jpg",
+		description: "This project is a recreation of the famous task management application Karban.It aims to provide a user-friendly and efficient interface for organizing your daily tasks.",
 	},
 ];
 
