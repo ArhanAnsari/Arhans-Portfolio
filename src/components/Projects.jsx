@@ -325,6 +325,12 @@ export const projects = [
 		image: "projects/Karban-Task-Management.jpg",
 		description: "This project is a recreation of the famous task management application Karban.It aims to provide a user-friendly and efficient interface for organizing your daily tasks.",
 	},
+	{
+		title: "Colour Flipper",
+		url: "https://simple-colour-flipper-app-yt.vercel.app/",
+		image: "projects/Colour-Flipper.jpg",
+		description: "A simple and beautiful Colour Flipper built with HTML,CSS,JS.",
+	},
 ];
 
 const Project = (props) => {
