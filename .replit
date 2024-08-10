@@ -3,7 +3,7 @@ modules = ["nodejs-20", "web"]
 hidden = [".config", "package-lock.json"]
 
 [nix]
-channel = "stable-23_11"
+channel = "stable-24_05"
 
 [unitTest]
 language = "nodejs"
