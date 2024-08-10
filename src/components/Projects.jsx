@@ -331,6 +331,12 @@ export const projects = [
 		image: "projects/Colour-Flipper.jpg",
 		description: "A simple and beautiful Colour Flipper built with HTML,CSS,JS.",
 	},
+	{
+		title: "Chat to PDF",
+		url: "https://chattopdf.netlify.app/",
+		image: "projects/chattopdf.jpg",
+		description: "My first AI SaaS app made with using Next.js, Clerk, React Dropzone, Pinecone, Langchain, Gemini, Stripe.",
+	},
 ];
 
 const Project = (props) => {
