@@ -110,8 +110,8 @@ export const projects = [
 		description: "Yoom aka Zoom Clone is a full stack app.",
 	},
 	{
-		title: "WhatsApp Clone",
-		url: "https://react-whatsapp-clone-three.vercel.app/",
+		title: "WhatsUp",
+		url: "https://arhans-whatsup.vercel.app/",
 		image: "projects/WhatsApp-Clone.jpg",
 		description: "A Frontend WhatsApp Clone made with React.",
 	},
@@ -151,84 +151,84 @@ export const projects = [
 		image: "projects/AmongUs.png",
 		description: "A Fan Made Among Us game made with HTML,CSS,JS,Socket.io.",
 	},
-	{
-		title: "Collaborative Code Editor",
-		url: "https://spgr5d-3000.csb.app/",
-		image: "projects/collaborative-code-editor.jpg",
-		description: "A Collaborative Code Editor that supports real time collaboration.",
-	},
-	{
-		title: "Collaborative To-do List",
-		url: "https://75f3l4-3000.csb.app/",
-		image: "projects/Collaborative-ToDo-List.jpg",
-		description: "A Collaborative To-do List that supports real time collaboration.",
-	},
-	{
-		title: "Collaborative Whiteboard",
-		url: "https://3n77d7-3000.csb.app/",
-		image: "projects/collaborative-whiteboard.jpg",
-		description: "A Collaborative Whiteboard that supports real time collaboration.",
-	},
-	{
-		title: "Multiplayer 3D Builder",
-		url: "https://z37ys9-3000.csb.app/",
-		image: "projects/multiplayer-3d-builder.jpg",
-		description: "A Multiplayer 3D Builder that supports real time users.",
-	},
-	{
-		title: "Live Cursors",
-		url: "https://3vsmww-5173.csb.app/",
-		image: "projects/live-cursor.jpg",
-		description: "A Live Cursor that is made with Vue.js that supports real time users.",
-	},
-	{
-		title: "Collaborative Spreadsheet",
-		url: "https://ykqxd7-3000.csb.app/",
-		image: "projects/spreadsheet.jpg",
-		description: "A Collaborative Spreadsheet that supports real time collaboration.",
-	},
-	{
-		title: "Comments Primitives",
-		url: "https://pwxgj8-3000.csb.app/",
-		image: "projects/commentspri.jpg",
-		description: "A Comments Primitive that supports real time comments.",
-	},
-	{
-		title: "Live Form Selection",
-		url: "https://qlt5wd-3000.csb.app/",
-		image: "projects/live-form-selection.jpg",
-		description: "A Live Form Selection that supports real time users.",
-	},
-	{
-		title: "Video Comment",
-		url: "https://2sypdd-3000.csb.app/",
-		image: "projects/video-comment.jpg",
-		description: "A Video Comment that supports real time users and comments.",
-	},
-	{
-		title: "Connection Status",
-		url: "https://xv8mdp-3000.csb.app/",
-		image: "projects/connection-status.jpg",
-		description: "A Connection Status that supports real time users.",
-	},
-	{
-		title: "Discord Clone",
-		url: "https://pll9ft-3000.csb.app/",
-		image: "projects/discord.jpg",
-		description: "A Discord Clone that has already users profile that you can use it and it also has notification."
-	},
-	{
-		title: "Collaborative Rich Text Editor",
-		url: "https://xd6zzf-3000.csb.app/",
-		image: "projects/rich-text-editor.jpg",
-		description: "A Collaborative Rich Text Editor that supports real time users."
-	},
-	{
-		title: "Text Editor Comments",
-		url: "https://833gmf-3000.csb.app/",
-		image: "projects/text-editor-comments.jpg",
-		description: "A Text Editor Comments that supports real time users.",
-	},
+	//{
+	// 	title: "Collaborative Code Editor",
+	// 	url: "https://spgr5d-3000.csb.app/",
+	// 	image: "projects/collaborative-code-editor.jpg",
+	// 	description: "A Collaborative Code Editor that supports real time collaboration.",
+	// },
+	// {
+	// 	title: "Collaborative To-do List",
+	// 	url: "https://75f3l4-3000.csb.app/",
+	// 	image: "projects/Collaborative-ToDo-List.jpg",
+	// 	description: "A Collaborative To-do List that supports real time collaboration.",
+	// },
+	// {
+	// 	title: "Collaborative Whiteboard",
+	// 	url: "https://3n77d7-3000.csb.app/",
+	// 	image: "projects/collaborative-whiteboard.jpg",
+	// 	description: "A Collaborative Whiteboard that supports real time collaboration.",
+	// },
+	// {
+	// 	title: "Multiplayer 3D Builder",
+	// 	url: "https://z37ys9-3000.csb.app/",
+	// 	image: "projects/multiplayer-3d-builder.jpg",
+	// 	description: "A Multiplayer 3D Builder that supports real time users.",
+	// },
+	// {
+	// 	title: "Live Cursors",
+	// 	url: "https://3vsmww-5173.csb.app/",
+	// 	image: "projects/live-cursor.jpg",
+	// 	description: "A Live Cursor that is made with Vue.js that supports real time users.",
+	// },
+	// {
+	// 	title: "Collaborative Spreadsheet",
+	// 	url: "https://ykqxd7-3000.csb.app/",
+	// 	image: "projects/spreadsheet.jpg",
+	// 	description: "A Collaborative Spreadsheet that supports real time collaboration.",
+	// },
+	// {
+	// 	title: "Comments Primitives",
+	// 	url: "https://pwxgj8-3000.csb.app/",
+	// 	image: "projects/commentspri.jpg",
+	// 	description: "A Comments Primitive that supports real time comments.",
+	// },
+	// {
+	// 	title: "Live Form Selection",
+	// 	url: "https://qlt5wd-3000.csb.app/",
+	// 	image: "projects/live-form-selection.jpg",
+	// 	description: "A Live Form Selection that supports real time users.",
+	// },
+	// {
+	// 	title: "Video Comment",
+	// 	url: "https://2sypdd-3000.csb.app/",
+	// 	image: "projects/video-comment.jpg",
+	// 	description: "A Video Comment that supports real time users and comments.",
+	// },
+	// {
+	// 	title: "Connection Status",
+	// 	url: "https://xv8mdp-3000.csb.app/",
+	// 	image: "projects/connection-status.jpg",
+	// 	description: "A Connection Status that supports real time users.",
+	// },
+	// {
+	// 	title: "Discord Clone",
+	// 	url: "https://pll9ft-3000.csb.app/",
+	// 	image: "projects/discord.jpg",
+	// 	description: "A Discord Clone that has already users profile that you can use it and it also has notification."
+	// },
+	// {
+	// 	title: "Collaborative Rich Text Editor",
+	// 	url: "https://xd6zzf-3000.csb.app/",
+	// 	image: "projects/rich-text-editor.jpg",
+	// 	description: "A Collaborative Rich Text Editor that supports real time users."
+	// },
+	// {
+	// 	title: "Text Editor Comments",
+	// 	url: "https://833gmf-3000.csb.app/",
+	// 	image: "projects/text-editor-comments.jpg",
+	// 	description: "A Text Editor Comments that supports real time users.",
+	// },
 	{
 		title: "Stopwatch",
 		url: "https://arhanansari.github.io/stopwatch/",
