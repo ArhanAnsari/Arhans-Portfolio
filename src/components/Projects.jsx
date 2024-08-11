@@ -337,6 +337,24 @@ export const projects = [
 		image: "projects/chattopdf.jpg",
 		description: "My first AI SaaS app made with using Next.js, Clerk, React Dropzone, Pinecone, Langchain, Gemini, Stripe.",
 	},
+	{
+		title: "SoundStram",
+		url: "https://soundstream.vercel.app/",
+		image: "projects/soundstream.jpg",
+		description: "This is a Spotify Clone made with Vite, Vue 3, Tailwind CSS, and Pinia.",
+	},
+	{
+		title: "hexta/ui",
+		url: "https://ui-hexta.vercel.app/",
+		image: "projects/ui-hexta.jpg",
+		description: "HextaUI is a user interface library that offers contemporary components, making it effortless to integrate into your projects. With the HextaUI CLI, you can quickly install and utilize these components without any hassle.",
+	},
+	{
+		title: "Language Translator",
+		url: "https://language-translator-app-phi.vercel.app/",
+		image: "projects/language-translator.jpg",
+		description: "Language translator is a program that is used to translate text into multiple languages like Nepali, Hindi, Spanish, etc. In my language translator app, users can easily translate text into different languages, copy translated text, and convert text to speech. It is similar to Google Translate. Made with HTML, CSS, JS and MyMemory API",
+	},
 ];
 
 const Project = (props) => {
