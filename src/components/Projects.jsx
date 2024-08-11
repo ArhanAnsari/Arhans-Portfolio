@@ -116,8 +116,8 @@ export const projects = [
 		description: "A Frontend WhatsApp Clone made with React.",
 	},
 	{
-		title: "Instagram Clone",
-		url: "https://instagram-clone-fifteen.vercel.app/",
+		title: "InstaSnap",
+		url: "https://arhans-instasnap.vercel.app/",
 		image: "projects/Instagram-Clone.jpg",
 		description: "A Full Stack Instagram Clone.",
 	},
