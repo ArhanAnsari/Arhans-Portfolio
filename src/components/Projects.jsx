@@ -49,12 +49,12 @@ export const projects = [
 		image: "projects/NoInternetSpidermanGame.jpg",
 		description: "A Spiderman Game",
 	},
-	{
-		title: "AI ChatBot",
-		url: "https://nextjs-chat-blue-beta-36.vercel.app/",
-		image: "projects/AI-ChatBot.jpg",
-		description: "An open-source AI chatbot app template built with Next.js, the Vercel AI SDK, OpenAI, and Vercel KV.",
-	},
+	//{
+	//	title: "AI ChatBot",
+	//	url: "https://nextjs-chat-blue-beta-36.vercel.app/",
+	//	image: "projects/AI-ChatBot.jpg",
+	//	description: "An open-source AI chatbot app template built with Next.js, the Vercel AI SDK, OpenAI, and Vercel KV.",
+	//},
 	{
 		title: "E-commerce Website",
 		url: "https://e-commerce-emporium-xrw1em4.gamma.site/",
@@ -354,6 +354,12 @@ export const projects = [
 		url: "https://language-translator-app-phi.vercel.app/",
 		image: "projects/language-translator.jpg",
 		description: "Language translator is a program that is used to translate text into multiple languages like Nepali, Hindi, Spanish, etc. In my language translator app, users can easily translate text into different languages, copy translated text, and convert text to speech. It is similar to Google Translate. Made with HTML, CSS, JS and MyMemory API",
+	},
+	{
+		title: "Google Translate",
+		url: "https://arhans-google-translate.vercel.app/",
+		image: "projects/Google-Translate.jpg",
+		description: "A simple Google Translate Clone made with HTML, CSS, JS and Google Translate API. It has a Dark mode feature too.",
 	},
 ];
 
