@@ -361,6 +361,18 @@ export const projects = [
 		image: "projects/Google-Translate.jpg",
 		description: "A simple Google Translate Clone made with HTML, CSS, JS and Google Translate API. It has a Dark mode feature too.",
 	},
+	{
+		title: "Gemini",
+		url: "https://gemini-ai-chatbot-pchm.vercel.app/",
+		image: "projects/Gemini.jpg",
+		description: "A Gemini Chatbot built with Next.js, Vercel AI SDK and Google Gemini.",
+	},
+	{
+		title: "Carrefour",
+		url: "https://arhans-ecommerce.vercel.app/",
+		image: "projects/CareeFour.jpg",
+		description: "This is a full stack Ecommerce website.",
+	},
 ];
 
 const Project = (props) => {
