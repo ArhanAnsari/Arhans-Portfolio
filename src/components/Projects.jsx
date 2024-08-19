@@ -334,7 +334,7 @@ export const projects = [
 	{
 		title: "Chat to PDF",
 		url: "https://arhans-chat-to-pdf.vercel.app/",
-		image: "projects/chattopdf.jpg",
+		image: "projects/chattopdf.png",
 		description: "My first AI SaaS app made with using Next.js, Clerk, React Dropzone, Pinecone, Langchain, Gemini, Stripe.",
 	},
 	{
