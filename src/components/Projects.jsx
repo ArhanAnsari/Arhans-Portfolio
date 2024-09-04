@@ -373,6 +373,18 @@ export const projects = [
 		image: "projects/CareeFour.jpg",
 		description: "This is a full stack Ecommerce website.",
 	},
+	{
+		title: "Windows 11",
+		url: "https://arhans-windows11.vercel.app/",
+		image: "projects/Windows11.jpg",
+		description: "A Windows 11 Clone app built with React, Tailwind CSS, Framer Motion, React Draggable, React Router DOM.",
+	},
+	{
+		title: "RentUP",
+		url: "https://arhans-rentup.vercel.app/",
+		image: "projects/RentUP.png",
+		description: "A Real Estate Website built with React. ",
+	},
 ];
 
 const Project = (props) => {
