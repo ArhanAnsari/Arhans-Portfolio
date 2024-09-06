@@ -385,6 +385,12 @@ export const projects = [
 		image: "projects/RentUP.png",
 		description: "A Real Estate Website built with React. ",
 	},
+	{
+		title: "Crousal Maker",
+		url: "https://crousalmaker.vercel.app/",
+		image: "projects/Crousal Maker.jpeg",
+		description: "Crousal maker is a simple crousal editing platform with in-built crousals templates only you can edit heading , descriptions and Images and download it in both format PDF and JPEG. Built with Nextjs, Typescript, Shadcn UI, js-pdf, Html2canvas and tinyColor2.",
+	},
 ];
 
 const Project = (props) => {
