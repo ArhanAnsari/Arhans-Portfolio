@@ -391,6 +391,12 @@ export const projects = [
 		image: "projects/Crousal Maker.jpeg",
 		description: "Crousal maker is a simple crousal editing platform with in-built crousals templates only you can edit heading , descriptions and Images and download it in both format PDF and JPEG. Built with Nextjs, Typescript, Shadcn UI, js-pdf, Html2canvas and tinyColor2.",
 	},
+	{
+		title: "ArhanBlog",
+		url: "https://arhanblog.vercel.app/",
+		image: "projects/ArhanBlog.jpg",
+		description: "A Markdown blog made with using Next.js, TailwindCSS, Shadcn, Pieces, Remark and Rehype.",
+	},
 ];
 
 const Project = (props) => {
