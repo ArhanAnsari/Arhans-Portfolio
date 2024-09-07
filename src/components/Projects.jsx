@@ -397,6 +397,12 @@ export const projects = [
 		image: "projects/ArhanBlog.jpg",
 		description: "A Markdown blog made with using Next.js, TailwindCSS, Shadcn, Pieces, Remark and Rehype.",
 	},
+	{
+		title: "Mixcnui",
+		url: "https://mixcnui.vercel.app/",
+		image: "projects/Mixcnui.jpg",
+		description: "Mixcnui is 20+ free and open-source animated components built with React, Typescript, Tailwind CSS, and Framer Motion. Built with React, Next.js, TailwindCSS, Framer Motion. ",
+	},
 ];
 
 const Project = (props) => {
