@@ -388,7 +388,7 @@ export const projects = [
 	{
 		title: "Crousal Maker",
 		url: "https://crousalmaker.vercel.app/",
-		image: "projects/Crousal Maker.jpeg",
+		image: "projects/Crousal Maker.jpg",
 		description: "Crousal maker is a simple crousal editing platform with in-built crousals templates only you can edit heading , descriptions and Images and download it in both format PDF and JPEG. Built with Nextjs, Typescript, Shadcn UI, js-pdf, Html2canvas and tinyColor2.",
 	},
 	{
