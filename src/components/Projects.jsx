@@ -403,6 +403,12 @@ export const projects = [
 		image: "projects/Mixcnui.jpg",
 		description: "My 3rd SaaS App. Mixcnui is 20+ free and open-source animated components built with React, Typescript, Tailwind CSS, and Framer Motion. Built with React, Next.js, TailwindCSS, Framer Motion. ",
 	},
+	{
+		title: "Metaverse",
+		url: "https://arhans-metaverse.vercel.app/",
+		image: "projects/Metaverse.jpg",
+		description: "A Metaverse Website made with Next.js, TailwindCSS & Framer Motion.",
+	},
 ];
 
 const Project = (props) => {
