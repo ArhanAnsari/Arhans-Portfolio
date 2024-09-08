@@ -335,7 +335,7 @@ export const projects = [
 		title: "Chat to PDF",
 		url: "https://arhans-chat-to-pdf.vercel.app/",
 		image: "projects/chattopdf.jpg",
-		description: "My first AI SaaS app made with using Next.js, Clerk, React Dropzone, Shadcn UI, Pinecone, Langchain, Gemini, OpenAI, Stripe.",
+		description: "My first AI SaaS app made with using Next.js, Clerk, React Dropzone, Shadcn UI, Pinecone, Langchain, Gemini, OpenAI, Stripe. Chat to PDF let's you PDF and then you can chat with AI if you any problems with PDF.",
 	},
 	{
 		title: "SoundStram",
@@ -389,7 +389,7 @@ export const projects = [
 		title: "Crousal Maker",
 		url: "https://crousalmaker.vercel.app/",
 		image: "projects/Crousal Maker.jpg",
-		description: "Crousal maker is a simple crousal editing platform with in-built crousals templates only you can edit heading , descriptions and Images and download it in both format PDF and JPEG. Built with Nextjs, Typescript, Shadcn UI, js-pdf, Html2canvas and tinyColor2.",
+		description: "My 2nd SaaS App. Crousal maker is a simple crousal editing platform with in-built crousals templates only you can edit heading , descriptions and Images and download it in both format PDF and JPEG. Built with Nextjs, Typescript, Shadcn UI, js-pdf, Html2canvas and tinyColor2.",
 	},
 	{
 		title: "ArhanBlog",
@@ -401,7 +401,7 @@ export const projects = [
 		title: "Mixcnui",
 		url: "https://mixcnui.vercel.app/",
 		image: "projects/Mixcnui.jpg",
-		description: "Mixcnui is 20+ free and open-source animated components built with React, Typescript, Tailwind CSS, and Framer Motion. Built with React, Next.js, TailwindCSS, Framer Motion. ",
+		description: "My 3rd SaaS App. Mixcnui is 20+ free and open-source animated components built with React, Typescript, Tailwind CSS, and Framer Motion. Built with React, Next.js, TailwindCSS, Framer Motion. ",
 	},
 ];
 
