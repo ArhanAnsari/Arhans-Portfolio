@@ -409,6 +409,18 @@ export const projects = [
 		image: "projects/Metaverse.jpg",
 		description: "A Metaverse Website made with Next.js, TailwindCSS & Framer Motion.",
 	},
+	{
+		title: "Evogym",
+		url: "https://evogym-brown-mu.vercel.app/",
+		image: "projects/Evogym.png",
+		description: "A Gym Website made with React.",
+	},
+	{
+		title: "InspireGem",
+		url: "https://inspiregem.vercel.app/",
+		image: "projects/InspireGem.png",
+		description: "InspireGem is a AI Powered Website made with Next.js, TailwindCSS, Google Gemini, Stripe amnd Google Firebase",
+	},
 ];
 
 const Project = (props) => {
