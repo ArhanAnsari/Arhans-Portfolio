@@ -338,7 +338,7 @@ export const projects = [
 		description: "My first AI SaaS app made with using Next.js, Clerk, React Dropzone, Shadcn UI, Pinecone, Langchain, Gemini, OpenAI, Stripe. Chat to PDF let's you PDF and then you can chat with AI if you any problems with PDF.",
 	},
 	{
-		title: "SoundStram",
+		title: "SoundStream",
 		url: "https://soundstream.vercel.app/",
 		image: "projects/soundstream.jpg",
 		description: "This is a Spotify Clone made with Vite, Vue 3, Tailwind CSS, and Pinia.",
