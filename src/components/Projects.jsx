@@ -421,6 +421,12 @@ export const projects = [
 		image: "projects/InspireGem.png",
 		description: "InspireGem is a AI Powered Website made with Next.js, TailwindCSS, Google Gemini, Stripe amnd Google Firebase",
 	},
+	{
+		title: "YC DIRECTORY",
+		url: "https://yc-directory-red.vercel.app/",
+		image: "projects/YC-DIRECTORY.jpg",
+		description: "A Next.js 15 platform where entrepreneurs can submit their startup ideas for virtual pitch competitions, browse other pitches, and gain exposure through a clean minimalistic design for a smooth user experience. It is made with React 19, Next.js 15, Sanity, TailwindCSS, ShadCN, TypeScript",
+	},
 ];
 
 const Project = (props) => {
