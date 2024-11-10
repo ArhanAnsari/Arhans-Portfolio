@@ -9,7 +9,7 @@ import { useEffect, useRef } from "react";
 export const projects = [
 	{
 		title: "Arhan Sales",
-		url: "https://arhansales.vercel.app/",
+		url: "https://arhan-sales.infinityfreeapp.com/",
 		image: "projects/arhansales.png",
 		description: "Website of my client.",
 	},
