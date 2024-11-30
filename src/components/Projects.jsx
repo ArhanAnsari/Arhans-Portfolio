@@ -427,6 +427,18 @@ export const projects = [
 		image: "projects/YC-DIRECTORY.jpg",
 		description: "A Next.js 15 platform where entrepreneurs can submit their startup ideas for virtual pitch competitions, browse other pitches, and gain exposure through a clean minimalistic design for a smooth user experience. It is made with React 19, Next.js 15, Sanity, TailwindCSS, ShadCN, TypeScript",
 	},
+	{
+		title: "StoreIt",
+		url: "https://storeit-five.vercel.app/",
+		image: "projects/StoreIt.png",
+		description: "A storage management and file sharing platform that lets users effortlessly upload, organize, and share files. Built with the latest Next.js 15 and the Appwrite Node SDK, utilizing advanced features for seamless file management. It is made with React 19, Next.js 15, Appwrite, TailwindCSS, ShadCN, TypeScript.",
+	},
+	{
+		title: "An Awwwards Winning Website",
+		url: "https://award-winning-website-iota.vercel.app/",
+		image: "projects/Award-Winning-Website.png",
+		description: "Build a visually captivating website inspired by Zentry, featuring scroll-triggered animations, geometric transitions, and engaging video storytelling. Learn how to deliver a luxurious, modern feel, focusing on engaging UI/UX and smooth responsiveness, capturing the essence of what makes an Awwwards winner. It is made with GSAP, React.js, Tailwind CSS",
+	},
 ];
 
 const Project = (props) => {
