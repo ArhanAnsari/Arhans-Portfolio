@@ -439,6 +439,12 @@ export const projects = [
 		image: "projects/Award-Winning-Website.png",
 		description: "Build a visually captivating website inspired by Zentry, featuring scroll-triggered animations, geometric transitions, and engaging video storytelling. Learn how to deliver a luxurious, modern feel, focusing on engaging UI/UX and smooth responsiveness, capturing the essence of what makes an Awwwards winner. It is made with GSAP, React.js, Tailwind CSS",
 	},
+	{
+		title: "CodeFount",
+		url: "https://codefount.vercel.app/",
+		image: "projects/CodeFount.png",
+		description: "A sleek and modern online IDE built with Next.js 15, Convex, Sentry, Lemon Squeezy, Clerk and EmailJS, offering multi-language support, customization, and community-driven collaboration. Perfect for developers seeking a powerful and seamless coding environment. ",
+	},
 ];
 
 const Project = (props) => {
