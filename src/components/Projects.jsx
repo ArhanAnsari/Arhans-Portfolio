@@ -416,6 +416,12 @@ export const projects = [
 		description: "A Gym Website made with React.",
 	},
 	{
+		title: "Nike Landing Page",
+		url: "https://nike-landing-page-seven-tan.vercel.app/",
+		image: "projects/Nike-Landing-Page.png",
+		description: "A Nike Landing Page made with TailwindCSS.",
+	},
+	{
 		title: "InspireGem",
 		url: "https://inspiregem.vercel.app/",
 		image: "projects/InspireGem.png",
