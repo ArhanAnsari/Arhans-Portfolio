@@ -281,8 +281,7 @@ const ContactSection = () => {
     message: "",
   });
   const [recaptchaToken, setRecaptchaToken] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const isFormValid =
     formValues.user_name.trim() &&
     formValues.user_email.trim() &&
@@ -306,16 +305,12 @@ const ContactSection = () => {
       // Get the reCAPTCHA token
       const recaptchaToken = await executeRecaptcha();
 
-      // Validate reCAPTCHA token on the server (optional but recommended)
-      const response = await axios.post("/api/verify-recaptcha", {
-        token: recaptchaToken,
-      });
-
-      if (!response.data.success) {
+      if (!recaptchaToken) {
         alert("reCAPTCHA verification failed.");
         setIsSubmitting(false);
         return;
       }
+
       // Proceed with form submission
       emailjs
         .sendForm("service_oxjis4c", "template_ho0bwum", e.target, {
@@ -342,8 +337,9 @@ const ContactSection = () => {
   const executeRecaptcha = async () => {
     return new Promise((resolve) => {
       if (!window.grecaptcha) {
-        alert("reCAPTCHA is not loaded.");
+        console.error("reCAPTCHA script is not loaded.");
         resolve("");
+        return;
       }
 
       window.grecaptcha.ready(() => {
@@ -354,6 +350,10 @@ const ContactSection = () => {
           .then((token) => {
             setRecaptchaToken(token);
             resolve(token);
+          })
+          .catch((error) => {
+            console.error("reCAPTCHA execution failed:", error);
+            resolve("");
           });
       });
     });
