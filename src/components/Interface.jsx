@@ -344,7 +344,7 @@ const ContactSection = () => {
 
       window.grecaptcha.ready(() => {
         window.grecaptcha
-          .execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, {
+          .execute( import.meta.env.VITE_RECAPTCHA_SITE_KEY, {
             action: "submit",
           })
           .then((token) => {
