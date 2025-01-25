@@ -1,5 +1,5 @@
-import React, { useRef } from 'react';
-import emailjs from '@emailjs/browser';
+import React, { useRef, useState } from "react";
+import emailjs from "@emailjs/browser";
 import { ValidationError, useForm } from "@formspree/react";
 import { motion } from "framer-motion";
 import { useAtom } from "jotai";
@@ -102,7 +102,7 @@ const skills = [
     level: 80,
   },
   {
-    title: "Full Stack Web Development", 
+    title: "Full Stack Web Development",
     level: 90,
   },
   {
@@ -274,50 +274,78 @@ const ProjectsSection = () => {
 
 const ContactSection = () => {
   const [state, handleSubmit] = useForm("mayzgjbd");
+  const [formValues, setFormValues] = useState({
+    user_name: "",
+    user_email: "",
+    message: "",
+  });
+
+  const isFormValid =
+    formValues.user_name.trim() &&
+    formValues.user_email.trim() &&
+    formValues.message.trim();
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormValues({ ...formValues, [name]: value });
+  };
+
   const form = useRef();
+
   const sendEmail = (e) => {
     e.preventDefault();
 
     emailjs
-      .sendForm('service_oxjis4c', 'template_ho0bwum', form.current, {
-        publicKey: '7i7_YEAdQWQzN_UBZ',
+      .sendForm("service_oxjis4c", "template_ho0bwum", form.current, {
+        publicKey: "7i7_YEAdQWQzN_UBZ",
       })
       .then(
         () => {
-          console.log('SUCCESS!');
+          console.log("SUCCESS!");
         },
         (error) => {
-          console.log('FAILED...', error.text);
-        },
+          console.log("FAILED...", error.text);
+        }
       );
   };
+
   return (
     <Section>
       <h2 className="text-3xl md:text-5xl font-bold">Contact me</h2>
       <div className="mt-8 p-8 rounded-md bg-white bg-opacity-50 w-96 max-w-full">
         {state.succeeded ? (
-          <p className="text-gray-900 text-center">Thanks for your message !</p>
+          <p className="text-gray-900 text-center">Thanks for your message!</p>
         ) : (
-          <form ref = {form} onSubmit={sendEmail}>
-            <label for="name" className="font-medium text-gray-900 block mb-1">
-              Name
+          <form ref={form} onSubmit={sendEmail}>
+            {/* Name Field */}
+            <label
+              htmlFor="name"
+              className="font-medium text-gray-900 block mb-1"
+            >
+              Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               name="user_name"
               id="name"
+              value={formValues.user_name}
+              onChange={handleInputChange}
               className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
             />
+
+            {/* Email Field */}
             <label
-              for="email"
+              htmlFor="email"
               className="font-medium text-gray-900 block mb-1 mt-8"
             >
-              Email
+              Email <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
               name="user_email"
               id="email"
+              value={formValues.user_email}
+              onChange={handleInputChange}
               className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
             />
             <ValidationError
@@ -326,24 +354,35 @@ const ContactSection = () => {
               field="email"
               errors={state.errors}
             />
+
+            {/* Message Field */}
             <label
-              for="email"
+              htmlFor="message"
               className="font-medium text-gray-900 block mb-1 mt-8"
             >
-              Message
+              Message <span className="text-red-500">*</span>
             </label>
             <textarea
               name="message"
               id="message"
+              value={formValues.message}
+              onChange={handleInputChange}
               className="h-32 block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
             />
             <ValidationError
               className="mt-1 text-red-500"
               errors={state.errors}
             />
+
+            {/* Submit Button */}
             <button
-              disabled={state.submitting}
-              className="bg-indigo-600 text-white py-4 px-8 rounded-lg font-bold text-lg mt-16 "
+              type="submit"
+              disabled={!isFormValid || state.submitting}
+              className={`py-4 px-8 rounded-lg font-bold text-lg mt-16 ${
+                isFormValid
+                  ? "bg-indigo-600 text-white"
+                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
+              }`}
             >
               Submit
             </button>
