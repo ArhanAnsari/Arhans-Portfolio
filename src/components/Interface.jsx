@@ -4,6 +4,7 @@ import { ValidationError, useForm } from "@formspree/react";
 import { motion } from "framer-motion";
 import { useAtom } from "jotai";
 import { currentProjectAtom, projects } from "./Projects";
+import axios from "axios";
 
 const Section = (props) => {
   const { children, mobileTop } = props;
@@ -279,6 +280,8 @@ const ContactSection = () => {
     user_email: "",
     message: "",
   });
+  const [recaptchaToken, setRecaptchaToken] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const isFormValid =
     formValues.user_name.trim() &&
@@ -290,23 +293,70 @@ const ContactSection = () => {
     setFormValues({ ...formValues, [name]: value });
   };
 
-  const form = useRef();
-
-  const sendEmail = (e) => {
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
 
-    emailjs
-      .sendForm("service_oxjis4c", "template_ho0bwum", form.current, {
-        publicKey: "7i7_YEAdQWQzN_UBZ",
-      })
-      .then(
-        () => {
-          console.log("SUCCESS!");
-        },
-        (error) => {
-          console.log("FAILED...", error.text);
-        }
-      );
+    if (!isFormValid) {
+      alert("Please fill all fields.");
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      // Get the reCAPTCHA token
+      const recaptchaToken = await executeRecaptcha();
+
+      // Validate reCAPTCHA token on the server (optional but recommended)
+      const response = await axios.post("/api/verify-recaptcha", {
+        token: recaptchaToken,
+      });
+
+      if (!response.data.success) {
+        alert("reCAPTCHA verification failed.");
+        setIsSubmitting(false);
+        return;
+      }
+      // Proceed with form submission
+      emailjs
+        .sendForm("service_oxjis4c", "template_ho0bwum", e.target, {
+          publicKey: "7i7_YEAdQWQzN_UBZ",
+        })
+        .then(
+          () => {
+            alert("Form submitted successfully!");
+            setFormValues({ user_name: "", user_email: "", message: "" });
+          },
+          (error) => {
+            console.error("Failed to send email:", error.text);
+            alert("Form submission failed. Please try again.");
+          }
+        );
+    } catch (error) {
+      console.error("Error:", error);
+      alert("An error occurred. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const executeRecaptcha = async () => {
+    return new Promise((resolve) => {
+      if (!window.grecaptcha) {
+        alert("reCAPTCHA is not loaded.");
+        resolve("");
+      }
+
+      window.grecaptcha.ready(() => {
+        window.grecaptcha
+          .execute(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY, {
+            action: "submit",
+          })
+          .then((token) => {
+            setRecaptchaToken(token);
+            resolve(token);
+          });
+      });
+    });
   };
 
   return (
@@ -316,7 +366,7 @@ const ContactSection = () => {
         {state.succeeded ? (
           <p className="text-gray-900 text-center">Thanks for your message!</p>
         ) : (
-          <form ref={form} onSubmit={sendEmail}>
+          <form onSubmit={handleFormSubmit}>
             {/* Name Field */}
             <label
               htmlFor="name"
@@ -377,14 +427,14 @@ const ContactSection = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={!isFormValid || state.submitting}
+              disabled={!isFormValid || isSubmitting}
               className={`py-4 px-8 rounded-lg font-bold text-lg mt-16 ${
                 isFormValid
                   ? "bg-indigo-600 text-white"
                   : "bg-gray-400 text-gray-700 cursor-not-allowed"
               }`}
             >
-              Submit
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
           </form>
         )}
