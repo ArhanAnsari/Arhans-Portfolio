@@ -1,5 +1,5 @@
 {
-  "name": "r3f-vite-starter",
+  "name": "Arhan-Ansari-Portfolio",
   "private": true,
   "version": "1.0.0",
   "type": "module",
@@ -22,6 +22,7 @@
     "leva": "^0.9.34",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^5.4.0",
     "three": "0.146.0"
   },
   "devDependencies": {
