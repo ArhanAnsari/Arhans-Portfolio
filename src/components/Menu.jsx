@@ -1,3 +1,5 @@
+import { FaGithub, FaYoutube, FaDiscord, FaGlobe } from "react-icons/fa";
+
 export const Menu = (props) => {
   const { onSectionChange, menuOpened, setMenuOpened } = props;
 
@@ -33,6 +35,28 @@ export const Menu = (props) => {
           <MenuButton label="Projects" onClick={() => onSectionChange(2)} />
           <MenuButton label="Contact" onClick={() => onSectionChange(3)} />
         </div>
+        <div className="flex items-center justify-center gap-4 p-4 border-t">
+          <SocialLink
+            href="https://github.com/ArhanAnsari"
+            icon={<FaGithub size={24} />}
+            label="GitHub"
+          />
+          <SocialLink
+            href="https://youtube.com/@codewitharhanofficial"
+            icon={<FaYoutube size={24} />}
+            label="YouTube"
+          />
+          <SocialLink
+            href="https://discord.com/invite/bwjCXVwS8k"
+            icon={<FaDiscord size={24} />}
+            label="Discord"
+          />
+          <SocialLink
+            href="https://codewitharhan.infinityfreeapp.com"
+            icon={<FaGlobe size={24} />}
+            label="Website"
+          />
+        </div>
       </div>
     </>
   );
@@ -47,5 +71,19 @@ const MenuButton = (props) => {
     >
       {label}
     </button>
+  );
+};
+
+const SocialLink = ({ href, icon, label }) => {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="flex items-center justify-center text-gray-600 hover:text-indigo-600 transition-colors"
+      aria-label={label}
+    >
+      {icon}
+    </a>
   );
 };
