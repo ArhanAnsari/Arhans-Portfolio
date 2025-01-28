@@ -446,10 +446,40 @@ export const projects = [
 		description: "Build a visually captivating website inspired by Zentry, featuring scroll-triggered animations, geometric transitions, and engaging video storytelling. Learn how to deliver a luxurious, modern feel, focusing on engaging UI/UX and smooth responsiveness, capturing the essence of what makes an Awwwards winner. It is made with GSAP, React.js, Tailwind CSS",
 	},
 	{
+		title: "Restyled",
+		url: "https://restyled-ecru.vercel.app/",
+		image: "projects/restyled.png",
+		description: "Restyled is a Image Editor & Video Editor also having AI support and is made with Next.js, TailwindCSS and Cloudinary.",
+	},
+	{
+		title: "Immersilearn",
+		url: "https://immersilearn.vercel.app/",
+		image: "projects/immersilearn.jpg",
+		description: "Immersilearn is a platform for learning and it has a clean and minimalistic design for a smooth user experience. It is made with React 19, Next.js 15, TailwindCSS, TypeScript and Appwrite.",
+	},
+	{
 		title: "CodeFount",
 		url: "https://codefount.vercel.app/",
 		image: "projects/CodeFount.png",
 		description: "A sleek and modern online IDE built with Next.js 15, Convex, Sentry, Lemon Squeezy, Clerk and EmailJS, offering multi-language support, customization, and community-driven collaboration. Perfect for developers seeking a powerful and seamless coding environment. ",
+	},
+	{
+		title: "Happy New Year 2025",
+		url: "https://happynewyear2025-olive.vercel.app/",
+		image: "projects/happynewyear2025.png",
+		description: "A Happy New Year 2025 Website made with HTML, CSS, JS.",
+	},
+	{
+		title: "Happy Republic Day 2025",
+		url: "https://happy-republic-day-one.vercel.app/",
+		image: "projects/happyrepublicday2025.png",
+		description: "A Happy Republic Day 2025 Website made with HTML, CSS, JS.",
+	},
+	{
+		title: "Moodflix",
+		url : "https://moodflix-theta.vercel.app/",
+		image : "projects/moodflix.png",
+		description : "Moodflix is a platform that allows users to discover movies based on their mood. It is made with React 19, Tailwind CSS, and the TMDb API.",
 	},
 ];
 
