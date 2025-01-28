@@ -454,7 +454,7 @@ export const projects = [
 	{
 		title: "Immersilearn",
 		url: "https://immersilearn.vercel.app/",
-		image: "projects/immersilearn.jpg",
+		image: "projects/immersilearn.png",
 		description: "Immersilearn is a platform for learning and it has a clean and minimalistic design for a smooth user experience. It is made with React 19, Next.js 15, TailwindCSS, TypeScript and Appwrite.",
 	},
 	{
