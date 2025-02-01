@@ -1,4 +1,4 @@
-import { FaGithub, FaYoutube, FaDiscord, FaGlobe } from "react-icons/fa";
+import { FaGithub, FaYoutube, FaDiscord, FaGlobe, FaXTwitter } from "react-icons/fa6";
 
 export const Menu = (props) => {
   const { onSectionChange, menuOpened, setMenuOpened } = props;
@@ -42,12 +42,12 @@ export const Menu = (props) => {
             label="GitHub"
           />
           <SocialLink
-            href="https://youtube.com/@codewitharhanofficial"
+            href="https://youtube.com/@CodeWithArhan"
             icon={<FaYoutube size={24} />}
             label="YouTube"
           />
           <SocialLink
-            href="https://discord.com/invite/bwjCXVwS8k"
+            href="https://discord.com/invite/YourDiscordInviteLink"
             icon={<FaDiscord size={24} />}
             label="Discord"
           />
@@ -55,6 +55,11 @@ export const Menu = (props) => {
             href="https://codewitharhan.infinityfreeapp.com"
             icon={<FaGlobe size={24} />}
             label="Website"
+          />
+          <SocialLink
+            href="https://x.com/codewitharhan"
+            icon={<FaXTwitter size={24} />}
+            label="X (Twitter)"
           />
         </div>
       </div>
