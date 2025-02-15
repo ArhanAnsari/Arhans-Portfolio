@@ -42,12 +42,12 @@ export const Menu = (props) => {
             label="GitHub"
           />
           <SocialLink
-            href="https://youtube.com/@CodeWithArhan"
+            href="https://youtube.com/@codewitharhanofficial"
             icon={<FaYoutube size={24} />}
             label="YouTube"
           />
           <SocialLink
-            href="https://discord.com/invite/YourDiscordInviteLink"
+            href="https://discord.com/invite/bwjCXVwS8k"
             icon={<FaDiscord size={24} />}
             label="Discord"
           />
