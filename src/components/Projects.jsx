@@ -484,13 +484,13 @@ export const projects = [
 	{
 		title: "Synthara",
 		url: "https://synthara.is-a.dev/",
-		image: "projects/synthara.png",
+		image: "projects/Synthara.png",
 		description: "Synthara is an advanced AI-powered application designed to process and generate insights from various types of files. Initially focused on image processing. Made with Next.js, Tailwind CSS, Gemini, Shadcn/ui and Together AI.",
 	},
 	{
 		title: "Clipgen AI",
 		url: "https://clipgen-ai.vercel.app/",
-		image: "projects/clipgen AI.png",
+		image: "projects/Clipgen AI.png",
 		description: "This is an AI-powered content analysis platform that helps content creators get insights from their YouTube videos. The platform uses advanced AI to analyze video content, generate transcriptions, create thumbnails, and provide content recommendations. Made with Next.js 15, React 19, TailwindCSS, AI SDK, Gemini, Together AI, Clerk, Convex, Radix UI components and youtubei.js for video data extraction.",
 	},
 ];
