@@ -70,9 +70,7 @@ const AboutSection = (props) => {
           delay: 1.5,
         }}
       >
-        I make websites to help developers
-        <br />
-        learn how to build 3D apps
+        I'm a versatile Full Stack Developer mastering all aspects of modern web development
       </motion.p>
       <motion.button
         onClick={() => setSection(3)}
@@ -134,11 +132,11 @@ const languages = [
   },
   {
     title: "🇺🇸 English",
-    level: 90,
+    level: 95,
   },
   {
     title: "🇮🇳 Marathi",
-    level: 75,
+    level: 80,
   },
 ];
 

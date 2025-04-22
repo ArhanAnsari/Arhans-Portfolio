@@ -493,6 +493,12 @@ export const projects = [
 		image: "projects/Clipgen AI.png",
 		description: "This is an AI-powered content analysis platform that helps content creators get insights from their YouTube videos. The platform uses advanced AI to analyze video content, generate transcriptions, create thumbnails, and provide content recommendations. Made with Next.js 15, React 19, TailwindCSS, AI SDK, Gemini, Together AI, Clerk, Convex, Radix UI components and youtubei.js for video data extraction.",
 	},
+	{
+		title: "Clystra Networks Pvt. Ltd.",
+		url: "https://www.clystranetworks.com/",
+		image: "projects/Clystra-Networks.png",
+		description: "This is a website of my client. This is a Network Infrastructure Provider Company made with Next.js 15, TailwindCSS, ShadCN, TypeScript, Framer Motion, React, Sentry and Resend.",
+	},
 ];
 
 const Project = (props) => {
