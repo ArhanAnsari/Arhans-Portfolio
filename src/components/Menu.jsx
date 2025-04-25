@@ -33,7 +33,9 @@ export const Menu = (props) => {
           <MenuButton label="About" onClick={() => onSectionChange(0)} />
           <MenuButton label="Skills" onClick={() => onSectionChange(1)} />
           <MenuButton label="Projects" onClick={() => onSectionChange(2)} />
-          <MenuButton label="Contact" onClick={() => onSectionChange(3)} />
+          <MenuButton label="Current Work" onClick={() => onSectionChange(3)} />
+          <MenuButton label="Testimonials" onClick={() => onSectionChange(4)} />
+          <MenuButton label="Contact" onClick={() => onSectionChange(5)} />
         </div>
         <div className="flex items-center justify-center gap-4 p-4 border-t">
           <SocialLink
