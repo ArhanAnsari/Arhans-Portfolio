@@ -12,7 +12,7 @@ const Section = (props) => {
   return (
     <motion.section
       className={`
-  h-screen w-screen p-8 max-w-screen-2xl mx-auto
+  relative min-h-screen w-full p-8 max-w-screen-2xl mx-auto
   flex flex-col items-start
   ${mobileTop ? "justify-start md:justify-center" : "justify-center"}
   `}
@@ -34,13 +34,32 @@ const Section = (props) => {
   );
 };
 
+const testimonials = [
+  {
+    name: "Clystra Networks Pvt. Ltd.",
+    role: "Client",
+    content: "Working with Arhan was an exceptional experience. His expertise in full-stack development and attention to detail helped us create a robust and scalable solution. His ability to understand our requirements and translate them into practical solutions was impressive.",
+    image: "/testimonials/clystra-logo.jpg"
+  },
+];
+
+const currentWork = {
+  title: "AI-Powered Redit Clone (Reddish)",
+  description: "Currently developing a cutting-edge Redit Clone (Reddish) that leverages artificial intelligence for moderating and classifying content. The project utilizes React, Node.js, and TensorFlow.",
+  progress: 25,
+  technologies: ["Next.js", "TypeScript", "Sanity CMS", "Clerk", "Tailwind CSS", "Radix UI", "Lucide Icons", "Gemini API", "Vercel"],
+  startDate: "April 2025"
+};
+
 export const Interface = (props) => {
   const { setSection } = props;
   return (
-    <div className="flex flex-col items-center w-screen">
+    <div className="relative flex flex-col w-full overflow-y-auto overflow-x-hidden">
       <AboutSection setSection={setSection} />
       <SkillsSection />
       <ProjectsSection />
+      <CurrentWorkSection />
+      <TestimonialsSection />
       <ContactSection />
     </div>
   );
@@ -70,7 +89,9 @@ const AboutSection = (props) => {
           delay: 1.5,
         }}
       >
-        I'm a versatile Full Stack Developer mastering all aspects of modern web development
+        I'm a versatile Full Stack Developer mastering all aspects of 
+        <br />
+        modern web development
       </motion.p>
       <motion.button
         onClick={() => setSection(3)}
@@ -98,31 +119,31 @@ const AboutSection = (props) => {
 const skills = [
   {
     title: "Threejs / React Three Fiber",
-    level: 80,
+    level: 100,
   },
   {
     title: "Full Stack Web Development",
-    level: 90,
+    level: 100,
   },
   {
     title: "React / React Native",
-    level: 90,
+    level: 100,
   },
   {
     title: "Nodejs",
-    level: 90,
+    level: 100,
   },
   {
     title: "Programming",
-    level: 90,
+    level: 100,
   },
   {
     title: "Typescript",
-    level: 60,
+    level: 100,
   },
   {
     title: "3D Modeling",
-    level: 40,
+    level: 95,
   },
 ];
 const languages = [
@@ -132,11 +153,11 @@ const languages = [
   },
   {
     title: "🇺🇸 English",
-    level: 95,
+    level: 100,
   },
   {
     title: "🇮🇳 Marathi",
-    level: 80,
+    level: 85,
   },
 ];
 
@@ -252,7 +273,7 @@ const ProjectsSection = () => {
 
   return (
     <Section>
-      <div className="flex w-full h-full gap-8 items-center justify-center">
+      <div className="flex w-full h-full gap-10 items-center justify-center">
         <button
           className="hover:text-indigo-600 transition-colors"
           onClick={previousProject}
@@ -267,6 +288,113 @@ const ProjectsSection = () => {
           Next →
         </button>
       </div>
+    </Section>
+  );
+};
+
+const TestimonialsSection = () => {
+  return (
+    <Section>
+      <motion.div className="w-full" whileInView={"visible"}>
+        <h2 className="text-3xl md:text-5xl font-bold text-white mb-8">Testimonials</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {testimonials.map((testimonial, index) => (
+            <motion.div
+              key={index}
+              className="bg-white bg-opacity-10 p-6 rounded-lg backdrop-blur-sm"
+              initial={{ opacity: 0, y: 20 }}
+              variants={{
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 1,
+                    delay: 0.5 + index * 0.2,
+                  },
+                },
+              }}
+            >
+              <div className="flex items-center gap-4 mb-4">
+                <div className="w-12 h-12 rounded-full overflow-hidden">
+                  <img
+                    src={testimonial.image}
+                    alt={testimonial.name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold text-white">{testimonial.name}</h3>
+                  <p className="text-gray-300">{testimonial.role}</p>
+                </div>
+              </div>
+              <p className="text-gray-200 italic">"{testimonial.content}"</p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </Section>
+  );
+};
+
+const CurrentWorkSection = () => {
+  return (
+    <Section>
+      <motion.div className="w-full" whileInView={"visible"}>
+        <h2 className="text-3xl md:text-5xl font-bold text-white mb-8">Currently Working On</h2>
+        <motion.div
+          className="bg-white bg-opacity-10 p-8 rounded-lg backdrop-blur-sm"
+          initial={{ opacity: 0, y: 20 }}
+          variants={{
+            visible: {
+              opacity: 1,
+              y: 0,
+              transition: {
+                duration: 1,
+                delay: 0.5,
+              },
+            },
+          }}
+        >
+          <h3 className="text-2xl font-bold text-white mb-4">{currentWork.title}</h3>
+          <p className="text-gray-200 mb-6">{currentWork.description}</p>
+          
+          <div className="mb-6">
+            <div className="flex justify-between text-sm text-gray-300 mb-2">
+              <span>Progress</span>
+              <span>{currentWork.progress}%</span>
+            </div>
+            <div className="h-2 w-full bg-gray-200 bg-opacity-20 rounded-full">
+              <motion.div
+                className="h-full bg-indigo-500 rounded-full"
+                style={{ width: `${currentWork.progress}%` }}
+                initial={{ scaleX: 0, originX: 0 }}
+                variants={{
+                  visible: {
+                    scaleX: 1,
+                    transition: {
+                      duration: 1,
+                      delay: 1,
+                    },
+                  },
+                }}
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            {currentWork.technologies.map((tech, index) => (
+              <span
+                key={index}
+                className="px-3 py-1 bg-indigo-500 bg-opacity-20 rounded-full text-indigo-300 text-sm"
+              >
+                {tech}
+              </span>
+            ))}
+          </div>
+          
+          <p className="text-gray-400 text-sm mt-4">Started: {currentWork.startDate}</p>
+        </motion.div>
+      </motion.div>
     </Section>
   );
 };

@@ -52,8 +52,8 @@ export const Experience = (props) => {
   useFrame((state) => {
     let curSection = Math.floor(data.scroll.current * data.pages);
 
-    if (curSection > 3) {
-      curSection = 3;
+    if (curSection > 5) {
+      curSection = 5;
     }
 
     if (curSection !== section) {
@@ -69,14 +69,6 @@ export const Experience = (props) => {
         characterGroup.current.position
       );
     }
-    // console.log([position.x, position.y, position.z]);
-
-    // const quaternion = new THREE.Quaternion();
-    // characterContainerAboutRef.current.getWorldQuaternion(quaternion);
-    // const euler = new THREE.Euler();
-    // euler.setFromQuaternion(quaternion, "XYZ");
-
-    // console.log([euler.x, euler.y, euler.z]);
   });
 
   return (
@@ -120,6 +112,28 @@ export const Experience = (props) => {
           },
           3: {
             y: -viewport.height * 3 + 1,
+            x: 0.24,
+            z: 8.5,
+            rotateX: 0,
+            rotateY: -Math.PI / 4,
+            rotateZ: 0,
+            scaleX: 1,
+            scaleY: 1,
+            scaleZ: 1,
+          },
+          4: {
+            y: -viewport.height * 4 + 1,
+            x: 0.24,
+            z: 8.5,
+            rotateX: 0,
+            rotateY: -Math.PI / 4,
+            rotateZ: 0,
+            scaleX: 1,
+            scaleY: 1,
+            scaleZ: 1,
+          },
+          5: {
+            y: -viewport.height * 5 + 1,
             x: 0.24,
             z: 8.5,
             rotateX: 0,
