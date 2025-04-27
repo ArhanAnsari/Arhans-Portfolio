@@ -39,14 +39,14 @@ const testimonials = [
     name: "Clystra Networks Pvt. Ltd.",
     role: "Client",
     content: "Working with Arhan was an exceptional experience. His expertise in full-stack development and attention to detail helped us create a robust and scalable solution. His ability to understand our requirements and translate them into practical solutions was impressive.",
-    image: "/testimonials/clystra-logo.jpg"
+    image: "/testimonials/clystra-logo.png"
   },
 ];
 
 const currentWork = {
   title: "AI-Powered Redit Clone (Reddish)",
   description: "Currently developing a cutting-edge Redit Clone (Reddish) that leverages artificial intelligence for moderating and classifying content. The project utilizes React, Node.js, and TensorFlow.",
-  progress: 25,
+  progress: 85,
   technologies: ["Next.js", "TypeScript", "Sanity CMS", "Clerk", "Tailwind CSS", "Radix UI", "Lucide Icons", "Gemini API", "Vercel"],
   startDate: "April 2025"
 };
@@ -89,9 +89,9 @@ const AboutSection = (props) => {
           delay: 1.5,
         }}
       >
-        I'm a versatile Full Stack Developer mastering all aspects of 
+        I'm a versatile Full Stack Developer  
         <br />
-        modern web development
+        mastering all aspects of modern web development
       </motion.p>
       <motion.button
         onClick={() => setSection(3)}
@@ -297,11 +297,11 @@ const TestimonialsSection = () => {
     <Section>
       <motion.div className="w-full" whileInView={"visible"}>
         <h2 className="text-3xl md:text-5xl font-bold text-white mb-8">Testimonials</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {testimonials.map((testimonial, index) => (
             <motion.div
               key={index}
-              className="bg-white bg-opacity-10 p-6 rounded-lg backdrop-blur-sm"
+              className="bg-white bg-opacity-10 p-4 md:p-6 rounded-lg backdrop-blur-sm"
               initial={{ opacity: 0, y: 20 }}
               variants={{
                 visible: {
@@ -314,8 +314,8 @@ const TestimonialsSection = () => {
                 },
               }}
             >
-              <div className="flex items-center gap-4 mb-4">
-                <div className="w-12 h-12 rounded-full overflow-hidden">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-4 mb-4">
+                <div className="w-16 h-16 md:w-12 md:h-12 rounded-full overflow-hidden flex-shrink-0">
                   <img
                     src={testimonial.image}
                     alt={testimonial.name}
@@ -323,11 +323,11 @@ const TestimonialsSection = () => {
                   />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold text-white">{testimonial.name}</h3>
-                  <p className="text-gray-300">{testimonial.role}</p>
+                  <h3 className="text-xl md:text-lg font-bold text-white">{testimonial.name}</h3>
+                  <p className="text-gray-300 text-sm md:text-base">{testimonial.role}</p>
                 </div>
               </div>
-              <p className="text-gray-200 italic">"{testimonial.content}"</p>
+              <p className="text-gray-200 italic text-sm md:text-base leading-relaxed">"{testimonial.content}"</p>
             </motion.div>
           ))}
         </div>
@@ -339,10 +339,10 @@ const TestimonialsSection = () => {
 const CurrentWorkSection = () => {
   return (
     <Section>
-      <motion.div className="w-full" whileInView={"visible"}>
+      <motion.div className="w-full max-w-[90vw] md:max-w-[800px]" whileInView={"visible"}>
         <h2 className="text-3xl md:text-5xl font-bold text-white mb-8">Currently Working On</h2>
         <motion.div
-          className="bg-white bg-opacity-10 p-8 rounded-lg backdrop-blur-sm"
+          className="bg-white bg-opacity-10 p-6 md:p-8 rounded-lg backdrop-blur-sm"
           initial={{ opacity: 0, y: 20 }}
           variants={{
             visible: {
@@ -355,15 +355,15 @@ const CurrentWorkSection = () => {
             },
           }}
         >
-          <h3 className="text-2xl font-bold text-white mb-4">{currentWork.title}</h3>
-          <p className="text-gray-200 mb-6">{currentWork.description}</p>
+          <h3 className="text-xl md:text-2xl font-bold text-white mb-4">{currentWork.title}</h3>
+          <p className="text-gray-200 text-sm md:text-base mb-6 leading-relaxed">{currentWork.description}</p>
           
           <div className="mb-6">
-            <div className="flex justify-between text-sm text-gray-300 mb-2">
+            <div className="flex justify-between text-sm md:text-base text-gray-300 mb-2">
               <span>Progress</span>
               <span>{currentWork.progress}%</span>
             </div>
-            <div className="h-2 w-full bg-gray-200 bg-opacity-20 rounded-full">
+            <div className="h-2 md:h-3 w-full bg-gray-200 bg-opacity-20 rounded-full">
               <motion.div
                 className="h-full bg-indigo-500 rounded-full"
                 style={{ width: `${currentWork.progress}%` }}
@@ -381,18 +381,29 @@ const CurrentWorkSection = () => {
             </div>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 md:gap-3">
             {currentWork.technologies.map((tech, index) => (
-              <span
+              <motion.span
                 key={index}
-                className="px-3 py-1 bg-indigo-500 bg-opacity-20 rounded-full text-indigo-300 text-sm"
+                className="px-3 py-1 bg-indigo-500 bg-opacity-20 rounded-full text-indigo-300 text-xs md:text-sm"
+                initial={{ opacity: 0, scale: 0.9 }}
+                variants={{
+                  visible: {
+                    opacity: 1,
+                    scale: 1,
+                    transition: {
+                      duration: 0.4,
+                      delay: 1.2 + index * 0.1,
+                    },
+                  },
+                }}
               >
                 {tech}
-              </span>
+              </motion.span>
             ))}
           </div>
           
-          <p className="text-gray-400 text-sm mt-4">Started: {currentWork.startDate}</p>
+          <p className="text-gray-400 text-xs md:text-sm mt-6">Started: {currentWork.startDate}</p>
         </motion.div>
       </motion.div>
     </Section>
