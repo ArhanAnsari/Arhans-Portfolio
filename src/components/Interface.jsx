@@ -356,7 +356,7 @@ const TestimonialsSection = () => {
   return (
     <Section>
       <motion.div className="w-full" whileInView={"visible"}>
-        <h2 className="text-3xl md:text-5xl font-bold text-white mb-8">Testimonials</h2>
+        <h2 className="text-3xl md:text-5xl font-bold text-black mb-8">Testimonials</h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {testimonials.map((testimonial, index) => (
             <motion.div
@@ -383,11 +383,11 @@ const TestimonialsSection = () => {
                   />
                 </div>
                 <div>
-                  <h3 className="text-xl md:text-lg font-bold text-white">{testimonial.name}</h3>
-                  <p className="text-gray-300 text-sm md:text-base">{testimonial.role}</p>
+                  <h3 className="text-xl md:text-lg font-bold text-indigo-500">{testimonial.name}</h3>
+                  <p className="text-indigo-400 text-sm md:text-base">{testimonial.role}</p>
                 </div>
               </div>
-              <p className="text-gray-200 italic text-sm md:text-base leading-relaxed">"{testimonial.content}"</p>
+              <p className="text-indigo-400 italic text-sm md:text-base leading-relaxed">"{testimonial.content}"</p>
             </motion.div>
           ))}
         </div>
@@ -400,7 +400,7 @@ const CurrentWorkSection = () => {
   return (
     <Section>
       <motion.div className="w-full max-w-[90vw] md:max-w-[800px]" whileInView={"visible"}>
-        <h2 className="text-3xl md:text-5xl font-bold text-white mb-8">Currently Working On</h2>
+        <h2 className="text-3xl md:text-5xl font-bold text-black mb-8">Currently Working On</h2>
         <motion.div
           className="bg-white bg-opacity-10 p-6 md:p-8 rounded-lg backdrop-blur-sm"
           initial={{ opacity: 0, y: 20 }}
@@ -415,11 +415,11 @@ const CurrentWorkSection = () => {
             },
           }}
         >
-          <h3 className="text-xl md:text-2xl font-bold text-white mb-4">{currentWork.title}</h3>
-          <p className="text-gray-200 text-sm md:text-base mb-6 leading-relaxed">{currentWork.description}</p>
+          <h3 className="text-xl md:text-2xl font-bold text-indigo-500 mb-4">{currentWork.title}</h3>
+          <p className="text-indigo-400 text-sm md:text-base mb-6 leading-relaxed">{currentWork.description}</p>
           
           <div className="mb-6">
-            <div className="flex justify-between text-sm md:text-base text-gray-300 mb-2">
+            <div className="flex justify-between text-sm md:text-base text-indigo-400 mb-2">
               <span>Progress</span>
               <span>{currentWork.progress}%</span>
             </div>
@@ -516,7 +516,7 @@ const AchievementsSection = () => {
   return (
     <Section>
       <motion.div className="w-full" whileInView={"visible"}>
-        <h2 className="text-3xl md:text-5xl font-bold text-white mb-8">Achievements & Metrics</h2>
+        <h2 className="text-3xl md:text-5xl font-bold text-black mb-8">Achievements & Metrics</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
           {Object.entries(achievements).map(([key, value], index) => (
             <motion.div
@@ -534,8 +534,8 @@ const AchievementsSection = () => {
                 },
               }}
             >
-              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">{value}+</h3>
-              <p className="text-gray-300 text-sm md:text-base capitalize">
+              <h3 className="text-2xl md:text-3xl font-bold text-indigo-500 mb-2">{value}+</h3>
+              <p className="text-indigo-400 text-sm md:text-base capitalize">
                 {key.replace(/([A-Z])/g, ' $1').trim()}
               </p>
             </motion.div>
@@ -550,7 +550,7 @@ const ServicesSection = () => {
   return (
     <Section>
       <motion.div className="w-full" whileInView={"visible"}>
-        <h2 className="text-3xl md:text-5xl font-bold text-white mb-8">Services</h2>
+        <h2 className="text-3xl md:text-5xl font-bold text-black mb-8">Services</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {services.map((service, index) => (
             <motion.div
@@ -569,8 +569,8 @@ const ServicesSection = () => {
               }}
             >
               <div className="text-4xl mb-4">{service.icon}</div>
-              <h3 className="text-xl font-bold text-white mb-2">{service.title}</h3>
-              <p className="text-gray-300">{service.description}</p>
+              <h3 className="text-xl font-bold text-indigo-500 mb-2">{service.title}</h3>
+              <p className="text-indigo-400">{service.description}</p>
             </motion.div>
           ))}
         </div>
@@ -667,16 +667,16 @@ const ContactSection = () => {
 
   return (
     <Section>
-      <h2 className="text-3xl md:text-5xl font-bold">Contact me</h2>
+      <h2 className="text-3xl md:text-5xl font-bold text-black">Contact me</h2>
       <div className="mt-8 p-8 rounded-md bg-white bg-opacity-50 w-96 max-w-full">
         {state.succeeded ? (
-          <p className="text-gray-900 text-center">Thanks for your message!</p>
+          <p className="text-indigo-500 text-center">Thanks for your message!</p>
         ) : (
           <form onSubmit={handleFormSubmit}>
             {/* Name Field */}
             <label
               htmlFor="name"
-              className="font-medium text-gray-900 block mb-1"
+              className="font-medium text-indigo-500 block mb-1"
             >
               Name <span className="text-red-500">*</span>
             </label>
@@ -686,13 +686,13 @@ const ContactSection = () => {
               id="name"
               value={formValues.user_name}
               onChange={handleInputChange}
-              className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
+              className="block w-full rounded-md border-0 text-indigo-500 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
             />
 
             {/* Email Field */}
             <label
               htmlFor="email"
-              className="font-medium text-gray-900 block mb-1 mt-8"
+              className="font-medium text-indigo-500 block mb-1 mt-8"
             >
               Email <span className="text-red-500">*</span>
             </label>
@@ -702,7 +702,7 @@ const ContactSection = () => {
               id="email"
               value={formValues.user_email}
               onChange={handleInputChange}
-              className="block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
+              className="block w-full rounded-md border-0 text-indigo-500 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
             />
             <ValidationError
               className="mt-1 text-red-500"
@@ -714,7 +714,7 @@ const ContactSection = () => {
             {/* Message Field */}
             <label
               htmlFor="message"
-              className="font-medium text-gray-900 block mb-1 mt-8"
+              className="font-medium text-indigo-500 block mb-1 mt-8"
             >
               Message <span className="text-red-500">*</span>
             </label>
@@ -723,7 +723,7 @@ const ContactSection = () => {
               id="message"
               value={formValues.message}
               onChange={handleInputChange}
-              className="h-32 block w-full rounded-md border-0 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
+              className="h-32 block w-full rounded-md border-0 text-indigo-500 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
             />
             <ValidationError
               className="mt-1 text-red-500"
