@@ -20,12 +20,6 @@ export const projects = [
 		description: "A car game made in ThreeJS.",
 	},
 	{
-		title: "vCard Personal Portfolio",
-		url: "https://arhanansari.github.io/vcard-personal-portfolio/",
-		image: "projects/vCard.png",
-		description: "A personal portfolio.",
-	},
-	{
 		title: "Task Manager App",
 		url: "https://arhanansari.github.io/Task-Manager-App/",
 		image: "projects/taskManager.jpg",
@@ -49,12 +43,6 @@ export const projects = [
 		image: "projects/NoInternetSpidermanGame.jpg",
 		description: "A Spiderman Game",
 	},
-	//{
-	//	title: "AI ChatBot",
-	//	url: "https://nextjs-chat-blue-beta-36.vercel.app/",
-	//	image: "projects/AI-ChatBot.jpg",
-	//	description: "An open-source AI chatbot app template built with Next.js, the Vercel AI SDK, OpenAI, and Vercel KV.",
-	//},
 	{
 		title: "E-commerce Website",
 		url: "https://e-commerce-emporium-xrw1em4.gamma.site/",
@@ -151,84 +139,6 @@ export const projects = [
 		image: "projects/AmongUs.png",
 		description: "A Fan Made Among Us game made with HTML,CSS,JS,Socket.io.",
 	},
-	//{
-	// 	title: "Collaborative Code Editor",
-	// 	url: "https://spgr5d-3000.csb.app/",
-	// 	image: "projects/collaborative-code-editor.jpg",
-	// 	description: "A Collaborative Code Editor that supports real time collaboration.",
-	// },
-	// {
-	// 	title: "Collaborative To-do List",
-	// 	url: "https://75f3l4-3000.csb.app/",
-	// 	image: "projects/Collaborative-ToDo-List.jpg",
-	// 	description: "A Collaborative To-do List that supports real time collaboration.",
-	// },
-	// {
-	// 	title: "Collaborative Whiteboard",
-	// 	url: "https://3n77d7-3000.csb.app/",
-	// 	image: "projects/collaborative-whiteboard.jpg",
-	// 	description: "A Collaborative Whiteboard that supports real time collaboration.",
-	// },
-	// {
-	// 	title: "Multiplayer 3D Builder",
-	// 	url: "https://z37ys9-3000.csb.app/",
-	// 	image: "projects/multiplayer-3d-builder.jpg",
-	// 	description: "A Multiplayer 3D Builder that supports real time users.",
-	// },
-	// {
-	// 	title: "Live Cursors",
-	// 	url: "https://3vsmww-5173.csb.app/",
-	// 	image: "projects/live-cursor.jpg",
-	// 	description: "A Live Cursor that is made with Vue.js that supports real time users.",
-	// },
-	// {
-	// 	title: "Collaborative Spreadsheet",
-	// 	url: "https://ykqxd7-3000.csb.app/",
-	// 	image: "projects/spreadsheet.jpg",
-	// 	description: "A Collaborative Spreadsheet that supports real time collaboration.",
-	// },
-	// {
-	// 	title: "Comments Primitives",
-	// 	url: "https://pwxgj8-3000.csb.app/",
-	// 	image: "projects/commentspri.jpg",
-	// 	description: "A Comments Primitive that supports real time comments.",
-	// },
-	// {
-	// 	title: "Live Form Selection",
-	// 	url: "https://qlt5wd-3000.csb.app/",
-	// 	image: "projects/live-form-selection.jpg",
-	// 	description: "A Live Form Selection that supports real time users.",
-	// },
-	// {
-	// 	title: "Video Comment",
-	// 	url: "https://2sypdd-3000.csb.app/",
-	// 	image: "projects/video-comment.jpg",
-	// 	description: "A Video Comment that supports real time users and comments.",
-	// },
-	// {
-	// 	title: "Connection Status",
-	// 	url: "https://xv8mdp-3000.csb.app/",
-	// 	image: "projects/connection-status.jpg",
-	// 	description: "A Connection Status that supports real time users.",
-	// },
-	// {
-	// 	title: "Discord Clone",
-	// 	url: "https://pll9ft-3000.csb.app/",
-	// 	image: "projects/discord.jpg",
-	// 	description: "A Discord Clone that has already users profile that you can use it and it also has notification."
-	// },
-	// {
-	// 	title: "Collaborative Rich Text Editor",
-	// 	url: "https://xd6zzf-3000.csb.app/",
-	// 	image: "projects/rich-text-editor.jpg",
-	// 	description: "A Collaborative Rich Text Editor that supports real time users."
-	// },
-	// {
-	// 	title: "Text Editor Comments",
-	// 	url: "https://833gmf-3000.csb.app/",
-	// 	image: "projects/text-editor-comments.jpg",
-	// 	description: "A Text Editor Comments that supports real time users.",
-	// },
 	{
 		title: "Stopwatch",
 		url: "https://arhanansari.github.io/stopwatch/",
@@ -288,12 +198,6 @@ export const projects = [
 		url: "https://arhanansari.github.io/Quiz_App/",
 		image: "projects/quizapp.png",
 		description: "This project is created with HTML, CSS and JavaScript that allows user to answer given questions.It includes sections for starting the quiz, displaying quiz information. There’s a timer, for each question and its options. If the user doesn’t answer within the time limit, then the next question appears automatically. After selecting an option, it checks if it’s correct or not. At the end,it displays your score with a result message.It also has the option to restart the quiz or quit.",
-	},
-	{
-		title: "Paytm Clone",
-		url: "https://arhanansari.github.io/Paytm-Clone/",
-		image: "projects/paytmclone.png",
-		description: "This Paytm Home Page Clone project replicates the user interface and design of the Paytm company's homepage. Utilizing a combination of HTML, CSS, and Bootstrap, the project aims to recreate the visual aesthetics of the original Paytm homepage. Notably, the implementation is designed to be responsive, ensuring a seamless and consistent user experience across various devices and screen sizes.",
 	},
 	{
 		title: "Aaiza Cosmetics",

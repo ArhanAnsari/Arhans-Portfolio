@@ -46,7 +46,7 @@ const testimonials = [
 const currentWork = {
   title: "AI-Powered Redit Clone (Reddish)",
   description: "Currently developing a cutting-edge Redit Clone (Reddish) that leverages artificial intelligence for moderating and classifying content. The project utilizes React, Node.js, and TensorFlow.",
-  progress: 85,
+  progress: 95,
   technologies: ["Next.js", "TypeScript", "Sanity CMS", "Clerk", "Tailwind CSS", "Radix UI", "Lucide Icons", "Gemini API", "Vercel"],
   startDate: "April 2025"
 };
