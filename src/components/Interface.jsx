@@ -44,21 +44,79 @@ const testimonials = [
 ];
 
 const currentWork = {
-  title: "AI-Powered Redit Clone (Reddish)",
-  description: "Currently developing a cutting-edge Redit Clone (Reddish) that leverages artificial intelligence for moderating and classifying content. The project utilizes React, Node.js, and TensorFlow.",
-  progress: 95,
-  technologies: ["Next.js", "TypeScript", "Sanity CMS", "Clerk", "Tailwind CSS", "Radix UI", "Lucide Icons", "Gemini API", "Vercel"],
-  startDate: "April 2025"
+  title: "Currently Not Working on Any Project",
+  description: "I am currently available for new opportunities and open to exciting projects. Feel free to reach out if you have an interesting project or collaboration in mind.",
+  progress: 0,
+  technologies: [],
+  startDate: "Present"
 };
+
+const achievements = {
+  projectsCompleted: 15,
+  yearsOfExperience: 2,
+  clientSatisfaction: 100,
+  githubContributions: 500,
+  technologiesMastered: 12
+};
+
+const education = {
+  current: {
+    school: "Shri Rajendra High School",
+    grade: "10th Class",
+    year: "2025-2026",
+    achievements: [
+      "Academic Excellence Award",
+      "Outstanding Student",
+      "Math Olympiad Gold Medalist",
+      "Science Olympiad Gold Medalist"
+    ]
+  }
+};
+
+const certifications = [
+  {
+    title: "Full Stack Web Development",
+    issuer: "Online Platform",
+    date: "2023",
+    link: "#"
+  },
+  {
+    title: "React.js Fundamentals",
+    issuer: "Online Platform",
+    date: "2023",
+    link: "#"
+  }
+];
+
+const services = [
+  {
+    title: "Web Development",
+    description: "Custom websites and web applications",
+    icon: "🌐"
+  },
+  {
+    title: "UI/UX Design",
+    description: "Beautiful and intuitive interfaces",
+    icon: "🎨"
+  },
+  {
+    title: "Mobile Development",
+    description: "Cross-platform mobile applications",
+    icon: "📱"
+  }
+];
 
 export const Interface = (props) => {
   const { setSection } = props;
   return (
-    <div className="relative flex flex-col w-full overflow-y-auto overflow-x-hidden">
+    <div className="flex flex-col items-center w-screen">
       <AboutSection setSection={setSection} />
       <SkillsSection />
       <ProjectsSection />
+      <EducationSection />
+      <AchievementsSection />
       <CurrentWorkSection />
+      <ServicesSection />
       <TestimonialsSection />
       <ContactSection />
     </div>
@@ -89,12 +147,14 @@ const AboutSection = (props) => {
           delay: 1.5,
         }}
       >
-        I'm a versatile Full Stack Developer  
+        I'm a passionate Full Stack Developer 
+        <br />
+        and a 10th-grade student at Shri Rajendra High School
         <br />
         mastering all aspects of modern web development
       </motion.p>
       <motion.button
-        onClick={() => setSection(3)}
+        onClick={() => setSection(6)}
         className={`bg-indigo-600 text-white py-4 px-8 
       rounded-lg font-bold text-lg mt-4 md:mt-16`}
         initial={{
@@ -405,6 +465,115 @@ const CurrentWorkSection = () => {
           
           <p className="text-gray-400 text-xs md:text-sm mt-6">Started: {currentWork.startDate}</p>
         </motion.div>
+      </motion.div>
+    </Section>
+  );
+};
+
+const EducationSection = () => {
+  return (
+    <Section>
+      <motion.div className="w-full" whileInView={"visible"}>
+        <h2 className="text-3xl md:text-5xl font-bold text-white mb-8">Education</h2>
+        <div className="bg-white bg-opacity-10 p-6 md:p-8 rounded-lg backdrop-blur-sm">
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-1">
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-2">
+                {education.current.school}
+              </h3>
+              <p className="text-gray-300 mb-4">{education.current.grade} • {education.current.year}</p>
+              <ul className="space-y-2">
+                {education.current.achievements.map((achievement, index) => (
+                  <motion.li
+                    key={index}
+                    className="flex items-center gap-2 text-gray-200"
+                    initial={{ opacity: 0, x: -20 }}
+                    variants={{
+                      visible: {
+                        opacity: 1,
+                        x: 0,
+                        transition: {
+                          duration: 0.5,
+                          delay: 0.5 + index * 0.1,
+                        },
+                      },
+                    }}
+                  >
+                    <span className="text-indigo-400">✓</span>
+                    {achievement}
+                  </motion.li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </motion.div>
+    </Section>
+  );
+};
+
+const AchievementsSection = () => {
+  return (
+    <Section>
+      <motion.div className="w-full" whileInView={"visible"}>
+        <h2 className="text-3xl md:text-5xl font-bold text-white mb-8">Achievements & Metrics</h2>
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-6">
+          {Object.entries(achievements).map(([key, value], index) => (
+            <motion.div
+              key={key}
+              className="bg-white bg-opacity-10 p-4 rounded-lg backdrop-blur-sm"
+              initial={{ opacity: 0, y: 20 }}
+              variants={{
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 1,
+                    delay: 0.5 + index * 0.1,
+                  },
+                },
+              }}
+            >
+              <h3 className="text-2xl md:text-3xl font-bold text-white mb-2">{value}+</h3>
+              <p className="text-gray-300 text-sm md:text-base capitalize">
+                {key.replace(/([A-Z])/g, ' $1').trim()}
+              </p>
+            </motion.div>
+          ))}
+        </div>
+      </motion.div>
+    </Section>
+  );
+};
+
+const ServicesSection = () => {
+  return (
+    <Section>
+      <motion.div className="w-full" whileInView={"visible"}>
+        <h2 className="text-3xl md:text-5xl font-bold text-white mb-8">Services</h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {services.map((service, index) => (
+            <motion.div
+              key={index}
+              className="bg-white bg-opacity-10 p-6 rounded-lg backdrop-blur-sm"
+              initial={{ opacity: 0, y: 20 }}
+              variants={{
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: {
+                    duration: 1,
+                    delay: 0.5 + index * 0.2,
+                  },
+                },
+              }}
+            >
+              <div className="text-4xl mb-4">{service.icon}</div>
+              <h3 className="text-xl font-bold text-white mb-2">{service.title}</h3>
+              <p className="text-gray-300">{service.description}</p>
+            </motion.div>
+          ))}
+        </div>
       </motion.div>
     </Section>
   );

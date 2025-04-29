@@ -52,8 +52,8 @@ export const Experience = (props) => {
   useFrame((state) => {
     let curSection = Math.floor(data.scroll.current * data.pages);
 
-    if (curSection > 5) {
-      curSection = 5;
+    if (curSection > 8) {
+      curSection = 8;
     }
 
     if (curSection !== section) {
@@ -143,6 +143,50 @@ export const Experience = (props) => {
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
+          6: {
+            y: -viewport.height * 6 + 1,
+            x: isMobile ? 0 : 0.24,
+            z: isMobile ? 6.5 : 8.5,
+            rotateX: 0,
+            rotateY: -Math.PI / 4,
+            rotateZ: 0,
+            scaleX: isMobile ? 0.9 : 1,
+            scaleY: isMobile ? 0.9 : 1,
+            scaleZ: isMobile ? 0.9 : 1,
+          },
+          7: {
+            y: -viewport.height * 7 + 1,
+            x: isMobile ? 0 : 0.24,
+            z: isMobile ? 6.5 : 8.5,
+            rotateX: 0,
+            rotateY: -Math.PI / 4,
+            rotateZ: 0,
+            scaleX: isMobile ? 0.9 : 1,
+            scaleY: isMobile ? 0.9 : 1,
+            scaleZ: isMobile ? 0.9 : 1,
+          },
+          8: {
+            y: -viewport.height * 8 + 1,
+            x: isMobile ? 0 : 0.24,
+            z: isMobile ? 6.5 : 8.5,
+            rotateX: 0,
+            rotateY: -Math.PI / 4,
+            rotateZ: 0,
+            scaleX: isMobile ? 0.9 : 1,
+            scaleY: isMobile ? 0.9 : 1,
+            scaleZ: isMobile ? 0.9 : 1,
+          },
+          // 9: {
+          //   y: -viewport.height * 9 + 1,
+          //   x: isMobile ? 0 : 0.24,
+          //   z: isMobile ? 6.5 : 8.5,
+          //   rotateX: 0,
+          //   rotateY: -Math.PI / 4,
+          //   rotateZ: 0,
+          //   scaleX: isMobile ? 0.9 : 1,
+          //   scaleY: isMobile ? 0.9 : 1,
+          //   scaleZ: isMobile ? 0.9 : 1,
+          // },
         }}
       >
         <Avatar animation={characterAnimation} wireframe={section === 1} />

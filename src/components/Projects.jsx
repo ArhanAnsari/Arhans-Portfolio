@@ -398,6 +398,12 @@ export const projects = [
 		description: "This is an AI-powered content analysis platform that helps content creators get insights from their YouTube videos. The platform uses advanced AI to analyze video content, generate transcriptions, create thumbnails, and provide content recommendations. Made with Next.js 15, React 19, TailwindCSS, AI SDK, Gemini, Together AI, Clerk, Convex, Radix UI components and youtubei.js for video data extraction.",
 	},
 	{
+		title: "Reddish",
+		url: "https://arhans-reddish.vercel.app/",
+		image: "projects/Reddish.jpg",
+		description: "Reddish is a Reddit Clone made with Next.js 15, TailwindCSS, ShadCN, Radix UI, TypeScript, Sanity CMS, Sentry, Clerk, Lucide Icons, Gemini API, Vercel.",
+	},
+	{
 		title: "Clystra Networks Pvt. Ltd.",
 		url: "https://www.clystranetworks.com/",
 		image: "projects/Clystra-Networks.png",
