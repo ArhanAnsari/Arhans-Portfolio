@@ -66,7 +66,6 @@ const education = {
     year: "2025-2026",
     achievements: [
       "Academic Excellence Award",
-      "Outstanding Student",
       "Math Olympiad Gold Medalist",
       "Science Olympiad Gold Medalist"
     ]
