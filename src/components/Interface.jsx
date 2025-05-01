@@ -52,11 +52,11 @@ const currentWork = {
 };
 
 const achievements = {
-  projectsCompleted: 15,
-  yearsOfExperience: 2,
-  clientSatisfaction: 100,
-  githubContributions: 500,
-  technologiesMastered: 12
+  projectsCompleted: 100+,
+  yearsOfExperience: 3+,
+  clientSatisfaction: 10+,
+  githubContributions: 1800+,
+  technologiesMastered: 15+
 };
 
 const education = {
@@ -72,6 +72,7 @@ const education = {
   }
 };
 
+//Sample one, will add the real one later
 const certifications = [
   {
     title: "Full Stack Web Development",
