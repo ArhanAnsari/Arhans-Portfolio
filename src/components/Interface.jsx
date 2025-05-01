@@ -52,11 +52,11 @@ const currentWork = {
 };
 
 const achievements = {
-  projectsCompleted: 100+,
-  yearsOfExperience: 3+,
-  clientSatisfaction: 10+,
-  githubContributions: 1800+,
-  technologiesMastered: 15+
+  projectsCompleted: 500,
+  yearsOfExperience: 3,
+  clientSatisfaction: 10,
+  githubContributions: 1869,
+  technologiesMastered: 15
 };
 
 const education = {
