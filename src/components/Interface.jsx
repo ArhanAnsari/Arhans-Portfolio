@@ -52,7 +52,7 @@ const currentWork = {
 };
 
 const achievements = {
-  projectsCompleted: 500,
+  projectsCompleted: 250,
   yearsOfExperience: 3,
   clientSatisfaction: 10,
   githubContributions: 1869,
