@@ -154,7 +154,7 @@ const AboutSection = (props) => {
         mastering all aspects of modern web development
       </motion.p>
       <motion.button
-        onClick={() => setSection(6)}
+        onClick={() => setSection(9)}
         className={`bg-indigo-600 text-white py-4 px-8 
       rounded-lg font-bold text-lg mt-4 md:mt-16`}
         initial={{
