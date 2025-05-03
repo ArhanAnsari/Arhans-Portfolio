@@ -190,15 +190,7 @@ const skills = [
     level: 100,
   },
   {
-    title: "Nodejs",
-    level: 100,
-  },
-  {
     title: "Programming",
-    level: 100,
-  },
-  {
-    title: "Typescript",
     level: 100,
   },
   {
@@ -208,11 +200,11 @@ const skills = [
 ];
 const languages = [
   {
-    title: "🇮🇳 Hindi",
+    title: "🇺🇸 English",
     level: 100,
   },
   {
-    title: "🇺🇸 English",
+    title: "🇮🇳 Hindi",
     level: 100,
   },
   {
