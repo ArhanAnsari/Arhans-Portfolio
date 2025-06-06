@@ -32,22 +32,10 @@ export const projects = [
 		description: "My own website.",
 	},
 	{
-		title: "Birthday Web",
-		url: "https://birthday-web-pi.vercel.app/",
-		image: "projects/Birthday-Web.jpg",
-		description: "A Birthday Web.",
-	},
-	{
 		title: "No Internet Spiderman Game",
 		url: "https://no-internet-spiderman-game.vercel.app/",
 		image: "projects/NoInternetSpidermanGame.jpg",
 		description: "A Spiderman Game",
-	},
-	{
-		title: "E-commerce Website",
-		url: "https://e-commerce-emporium-xrw1em4.gamma.site/",
-		image: "projects/ECommerce.jpg",
-		description: "An e-commerce website.",
 	},
 	{
 		title: "ChatGPT Clone",
