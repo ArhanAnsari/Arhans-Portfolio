@@ -1,96 +1,193 @@
-import { FaGithub, FaYoutube, FaDiscord, FaGlobe, FaXTwitter } from "react-icons/fa6";
+import { FaGithub, FaYoutube, FaDiscord, FaGlobe, FaXTwitter, FaLinkedin } from "react-icons/fa6";
+import { motion, AnimatePresence } from "framer-motion";
 
 export const Menu = (props) => {
   const { onSectionChange, menuOpened, setMenuOpened } = props;
 
+  const menuItems = [
+    { label: "About", section: 0, icon: "👨‍💻" },
+    { label: "Skills", section: 1, icon: "⚡" },
+    { label: "Projects", section: 2, icon: "🚀" },
+    { label: "Education", section: 3, icon: "🎓" },
+    { label: "Achievements", section: 4, icon: "🏆" },
+    { label: "Current Work", section: 5, icon: "💼" },
+    { label: "Services", section: 6, icon: "🛠️" },
+    { label: "Testimonials", section: 7, icon: "💬" },
+    { label: "Contact", section: 8, icon: "📬" },
+  ];
+
   return (
     <>
-      <button
+      {/* Hamburger Menu Button */}
+      <motion.button
         onClick={() => setMenuOpened(!menuOpened)}
-        className="z-20 fixed top-4 right-4 md:top-12 md:right-12 p-3 bg-indigo-600 w-11 h-11 rounded-md"
+        className="z-30 fixed top-6 right-6 p-3 glass-morphism-dark rounded-xl w-14 h-14 flex items-center justify-center group hover:bg-primary-500/20 transition-all duration-300"
+        whileHover={{ scale: 1.05 }}
+        whileTap={{ scale: 0.95 }}
       >
-        <div
-          className={`bg-white h-0.5 rounded-md w-full transition-all ${
-            menuOpened ? "rotate-45  translate-y-0.5" : ""
-          }`}
-        />
-        <div
-          className={`bg-white h-0.5 rounded-md w-full my-1 ${
-            menuOpened ? "hidden" : ""
-          }`}
-        />
-        <div
-          className={`bg-white h-0.5 rounded-md w-full transition-all ${
-            menuOpened ? "-rotate-45" : ""
-          }`}
-        />
-      </button>
-      <div
-        className={`z-10 fixed top-0 right-0 bottom-0 bg-white transition-all overflow-hidden flex flex-col
-      ${menuOpened ? "w-full md:w-80" : "w-0"}`}
-      >
-        <div className="flex-1 flex items-start justify-center flex-col gap-6 p-8">
-          <MenuButton label="About" onClick={() => onSectionChange(0)} />
-          <MenuButton label="Skills" onClick={() => onSectionChange(1)} />
-          <MenuButton label="Projects" onClick={() => onSectionChange(2)} />
-          <MenuButton label="Current Work" onClick={() => onSectionChange(5)} />
-          <MenuButton label="Testimonials" onClick={() => onSectionChange(7)} />
-          <MenuButton label="Contact" onClick={() => onSectionChange(8)} />
-        </div>
-        <div className="flex items-center justify-center gap-4 p-4 border-t">
-          <SocialLink
-            href="https://github.com/ArhanAnsari"
-            icon={<FaGithub size={24} />}
-            label="GitHub"
+        <div className="w-6 h-5 relative">
+          <motion.div
+            className={`absolute bg-neutral-200 h-0.5 rounded-full transition-all duration-300 ${
+              menuOpened ? "rotate-45 translate-y-2 bg-primary-400" : "w-6 top-0"
+            }`}
+            animate={menuOpened ? { rotate: 45, y: 8, backgroundColor: "#0ea5e9" } : { rotate: 0, y: 0, backgroundColor: "#e2e8f0" }}
           />
-          <SocialLink
-            href="https://youtube.com/@codewitharhanofficial"
-            icon={<FaYoutube size={24} />}
-            label="YouTube"
+          <motion.div
+            className={`absolute bg-neutral-200 h-0.5 w-6 rounded-full top-2 transition-all duration-300 ${
+              menuOpened ? "opacity-0" : "opacity-100"
+            }`}
+            animate={menuOpened ? { opacity: 0 } : { opacity: 1 }}
           />
-          <SocialLink
-            href="https://discord.com/invite/bwjCXVwS8k"
-            icon={<FaDiscord size={24} />}
-            label="Discord"
-          />
-          <SocialLink
-            href="https://codewitharhan.infinityfreeapp.com"
-            icon={<FaGlobe size={24} />}
-            label="Website"
-          />
-          <SocialLink
-            href="https://x.com/codewitharhan"
-            icon={<FaXTwitter size={24} />}
-            label="X (Twitter)"
+          <motion.div
+            className={`absolute bg-neutral-200 h-0.5 rounded-full transition-all duration-300 ${
+              menuOpened ? "-rotate-45 translate-y-2 bg-primary-400 w-6" : "w-4 top-4"
+            }`}
+            animate={menuOpened ? { rotate: -45, y: 8, width: 24, backgroundColor: "#0ea5e9" } : { rotate: 0, y: 16, width: 16, backgroundColor: "#e2e8f0" }}
           />
         </div>
-      </div>
+      </motion.button>
+
+      {/* Menu Overlay */}
+      <AnimatePresence>
+        {menuOpened && (
+          <motion.div
+            className="z-20 fixed inset-0 bg-black/50 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setMenuOpened(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Menu Panel */}
+      <motion.div
+        className="z-25 fixed top-0 right-0 bottom-0 glass-morphism-dark border-l border-neutral-700/50 flex flex-col overflow-hidden"
+        initial={{ x: "100%" }}
+        animate={{ x: menuOpened ? 0 : "100%" }}
+        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+        style={{ width: menuOpened ? "min(400px, 100vw)" : "0" }}
+      >
+        {/* Header */}
+        <div className="p-8 border-b border-neutral-700/30">
+          <div className="flex items-center space-x-4">
+            <img 
+              src="/logo.png" 
+              alt="Arhan Ansari Logo" 
+              className="w-12 h-12 object-contain"
+            />
+            <div>
+              <h2 className="text-xl font-display font-bold text-gradient">Arhan Ansari</h2>
+              <p className="text-sm text-neutral-400">Full Stack Developer</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation */}
+        <div className="flex-1 overflow-y-auto py-8 px-6">
+          <nav className="space-y-2">
+            {menuItems.map((item, index) => (
+              <MenuButton
+                key={item.label}
+                {...item}
+                onClick={() => onSectionChange(item.section)}
+                index={index}
+                delay={index * 0.1}
+              />
+            ))}
+          </nav>
+        </div>
+
+        {/* Social Links */}
+        <div className="p-6 border-t border-neutral-700/30">
+          <h3 className="text-sm font-semibold text-neutral-400 mb-4 uppercase tracking-wider">
+            Connect With Me
+          </h3>
+          <div className="grid grid-cols-5 gap-3">
+            <SocialLink
+              href="https://github.com/ArhanAnsari"
+              icon={<FaGithub size={20} />}
+              label="GitHub"
+              color="hover:text-neutral-100"
+            />
+            <SocialLink
+              href="https://youtube.com/@codewitharhanofficial"
+              icon={<FaYoutube size={20} />}
+              label="YouTube"
+              color="hover:text-red-400"
+            />
+            <SocialLink
+              href="https://discord.com/invite/bwjCXVwS8k"
+              icon={<FaDiscord size={20} />}
+              label="Discord"
+              color="hover:text-indigo-400"
+            />
+            <SocialLink
+              href="https://codewitharhan.infinityfreeapp.com"
+              icon={<FaGlobe size={20} />}
+              label="Website"
+              color="hover:text-primary-400"
+            />
+            <SocialLink
+              href="https://x.com/codewitharhan"
+              icon={<FaXTwitter size={20} />}
+              label="X (Twitter)"
+              color="hover:text-neutral-100"
+            />
+          </div>
+          
+          {/* Contact Info */}
+          <div className="mt-6 p-4 bg-neutral-800/30 rounded-xl">
+            <div className="text-xs text-neutral-400 mb-1">Ready to collaborate?</div>
+            <div className="text-sm text-neutral-200 font-medium">arhanansari2009@gmail.com</div>
+          </div>
+        </div>
+      </motion.div>
     </>
   );
 };
 
 const MenuButton = (props) => {
-  const { label, onClick } = props;
+  const { label, onClick, icon, index, delay } = props;
+  
   return (
-    <button
+    <motion.button
       onClick={onClick}
-      className="text-2xl font-bold cursor-pointer hover:text-indigo-600 transition-colors"
+      className="w-full flex items-center space-x-4 p-4 rounded-xl text-left group hover:bg-neutral-800/30 transition-all duration-300 border border-transparent hover:border-primary-500/30"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay, duration: 0.3 }}
+      whileHover={{ scale: 1.02, x: 8 }}
+      whileTap={{ scale: 0.98 }}
     >
-      {label}
-    </button>
+      <span className="text-2xl group-hover:scale-110 transition-transform">{icon}</span>
+      <span className="text-lg font-medium text-neutral-200 group-hover:text-primary-300 transition-colors">
+        {label}
+      </span>
+      <svg 
+        className="w-4 h-4 ml-auto text-neutral-600 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" 
+        fill="none" 
+        stroke="currentColor" 
+        viewBox="0 0 24 24"
+      >
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+      </svg>
+    </motion.button>
   );
 };
 
-const SocialLink = ({ href, icon, label }) => {
+const SocialLink = ({ href, icon, label, color }) => {
   return (
-    <a
+    <motion.a
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center justify-center text-gray-600 hover:text-indigo-600 transition-colors"
+      className={`flex items-center justify-center p-3 rounded-xl bg-neutral-800/30 text-neutral-400 ${color} transition-all duration-300 hover:scale-110 hover:bg-neutral-700/30`}
       aria-label={label}
+      whileHover={{ scale: 1.1, y: -2 }}
+      whileTap={{ scale: 0.95 }}
     >
       {icon}
-    </a>
+    </motion.a>
   );
 };
