@@ -20,29 +20,32 @@ export const Menu = (props) => {
     <>
       {/* Hamburger Menu Button */}
       <motion.button
+        type="button" // ✅ prevents form-submit issues on mobile
         onClick={() => setMenuOpened(!menuOpened)}
-        className="z-30 fixed top-6 right-6 p-3 glass-morphism-dark rounded-xl w-14 h-14 flex items-center justify-center group hover:bg-primary-500/20 transition-all duration-300"
+        className="z-50 fixed top-6 right-6 p-3 glass-morphism-dark rounded-xl w-14 h-14 flex items-center justify-center group hover:bg-primary-500/20 transition-all duration-300"
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
       >
         <div className="w-6 h-5 relative">
           <motion.div
-            className={`absolute bg-neutral-200 h-0.5 rounded-full transition-all duration-300 ${
-              menuOpened ? "rotate-45 translate-y-2 bg-primary-400" : "w-6 top-0"
-            }`}
-            animate={menuOpened ? { rotate: 45, y: 8, backgroundColor: "#0ea5e9" } : { rotate: 0, y: 0, backgroundColor: "#e2e8f0" }}
+            className="absolute h-0.5 rounded-full"
+            animate={
+              menuOpened
+                ? { rotate: 45, y: 8, width: 24, backgroundColor: "#0ea5e9" }
+                : { rotate: 0, y: 0, width: 24, backgroundColor: "#e2e8f0" }
+            }
           />
           <motion.div
-            className={`absolute bg-neutral-200 h-0.5 w-6 rounded-full top-2 transition-all duration-300 ${
-              menuOpened ? "opacity-0" : "opacity-100"
-            }`}
-            animate={menuOpened ? { opacity: 0 } : { opacity: 1 }}
+            className="absolute top-2 h-0.5 w-6 rounded-full"
+            animate={menuOpened ? { opacity: 0 } : { opacity: 1, backgroundColor: "#e2e8f0" }}
           />
           <motion.div
-            className={`absolute bg-neutral-200 h-0.5 rounded-full transition-all duration-300 ${
-              menuOpened ? "-rotate-45 translate-y-2 bg-primary-400 w-6" : "w-4 top-4"
-            }`}
-            animate={menuOpened ? { rotate: -45, y: 8, width: 24, backgroundColor: "#0ea5e9" } : { rotate: 0, y: 16, width: 16, backgroundColor: "#e2e8f0" }}
+            className="absolute h-0.5 rounded-full"
+            animate={
+              menuOpened
+                ? { rotate: -45, y: 8, width: 24, backgroundColor: "#0ea5e9" }
+                : { rotate: 0, y: 16, width: 16, backgroundColor: "#e2e8f0" }
+            }
           />
         </div>
       </motion.button>
@@ -51,7 +54,7 @@ export const Menu = (props) => {
       <AnimatePresence>
         {menuOpened && (
           <motion.div
-            className="z-20 fixed inset-0 bg-black/50 backdrop-blur-sm"
+            className="z-40 fixed inset-0 bg-black/50 backdrop-blur-sm"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
@@ -62,7 +65,7 @@ export const Menu = (props) => {
 
       {/* Menu Panel */}
       <motion.div
-        className="z-25 fixed top-0 right-0 bottom-0 glass-morphism-dark border-l border-neutral-700/50 flex flex-col overflow-hidden"
+        className="z-50 fixed top-0 right-0 bottom-0 glass-morphism-dark border-l border-neutral-700/50 flex flex-col overflow-hidden"
         initial={{ x: "100%" }}
         animate={{ x: menuOpened ? 0 : "100%" }}
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -71,11 +74,7 @@ export const Menu = (props) => {
         {/* Header */}
         <div className="p-8 border-b border-neutral-700/30">
           <div className="flex items-center space-x-4">
-            <img 
-              src="/logo.png" 
-              alt="Arhan Ansari Logo" 
-              className="w-12 h-12 object-contain"
-            />
+            <img src="/logo.png" alt="Arhan Ansari Logo" className="w-12 h-12 object-contain" />
             <div>
               <h2 className="text-xl font-display font-bold text-gradient">Arhan Ansari</h2>
               <p className="text-sm text-neutral-400">Full Stack Developer</p>
@@ -90,7 +89,10 @@ export const Menu = (props) => {
               <MenuButton
                 key={item.label}
                 {...item}
-                onClick={() => onSectionChange(item.section)}
+                onClick={() => {
+                  onSectionChange(item.section);
+                  setMenuOpened(false); // ✅ close menu after click
+                }}
                 index={index}
                 delay={index * 0.1}
               />
@@ -104,38 +106,13 @@ export const Menu = (props) => {
             Connect With Me
           </h3>
           <div className="grid grid-cols-5 gap-3">
-            <SocialLink
-              href="https://github.com/ArhanAnsari"
-              icon={<FaGithub size={20} />}
-              label="GitHub"
-              color="hover:text-neutral-100"
-            />
-            <SocialLink
-              href="https://youtube.com/@codewitharhanofficial"
-              icon={<FaYoutube size={20} />}
-              label="YouTube"
-              color="hover:text-red-400"
-            />
-            <SocialLink
-              href="https://discord.com/invite/bwjCXVwS8k"
-              icon={<FaDiscord size={20} />}
-              label="Discord"
-              color="hover:text-indigo-400"
-            />
-            <SocialLink
-              href="https://codewitharhan.infinityfreeapp.com"
-              icon={<FaGlobe size={20} />}
-              label="Website"
-              color="hover:text-primary-400"
-            />
-            <SocialLink
-              href="https://x.com/codewitharhan"
-              icon={<FaXTwitter size={20} />}
-              label="X (Twitter)"
-              color="hover:text-neutral-100"
-            />
+            <SocialLink href="https://github.com/ArhanAnsari" icon={<FaGithub size={20} />} label="GitHub" color="hover:text-neutral-100" />
+            <SocialLink href="https://youtube.com/@codewitharhanofficial" icon={<FaYoutube size={20} />} label="YouTube" color="hover:text-red-400" />
+            <SocialLink href="https://discord.com/invite/bwjCXVwS8k" icon={<FaDiscord size={20} />} label="Discord" color="hover:text-indigo-400" />
+            <SocialLink href="https://codewitharhan.infinityfreeapp.com" icon={<FaGlobe size={20} />} label="Website" color="hover:text-primary-400" />
+            <SocialLink href="https://x.com/codewitharhan" icon={<FaXTwitter size={20} />} label="X (Twitter)" color="hover:text-neutral-100" />
           </div>
-          
+
           {/* Contact Info */}
           <div className="mt-6 p-4 bg-neutral-800/30 rounded-xl">
             <div className="text-xs text-neutral-400 mb-1">Ready to collaborate?</div>
@@ -147,9 +124,7 @@ export const Menu = (props) => {
   );
 };
 
-const MenuButton = (props) => {
-  const { label, onClick, icon, index, delay } = props;
-  
+const MenuButton = ({ label, onClick, icon, index, delay }) => {
   return (
     <motion.button
       onClick={onClick}
@@ -161,13 +136,11 @@ const MenuButton = (props) => {
       whileTap={{ scale: 0.98 }}
     >
       <span className="text-2xl group-hover:scale-110 transition-transform">{icon}</span>
-      <span className="text-lg font-medium text-neutral-200 group-hover:text-primary-300 transition-colors">
-        {label}
-      </span>
-      <svg 
-        className="w-4 h-4 ml-auto text-neutral-600 group-hover:text-primary-400 group-hover:translate-x-1 transition-all" 
-        fill="none" 
-        stroke="currentColor" 
+      <span className="text-lg font-medium text-neutral-200 group-hover:text-primary-300 transition-colors">{label}</span>
+      <svg
+        className="w-4 h-4 ml-auto text-neutral-600 group-hover:text-primary-400 group-hover:translate-x-1 transition-all"
+        fill="none"
+        stroke="currentColor"
         viewBox="0 0 24 24"
       >
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
