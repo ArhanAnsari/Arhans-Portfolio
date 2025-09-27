@@ -1,8 +1,15 @@
-import { FaGithub, FaYoutube, FaDiscord, FaGlobe, FaXTwitter, FaLinkedin } from "react-icons/fa6";
+import {
+  FaGithub,
+  FaYoutube,
+  FaDiscord,
+  FaGlobe,
+  FaXTwitter,
+} from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
 
 export const Menu = (props) => {
-  const { onSectionChange, menuOpened, setMenuOpened } = props;
+  const { menuOpened, setMenuOpened } = props;
 
   const menuItems = [
     { label: "About", section: 0, icon: "👨‍💻" },
@@ -16,41 +23,35 @@ export const Menu = (props) => {
     { label: "Contact", section: 8, icon: "📬" },
   ];
 
+  // 🔥 Smooth scroll handler
+  const handleScroll = (section) => {
+    setMenuOpened(false);
+    const target = document.getElementById(`section-${section}`);
+    if (target) {
+      target.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <>
-      {/* Hamburger Menu Button */}
-      <motion.button
-        type="button" // ✅ prevents form-submit issues on mobile
-        onClick={() => setMenuOpened(!menuOpened)}
-        className="z-50 fixed top-6 right-6 p-3 glass-morphism-dark rounded-xl w-14 h-14 flex items-center justify-center group hover:bg-primary-500/20 transition-all duration-300"
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-      >
-        <div className="w-6 h-5 relative">
-          <motion.div
-            className="absolute h-0.5 rounded-full"
-            animate={
-              menuOpened
-                ? { rotate: 45, y: 8, width: 24, backgroundColor: "#0ea5e9" }
-                : { rotate: 0, y: 0, width: 24, backgroundColor: "#e2e8f0" }
-            }
-          />
-          <motion.div
-            className="absolute top-2 h-0.5 w-6 rounded-full"
-            animate={menuOpened ? { opacity: 0 } : { opacity: 1, backgroundColor: "#e2e8f0" }}
-          />
-          <motion.div
-            className="absolute h-0.5 rounded-full"
-            animate={
-              menuOpened
-                ? { rotate: -45, y: 8, width: 24, backgroundColor: "#0ea5e9" }
-                : { rotate: 0, y: 16, width: 16, backgroundColor: "#e2e8f0" }
-            }
-          />
-        </div>
-      </motion.button>
+      {/* Hamburger Button (hidden when open) */}
+      {!menuOpened && (
+        <motion.button
+          type="button"
+          onClick={() => setMenuOpened(true)}
+          className="z-50 fixed top-6 right-6 p-3 glass-morphism-dark rounded-xl w-14 h-14 flex items-center justify-center group hover:bg-primary-500/20 transition-all duration-300"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <div className="w-6 h-5 relative">
+            <motion.div className="absolute h-0.5 w-6 rounded-full bg-slate-200" />
+            <motion.div className="absolute top-2 h-0.5 w-6 rounded-full bg-slate-200" />
+            <motion.div className="absolute top-4 h-0.5 w-6 rounded-full bg-slate-200" />
+          </div>
+        </motion.button>
+      )}
 
-      {/* Menu Overlay */}
+      {/* Overlay */}
       <AnimatePresence>
         {menuOpened && (
           <motion.div
@@ -71,15 +72,28 @@ export const Menu = (props) => {
         transition={{ type: "spring", stiffness: 300, damping: 30 }}
         style={{ width: menuOpened ? "min(400px, 100vw)" : "0" }}
       >
-        {/* Header */}
-        <div className="p-8 border-b border-neutral-700/30">
+        {/* Header + Close */}
+        <div className="p-8 border-b border-neutral-700/30 flex items-center justify-between">
           <div className="flex items-center space-x-4">
-            <img src="/logo.png" alt="Arhan Ansari Logo" className="w-12 h-12 object-contain" />
+            <img
+              src="/logo.png"
+              alt="Arhan Ansari Logo"
+              className="w-12 h-12 object-contain"
+            />
             <div>
-              <h2 className="text-xl font-display font-bold text-gradient">Arhan Ansari</h2>
+              <h2 className="text-xl font-display font-bold text-gradient">
+                Arhan Ansari
+              </h2>
               <p className="text-sm text-neutral-400">Full Stack Developer</p>
             </div>
           </div>
+          <button
+            onClick={() => setMenuOpened(false)}
+            className="p-2 rounded-lg hover:bg-neutral-800/40 transition"
+            aria-label="Close Menu"
+          >
+            <X size={28} className="text-neutral-300" />
+          </button>
         </div>
 
         {/* Navigation */}
@@ -89,10 +103,7 @@ export const Menu = (props) => {
               <MenuButton
                 key={item.label}
                 {...item}
-                onClick={() => {
-                  onSectionChange(item.section);
-                  setMenuOpened(false); // ✅ close menu after click
-                }}
+                onClick={() => handleScroll(item.section)}
                 index={index}
                 delay={index * 0.1}
               />
@@ -106,17 +117,46 @@ export const Menu = (props) => {
             Connect With Me
           </h3>
           <div className="grid grid-cols-5 gap-3">
-            <SocialLink href="https://github.com/ArhanAnsari" icon={<FaGithub size={20} />} label="GitHub" color="hover:text-neutral-100" />
-            <SocialLink href="https://youtube.com/@codewitharhanofficial" icon={<FaYoutube size={20} />} label="YouTube" color="hover:text-red-400" />
-            <SocialLink href="https://discord.com/invite/bwjCXVwS8k" icon={<FaDiscord size={20} />} label="Discord" color="hover:text-indigo-400" />
-            <SocialLink href="https://codewitharhan.infinityfreeapp.com" icon={<FaGlobe size={20} />} label="Website" color="hover:text-primary-400" />
-            <SocialLink href="https://x.com/codewitharhan" icon={<FaXTwitter size={20} />} label="X (Twitter)" color="hover:text-neutral-100" />
+            <SocialLink
+              href="https://github.com/ArhanAnsari"
+              icon={<FaGithub size={20} />}
+              label="GitHub"
+              color="hover:text-neutral-100"
+            />
+            <SocialLink
+              href="https://youtube.com/@codewitharhanofficial"
+              icon={<FaYoutube size={20} />}
+              label="YouTube"
+              color="hover:text-red-400"
+            />
+            <SocialLink
+              href="https://discord.com/invite/bwjCXVwS8k"
+              icon={<FaDiscord size={20} />}
+              label="Discord"
+              color="hover:text-indigo-400"
+            />
+            <SocialLink
+              href="https://codewitharhan.infinityfreeapp.com"
+              icon={<FaGlobe size={20} />}
+              label="Website"
+              color="hover:text-primary-400"
+            />
+            <SocialLink
+              href="https://x.com/codewitharhan"
+              icon={<FaXTwitter size={20} />}
+              label="X (Twitter)"
+              color="hover:text-neutral-100"
+            />
           </div>
 
           {/* Contact Info */}
           <div className="mt-6 p-4 bg-neutral-800/30 rounded-xl">
-            <div className="text-xs text-neutral-400 mb-1">Ready to collaborate?</div>
-            <div className="text-sm text-neutral-200 font-medium">arhanansari2009@gmail.com</div>
+            <div className="text-xs text-neutral-400 mb-1">
+              Ready to collaborate?
+            </div>
+            <div className="text-sm text-neutral-200 font-medium">
+              arhanansari2009@gmail.com
+            </div>
           </div>
         </div>
       </motion.div>
@@ -135,15 +175,24 @@ const MenuButton = ({ label, onClick, icon, index, delay }) => {
       whileHover={{ scale: 1.02, x: 8 }}
       whileTap={{ scale: 0.98 }}
     >
-      <span className="text-2xl group-hover:scale-110 transition-transform">{icon}</span>
-      <span className="text-lg font-medium text-neutral-200 group-hover:text-primary-300 transition-colors">{label}</span>
+      <span className="text-2xl group-hover:scale-110 transition-transform">
+        {icon}
+      </span>
+      <span className="text-lg font-medium text-neutral-200 group-hover:text-primary-300 transition-colors">
+        {label}
+      </span>
       <svg
         className="w-4 h-4 ml-auto text-neutral-600 group-hover:text-primary-400 group-hover:translate-x-1 transition-all"
         fill="none"
         stroke="currentColor"
         viewBox="0 0 24 24"
       >
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+        <path
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={2}
+          d="M9 5l7 7-7 7"
+        />
       </svg>
     </motion.button>
   );
