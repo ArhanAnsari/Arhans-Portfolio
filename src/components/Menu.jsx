@@ -9,8 +9,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
 
 export const Menu = (props) => {
-  const { menuOpened, setMenuOpened } = props;
-
+  const { onSectionChange, menuOpened, setMenuOpened } = props;
+  
   const menuItems = [
     { label: "About", section: 0, icon: "👨‍💻" },
     { label: "Skills", section: 1, icon: "⚡" },
@@ -103,7 +103,11 @@ export const Menu = (props) => {
               <MenuButton
                 key={item.label}
                 {...item}
-                onClick={() => handleScroll(item.section)}
+                onClick={() => { 
+                  onSectionChange(item.section); 
+                  handleScroll(item.section);
+                  setMenuOpened(false); // ✅ close menu after click
+                }}
                 index={index}
                 delay={index * 0.1}
               />
