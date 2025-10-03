@@ -13,7 +13,7 @@ const Section = (props) => {
     <motion.section
       className={`
         relative min-h-screen w-full section-padding
-        flex flex-col items-start
+        flex flex-col items-center
         ${mobileTop ? "justify-start md:justify-center" : "justify-center"}
         ${className}
       `}
@@ -148,13 +148,13 @@ const services = [
 export const Interface = (props) => {
   const { setSection } = props;
   return (
-    <div className="flex flex-col items-center w-screen relative interface-content">
+    <div className="flex flex-col items-center w-full relative interface-content">
       {/* Enhanced Background Coverage */}
-      <div className="fixed inset-0 bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 -z-50" />
-      <div className="fixed inset-0 hero-pattern opacity-30 -z-40" />
+      <div className="fixed inset-0 bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 -z-50" style={{ pointerEvents: 'none' }} />
+      <div className="fixed inset-0 hero-pattern opacity-30 -z-40" style={{ pointerEvents: 'none' }} />
       
       {/* Floating particles background */}
-      <div className="particles-container">
+      <div className="particles-container" style={{ pointerEvents: 'none' }}>
         <div className="absolute top-20 left-10 w-2 h-2 bg-primary-400 rounded-full animate-float opacity-60"></div>
         <div className="absolute top-40 right-20 w-1 h-1 bg-accent-400 rounded-full animate-float opacity-40"></div>
         <div className="absolute top-60 left-1/4 w-1.5 h-1.5 bg-primary-300 rounded-full animate-bounce-subtle opacity-50"></div>
@@ -303,51 +303,57 @@ const AboutSection = (props) => {
 const skills = [
   {
     title: "Three.js / React Three Fiber",
-    level: 100,
+    description: "Building immersive 3D web experiences",
+    years: "2+ years",
+    projects: "15+ projects",
     icon: "🎮",
-    category: "3D Development"
+    category: "3D Development",
+    technologies: ["Three.js", "React Three Fiber", "WebGL", "Blender"]
   },
   {
-    title: "Full Stack Web Development",
-    level: 100,
-    icon: "⚡",
-    category: "Backend"
-  },
-  {
-    title: "React / React Native",
-    level: 100,
+    title: "Frontend Development",
+    description: "Modern React applications with TypeScript",
+    years: "3+ years",
+    projects: "50+ projects",
     icon: "⚛️",
-    category: "Frontend"
+    category: "Frontend",
+    technologies: ["React", "TypeScript", "Next.js", "Tailwind CSS"]
+  },
+  {
+    title: "Backend Development", 
+    description: "RESTful APIs and real-time applications",
+    years: "2+ years",
+    projects: "30+ projects",
+    icon: "🚀",
+    category: "Backend",
+    technologies: ["Node.js", "Express", "MongoDB", "PostgreSQL"]
   },
   {
     title: "UI/UX Design",
-    level: 95,
-    icon: "🎨",
-    category: "Design"
+    description: "User-centered design with modern aesthetics",
+    years: "2+ years",
+    projects: "40+ designs",
+    icon: "�",
+    category: "Design",
+    technologies: ["Figma", "Adobe XD", "Framer", "Sketch"]
   },
   {
-    title: "Node.js / Express",
-    level: 98,
-    icon: "🚀",
-    category: "Backend"
+    title: "Mobile Development",
+    description: "Cross-platform mobile applications",
+    years: "1+ years",
+    projects: "10+ apps",
+    icon: "�",
+    category: "Mobile",
+    technologies: ["React Native", "Flutter", "Expo"]
   },
   {
-    title: "3D Modeling & Animation",
-    level: 95,
-    icon: "🎯",
-    category: "3D Development"
-  },
-  {
-    title: "TypeScript",
-    level: 92,
-    icon: "📘",
-    category: "Programming"
-  },
-  {
-    title: "Database Management",
-    level: 90,
-    icon: "🗄️",
-    category: "Backend"
+    title: "DevOps & Deployment",
+    description: "CI/CD and cloud infrastructure",
+    years: "1+ years",
+    projects: "25+ deployments",
+    icon: "☁️",
+    category: "DevOps",
+    technologies: ["Vercel", "Netlify", "AWS", "Docker"]
   }
 ];
 
@@ -419,29 +425,40 @@ const SkillsSection = () => {
                       whileHover={{ scale: 1.02 }}
                       transition={{ type: "spring", stiffness: 300 }}
                     >
-                      <div className="flex items-center justify-between mb-3">
+                      <div className="flex items-start justify-between mb-4">
                         <div className="flex items-center space-x-3">
                           <span className="text-2xl group-hover:scale-110 transition-transform">
                             {skill.icon}
                           </span>
-                          <h4 className="font-semibold text-neutral-200 group-hover:text-primary-300 transition-colors">
-                            {skill.title}
-                          </h4>
+                          <div>
+                            <h4 className="font-semibold text-neutral-200 group-hover:text-primary-300 transition-colors">
+                              {skill.title}
+                            </h4>
+                            <p className="text-sm text-neutral-400 mt-1">
+                              {skill.description}
+                            </p>
+                          </div>
                         </div>
-                        <span className="text-sm text-primary-400 font-bold">
-                          {skill.level}%
-                        </span>
                       </div>
                       
-                      <div className="relative h-2 bg-neutral-800 rounded-full overflow-hidden">
-                        <motion.div
-                          className="h-full bg-gradient-to-r from-primary-500 to-accent-500 rounded-full shadow-glow"
-                          initial={{ width: 0 }}
-                          whileInView={{ width: `${skill.level}%` }}
-                          transition={{ duration: 1.5, delay: 0.5 + index * 0.1, ease: "easeOut" }}
-                          viewport={{ once: true }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer"></div>
+                      <div className="flex flex-wrap gap-2 mb-3">
+                        {skill.technologies.map((tech, techIndex) => (
+                          <span 
+                            key={techIndex}
+                            className="px-2 py-1 bg-primary-500/10 text-primary-300 text-xs rounded-full border border-primary-500/20"
+                          >
+                            {tech}
+                          </span>
+                        ))}
+                      </div>
+                      
+                      <div className="flex justify-between text-sm">
+                        <span className="text-neutral-400">
+                          <span className="text-accent-400 font-medium">{skill.years}</span> experience
+                        </span>
+                        <span className="text-neutral-400">
+                          <span className="text-primary-400 font-medium">{skill.projects}</span> completed
+                        </span>
                       </div>
                     </motion.div>
                   ))}
@@ -593,30 +610,80 @@ const ProjectsSection = () => {
           </motion.div>
         )}
 
-        {/* Project Stats */}
+        {/* Project Stats & Breakdown */}
         <motion.div
-          className="mt-16 p-8 glass-morphism rounded-2xl"
+          className="mt-16 space-y-8"
           initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true }}
         >
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-primary-400">{projects.length}+</div>
-              <div className="text-sm text-neutral-400">Total Projects</div>
+          {/* Stats */}
+          <div className="p-8 glass-morphism rounded-2xl">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              <div className="space-y-2">
+                <div className="text-3xl font-bold text-primary-400">{projects.length}+</div>
+                <div className="text-sm text-neutral-400">Total Projects</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-3xl font-bold text-accent-400">{categories.length - 1}</div>
+                <div className="text-sm text-neutral-400">Categories</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-3xl font-bold text-primary-400">1000+</div>
+                <div className="text-sm text-neutral-400">Hours Coded</div>
+              </div>
+              <div className="space-y-2">
+                <div className="text-3xl font-bold text-accent-400">5+</div>
+                <div className="text-sm text-neutral-400">Happy Clients</div>
+              </div>
             </div>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-accent-400">{categories.length - 1}</div>
-              <div className="text-sm text-neutral-400">Categories</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-primary-400">100+</div>
-              <div className="text-sm text-neutral-400">Hours Coded</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-3xl font-bold text-accent-400">10</div>
-              <div className="text-sm text-neutral-400">Happy Clients</div>
+          </div>
+
+          {/* Project Breakdown */}
+          <div className="p-8 glass-morphism rounded-2xl">
+            <h3 className="text-xl font-bold text-neutral-200 mb-6 text-center">Project Breakdown</h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 text-center">
+              <div className="space-y-2">
+                <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <span className="text-2xl">✨</span>
+                </div>
+                <div className="text-2xl font-bold text-green-400">
+                  {projects.filter(p => p.type === 'original').length}
+                </div>
+                <div className="text-sm text-neutral-400">Original Ideas</div>
+                <div className="text-xs text-neutral-500">Built from scratch with my own concepts</div>
+              </div>
+              <div className="space-y-2">
+                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <span className="text-2xl">👨‍💼</span>
+                </div>
+                <div className="text-2xl font-bold text-purple-400">
+                  {projects.filter(p => p.type === 'client').length}
+                </div>
+                <div className="text-sm text-neutral-400">Client Work</div>
+                <div className="text-xs text-neutral-500">Real-world projects for businesses</div>
+              </div>
+              <div className="space-y-2">
+                <div className="w-16 h-16 bg-yellow-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <span className="text-2xl">🎨</span>
+                </div>
+                <div className="text-2xl font-bold text-yellow-400">
+                  {projects.filter(p => p.type === 'inspired').length}
+                </div>
+                <div className="text-sm text-neutral-400">Inspired Recreations</div>
+                <div className="text-xs text-neutral-500">My take on existing concepts</div>
+              </div>
+              <div className="space-y-2">
+                <div className="w-16 h-16 bg-blue-500/20 rounded-full flex items-center justify-center mx-auto">
+                  <span className="text-2xl">📚</span>
+                </div>
+                <div className="text-2xl font-bold text-blue-400">
+                  {projects.filter(p => p.type === 'learning').length}
+                </div>
+                <div className="text-sm text-neutral-400">Learning Projects</div>
+                <div className="text-xs text-neutral-500">Tutorial-based for skill development</div>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -682,6 +749,23 @@ const ProjectCard = ({ project, index, onClick }) => {
             {project.category || "Web"}
           </span>
         </div>
+
+        {/* Project Type Badge */}
+        {project.type && (
+          <div className="absolute top-3 right-3">
+            <span className={`px-2 py-1 text-xs font-medium rounded-full ${
+              project.type === 'original' ? 'bg-green-500/90 text-white' :
+              project.type === 'inspired' ? 'bg-yellow-500/90 text-white' :
+              project.type === 'learning' ? 'bg-blue-500/90 text-white' :
+              'bg-purple-500/90 text-white'
+            }`}>
+              {project.type === 'original' ? '✨ Original' :
+               project.type === 'inspired' ? '🎨 Inspired' :
+               project.type === 'learning' ? '📚 Learning' :
+               '👨‍💼 Client'}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Project Info */}
@@ -721,7 +805,26 @@ const TestimonialsSection = () => {
   return (
     <Section>
       <motion.div className="w-full" whileInView={"visible"}>
-        <h2 className="text-3xl md:text-5xl font-bold text-black mb-8">Testimonials</h2>
+        <div className="text-center space-y-4 mb-12">
+          <motion.h2 
+            className="text-responsive-lg font-display font-bold text-gradient"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            Client Testimonials
+          </motion.h2>
+          <motion.p 
+            className="text-neutral-400 max-w-2xl mx-auto text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            What clients say about working with me
+          </motion.p>
+        </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           {testimonials.map((testimonial, index) => (
             <motion.div
@@ -1306,84 +1409,237 @@ const ContactSection = () => {
 
   return (
     <Section>
-      <h2 className="text-3xl md:text-5xl font-bold text-black">Contact me</h2>
-      <div className="mt-8 p-8 rounded-md bg-white bg-opacity-50 w-96 max-w-full">
-        {state.succeeded ? (
-          <p className="text-indigo-500 text-center">Thanks for your message!</p>
-        ) : (
-          <form onSubmit={handleFormSubmit}>
-            {/* Name Field */}
-            <label
-              htmlFor="name"
-              className="font-medium text-indigo-500 block mb-1"
-            >
-              Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              name="user_name"
-              id="name"
-              value={formValues.user_name}
-              onChange={handleInputChange}
-              className="block w-full rounded-md border-0 text-indigo-500 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
-            />
+      <motion.div className="w-full max-w-6xl mx-auto space-y-12">
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <motion.h2 
+            className="text-responsive-lg font-display font-bold text-gradient"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            Let's Work Together
+          </motion.h2>
+          <motion.p 
+            className="text-neutral-300 max-w-2xl mx-auto text-center text-lg"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            Ready to bring your ideas to life? Let's create something amazing together.
+          </motion.p>
+        </div>
 
-            {/* Email Field */}
-            <label
-              htmlFor="email"
-              className="font-medium text-indigo-500 block mb-1 mt-8"
-            >
-              Email <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="email"
-              name="user_email"
-              id="email"
-              value={formValues.user_email}
-              onChange={handleInputChange}
-              className="block w-full rounded-md border-0 text-indigo-500 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
-            />
-            <ValidationError
-              className="mt-1 text-red-500"
-              prefix="Email"
-              field="email"
-              errors={state.errors}
-            />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+          {/* Contact Form */}
+          <motion.div
+            className="card-modern"
+            initial={{ opacity: 0, x: -30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true }}
+          >
+            {state.succeeded ? (
+              <div className="text-center py-12">
+                <div className="text-6xl mb-4">🎉</div>
+                <h3 className="text-2xl font-bold text-primary-400 mb-2">Message Sent!</h3>
+                <p className="text-neutral-300">Thanks for reaching out! I'll get back to you soon.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleFormSubmit} className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Name Field */}
+                  <div>
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-neutral-200 mb-2"
+                    >
+                      Name <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="user_name"
+                      id="name"
+                      value={formValues.user_name}
+                      onChange={handleInputChange}
+                      placeholder="Your full name"
+                      className="w-full px-4 py-3 bg-neutral-800/50 border border-neutral-700 rounded-lg text-neutral-200 placeholder-neutral-500 focus:border-primary-500 focus:ring-1 focus:ring-primary-500/50 transition-all"
+                    />
+                  </div>
 
-            {/* Message Field */}
-            <label
-              htmlFor="message"
-              className="font-medium text-indigo-500 block mb-1 mt-8"
-            >
-              Message <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              name="message"
-              id="message"
-              value={formValues.message}
-              onChange={handleInputChange}
-              className="h-32 block w-full rounded-md border-0 text-indigo-500 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 p-3"
-            />
-            <ValidationError
-              className="mt-1 text-red-500"
-              errors={state.errors}
-            />
+                  {/* Email Field */}
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-neutral-200 mb-2"
+                    >
+                      Email <span className="text-red-400">*</span>
+                    </label>
+                    <input
+                      type="email"
+                      name="user_email"
+                      id="email"
+                      value={formValues.user_email}
+                      onChange={handleInputChange}
+                      placeholder="your@email.com"
+                      className="w-full px-4 py-3 bg-neutral-800/50 border border-neutral-700 rounded-lg text-neutral-200 placeholder-neutral-500 focus:border-primary-500 focus:ring-1 focus:ring-primary-500/50 transition-all"
+                    />
+                    <ValidationError
+                      className="mt-1 text-red-400 text-sm"
+                      prefix="Email"
+                      field="email"
+                      errors={state.errors}
+                    />
+                  </div>
+                </div>
 
-            {/* Submit Button */}
-            <button
-              type="submit"
-              disabled={!isFormValid || isSubmitting}
-              className={`py-4 px-8 rounded-lg font-bold text-lg mt-16 ${
-                isFormValid
-                  ? "bg-indigo-600 text-white"
-                  : "bg-gray-400 text-gray-700 cursor-not-allowed"
-              }`}
-            >
-              {isSubmitting ? "Submitting..." : "Submit"}
-            </button>
-          </form>
-        )}
-      </div>
+                {/* Message Field */}
+                <div>
+                  <label
+                    htmlFor="message"
+                    className="block text-sm font-medium text-neutral-200 mb-2"
+                  >
+                    Message <span className="text-red-400">*</span>
+                  </label>
+                  <textarea
+                    name="message"
+                    id="message"
+                    value={formValues.message}
+                    onChange={handleInputChange}
+                    rows={5}
+                    placeholder="Tell me about your project..."
+                    className="w-full px-4 py-3 bg-neutral-800/50 border border-neutral-700 rounded-lg text-neutral-200 placeholder-neutral-500 focus:border-primary-500 focus:ring-1 focus:ring-primary-500/50 transition-all resize-none"
+                  />
+                  <ValidationError
+                    className="mt-1 text-red-400 text-sm"
+                    errors={state.errors}
+                  />
+                </div>
+
+                {/* Submit Button */}
+                <motion.button
+                  type="submit"
+                  disabled={!isFormValid || isSubmitting}
+                  className={`w-full py-4 px-6 rounded-lg font-semibold text-lg transition-all ${
+                    isFormValid && !isSubmitting
+                      ? "btn-primary hover:scale-105"
+                      : "bg-neutral-700 text-neutral-400 cursor-not-allowed"
+                  }`}
+                  whileHover={isFormValid && !isSubmitting ? { scale: 1.02 } : {}}
+                  whileTap={isFormValid && !isSubmitting ? { scale: 0.98 } : {}}
+                >
+                  {isSubmitting ? (
+                    <span className="flex items-center justify-center">
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-current" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Sending...
+                    </span>
+                  ) : (
+                    "Send Message"
+                  )}
+                </motion.button>
+              </form>
+            )}
+          </motion.div>
+
+          {/* Contact Info */}
+          <motion.div
+            className="space-y-8"
+            initial={{ opacity: 0, x: 30 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            {/* Quick Contact */}
+            <div className="card-modern">
+              <h3 className="text-xl font-bold text-neutral-200 mb-6">Get In Touch</h3>
+              <div className="space-y-4">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-primary-500/20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-neutral-300 font-medium">Email</p>
+                    <a href="mailto:arhanansari2009@gmail.com" className="text-primary-400 hover:text-primary-300 transition-colors">
+                      arhanansari2009@gmail.com
+                    </a>
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-accent-500/20 rounded-full flex items-center justify-center">
+                    <svg className="w-6 h-6 text-accent-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="text-neutral-300 font-medium">Response Time</p>
+                    <p className="text-accent-400">Usually within 24 hours</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div className="card-modern">
+              <h3 className="text-xl font-bold text-neutral-200 mb-6">Quick Start</h3>
+              <div className="space-y-3">
+                <a 
+                  href="https://calendly.com/arhanansari2009"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-neutral-800/30 rounded-lg hover:bg-neutral-700/30 transition-colors group"
+                >
+                  <span className="text-neutral-300 group-hover:text-primary-300">Schedule a Call</span>
+                  <svg className="w-5 h-5 text-neutral-500 group-hover:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                </a>
+                
+                <a 
+                  href="https://github.com/ArhanAnsari"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center justify-between p-3 bg-neutral-800/30 rounded-lg hover:bg-neutral-700/30 transition-colors group"
+                >
+                  <span className="text-neutral-300 group-hover:text-primary-300">View My Code</span>
+                  <svg className="w-5 h-5 text-neutral-500 group-hover:text-primary-400" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            {/* Social Links */}
+            <div className="card-modern">
+              <h3 className="text-xl font-bold text-neutral-200 mb-6">Connect</h3>
+              <div className="flex space-x-4">
+                <a href="https://github.com/ArhanAnsari" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-neutral-700 transition-colors">
+                  <svg className="w-6 h-6 text-neutral-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                  </svg>
+                </a>
+                <a href="https://linkedin.com/in/arhan-ansari" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center hover:bg-blue-700 transition-colors">
+                  <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                </a>
+                <a href="https://twitter.com/codewitharhan" target="_blank" rel="noopener noreferrer" className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center hover:bg-neutral-700 transition-colors">
+                  <svg className="w-6 h-6 text-neutral-300" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      </motion.div>
     </Section>
   );
 };

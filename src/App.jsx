@@ -1,4 +1,3 @@
-import { Scroll, ScrollControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { MotionConfig } from "framer-motion";
 import { Leva } from "leva";
@@ -8,7 +7,6 @@ import { Experience } from "./components/Experience";
 import { Interface } from "./components/Interface";
 import { LoadingScreen } from "./components/LoadingScreen";
 import { Menu } from "./components/Menu";
-import { ScrollManager } from "./components/ScrollManager";
 import { ParticleBackground } from "./components/ParticleBackground";
 import { framerMotionConfig } from "./config";
 import { Analytics } from '@vercel/analytics/react';
@@ -22,6 +20,22 @@ function App() {
     setMenuOpened(false);
   }, [section]);
 
+  // Native scroll listener for section tracking
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const newSection = Math.min(Math.floor(scrollY / windowHeight), 8);
+      
+      if (newSection !== section) {
+        setSection(newSection);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, [section]);
+
   return (
     <>
       <ParticleBackground />
@@ -33,38 +47,35 @@ function App() {
           ...framerMotionConfig,
         }}
       >
-        <div className="canvas-container">
+        {/* Fixed Canvas for 3D Scene */}
+        <div className="fixed inset-0 z-0 pointer-events-none">
           <Canvas 
             shadows 
             camera={{ position: [0, 3, 10], fov: 42 }}
             gl={{ 
               antialias: true,
               alpha: true,
-              powerPreference: "high-performance"
+              powerPreference: "high-performance",
+              preserveDrawingBuffer: true
             }}
           >
             <color attach="background" args={["transparent"]} />
-            <fog attach="fog" args={["#0f172a", 10, 50]} />
+            <fog attach="fog" args={["#0f172a", 15, 60]} />
           
-            <ScrollControls pages={13} damping={0.1}>
-              <ScrollManager section={section} onSectionChange={setSection} />
-              <Scroll>
-                <Suspense fallback={null}>
-                  {started && (
-                    <Experience section={section} menuOpened={menuOpened} />
-                  )}
-                </Suspense>
-              </Scroll>
-              <Scroll html>
-                {started && (
-                  <div className="content-overlay">
-                    <Interface setSection={setSection} />
-                  </div>
-                )}
-              </Scroll>
-            </ScrollControls>
+            <Suspense fallback={null}>
+              {started && (
+                <Experience section={section} menuOpened={menuOpened} />
+              )}
+            </Suspense>
           </Canvas>
         </div>
+
+        {/* Scrollable Content */}
+        {started && (
+          <div className="relative z-10 pointer-events-auto">
+            <Interface setSection={setSection} />
+          </div>
+        )}
         
         {started && (
           <Menu

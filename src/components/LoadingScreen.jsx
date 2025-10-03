@@ -22,6 +22,17 @@ export const LoadingScreen = (props) => {
     return () => clearTimeout(timer);
   }, [progress, total, loaded, item, setStarted]);
 
+  // Fallback for when progress doesn't update
+  useEffect(() => {
+    const fallbackTimer = setTimeout(() => {
+      if (!started) {
+        setStarted(true);
+      }
+    }, 3000); // Start after 3 seconds regardless
+
+    return () => clearTimeout(fallbackTimer);
+  }, [started, setStarted]);
+
   return (
     <AnimatePresence>
       {!started && (

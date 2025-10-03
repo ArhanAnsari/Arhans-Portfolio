@@ -5,14 +5,20 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    width: 100%;
+    height: 100%;
   }
   
   body {
     margin: 0;
+    padding: 0;
     font-family: 'Inter', system-ui, sans-serif;
     background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
     color: #f8fafc;
     overflow-x: hidden;
+    overflow-y: auto;
+    width: 100%;
+    min-height: 100vh;
   }
 
   * {
@@ -106,30 +112,28 @@
   }
   
   .section-padding {
-    padding: 64px 16px;
-    padding-left: max(16px, 25vw);
-    padding-right: 16px;
+    padding: 80px 16px;
   }
   
   @media (min-width: 640px) {
     .section-padding {
-      padding: 64px 24px;
-      padding-left: max(24px, 30vw);
+      padding: 80px 24px;
+      padding-left: max(24px, 20vw);
       padding-right: 24px;
     }
   }
   
   @media (min-width: 1024px) {
     .section-padding {
-      padding: 96px 32px;
-      padding-left: max(32px, 35vw);
+      padding: 100px 32px;
+      padding-left: max(32px, 25vw);
       padding-right: 32px;
     }
   }
   
   @media (min-width: 1400px) {
     .section-padding {
-      padding-left: max(32px, 40vw);
+      padding-left: max(32px, 30vw);
     }
   }
   
@@ -156,9 +160,10 @@
 }
 
 #root {
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  min-height: 100vh;
   position: relative;
+  overflow: visible;
 }
 
 /* Custom scrollbar */
@@ -239,15 +244,7 @@ textarea:focus {
   position: relative;
   z-index: 10;
   width: 100%;
-  min-height: 100vh;
-  background: linear-gradient(
-    to bottom,
-    rgba(15, 23, 42, 0.95) 0%,
-    rgba(15, 23, 42, 0.9) 20%,
-    rgba(15, 23, 42, 0.85) 40%,
-    rgba(15, 23, 42, 0.9) 60%,
-    rgba(15, 23, 42, 0.95) 100%
-  );
+  background: transparent;
 }
 
 /* Floating elements */
@@ -279,37 +276,21 @@ textarea:focus {
 /* Mobile adjustments for 3D character overlap */
 @media (max-width: 768px) {
   .section-padding {
-    padding-left: 16px !important;
-    padding-right: 16px !important;
+    padding: 60px 16px !important;
   }
   
   .interface-content {
-    background: linear-gradient(
-      to bottom,
-      rgba(15, 23, 42, 0.98) 0%,
-      rgba(15, 23, 42, 0.95) 20%,
-      rgba(15, 23, 42, 0.90) 40%,
-      rgba(15, 23, 42, 0.95) 60%,
-      rgba(15, 23, 42, 0.98) 100%
-    );
+    background: transparent;
   }
 }
 
-/* Ensure proper stacking context */
-.canvas-container {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  z-index: 1;
-  pointer-events: none;
-}
+
 
 .content-overlay {
   position: relative;
   z-index: 10;
   pointer-events: auto;
+  width: 100%;
 }
 
 /* Menu positioning fixes */

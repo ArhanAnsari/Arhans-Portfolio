@@ -2,7 +2,6 @@ import {
   Float,
   MeshDistortMaterial,
   MeshWobbleMaterial,
-  useScroll,
 } from "@react-three/drei";
 import { useFrame, useThree } from "@react-three/fiber";
 import { animate, useMotionValue } from "framer-motion";
@@ -15,9 +14,8 @@ import { Office } from "./Office";
 import { Projects } from "./Projects";
 
 export const Experience = (props) => {
-  const { menuOpened } = props;
+  const { menuOpened, section: parentSection } = props;
   const { viewport } = useThree();
-  const data = useScroll();
 
   const isMobile = window.innerWidth < 768;
   const responsiveRatio = viewport.width / 12;
@@ -37,6 +35,13 @@ export const Experience = (props) => {
     });
   }, [menuOpened]);
 
+  // Update section from parent
+  useEffect(() => {
+    if (parentSection !== undefined && parentSection !== section) {
+      setSection(parentSection);
+    }
+  }, [parentSection]);
+
   const characterContainerAboutRef = useRef();
 
   const [characterAnimation, setCharacterAnimation] = useState("Typing");
@@ -50,15 +55,6 @@ export const Experience = (props) => {
   const characterGroup = useRef();
 
   useFrame((state) => {
-    let curSection = Math.floor(data.scroll.current * data.pages);
-
-    if (curSection > 8) {
-      curSection = 8;
-    }
-
-    if (curSection !== section) {
-      setSection(curSection);
-    }
 
     state.camera.position.x = cameraPositionX.get();
     state.camera.lookAt(cameraLookAtX.get(), 0, 0);
@@ -84,25 +80,31 @@ export const Experience = (props) => {
         }}
         variants={{
           0: {
+            x: 0,
+            y: 0,
+            z: 0,
+            rotateX: 0,
+            rotateY: 0,
+            rotateZ: 0,
             scaleX: officeScaleRatio,
             scaleY: officeScaleRatio,
             scaleZ: officeScaleRatio,
           },
           1: {
-            y: -viewport.height + 0.5,
-            x: isMobile ? 0.3 : 0,
+            y: 0.5,
+            x: isMobile ? 0.3 : -1,
             z: 7,
             rotateX: 0,
-            rotateY: isMobile ? -Math.PI / 2 : 0,
+            rotateY: isMobile ? -Math.PI / 2 : Math.PI / 4,
             rotateZ: 0,
-            scaleX: isMobile ? 1.5 : 1,
-            scaleY: isMobile ? 1.5 : 1,
-            scaleZ: isMobile ? 1.5 : 1,
+            scaleX: isMobile ? 1.2 : 1,
+            scaleY: isMobile ? 1.2 : 1,
+            scaleZ: isMobile ? 1.2 : 1,
           },
           2: {
             x: isMobile ? -1.4 : -2,
-            y: -viewport.height * 2 + 0.5,
-            z: 0,
+            y: 0.5,
+            z: 3,
             rotateX: 0,
             rotateY: Math.PI / 2,
             rotateZ: 0,
@@ -111,42 +113,42 @@ export const Experience = (props) => {
             scaleZ: 1,
           },
           3: {
-            y: -viewport.height * 3 + 1,
-            x: isMobile ? 0 : 0.24,
-            z: isMobile ? 6.5 : 8.5,
+            y: 1,
+            x: isMobile ? 1 : 2,
+            z: isMobile ? 4 : 5,
             rotateX: 0,
-            rotateY: -Math.PI / 4,
+            rotateY: -Math.PI / 6,
             rotateZ: 0,
             scaleX: isMobile ? 0.9 : 1,
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
           4: {
-            y: -viewport.height * 4 + 1,
-            x: isMobile ? 0 : 0.24,
-            z: isMobile ? 6.5 : 8.5,
+            y: 1,
+            x: isMobile ? -1 : -1.5,
+            z: isMobile ? 4 : 5,
             rotateX: 0,
-            rotateY: -Math.PI / 4,
+            rotateY: Math.PI / 6,
             rotateZ: 0,
             scaleX: isMobile ? 0.9 : 1,
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
           5: {
-            y: -viewport.height * 5 + 1,
-            x: isMobile ? 0 : 0.24,
-            z: isMobile ? 6.5 : 8.5,
+            y: 1,
+            x: isMobile ? 0 : 0.5,
+            z: isMobile ? 5 : 6,
             rotateX: 0,
-            rotateY: -Math.PI / 4,
+            rotateY: 0,
             rotateZ: 0,
             scaleX: isMobile ? 0.9 : 1,
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
           6: {
-            y: -viewport.height * 6 + 1,
-            x: isMobile ? 0 : 0.24,
-            z: isMobile ? 6.5 : 8.5,
+            y: 1,
+            x: isMobile ? 1.5 : 2,
+            z: isMobile ? 4 : 5,
             rotateX: 0,
             rotateY: -Math.PI / 4,
             rotateZ: 0,
@@ -155,22 +157,22 @@ export const Experience = (props) => {
             scaleZ: isMobile ? 0.9 : 1,
           },
           7: {
-            y: -viewport.height * 7 + 1,
-            x: isMobile ? 0 : 0.24,
-            z: isMobile ? 6.5 : 8.5,
+            y: 1,
+            x: isMobile ? -1 : -1.5,
+            z: isMobile ? 5 : 6,
             rotateX: 0,
-            rotateY: -Math.PI / 4,
+            rotateY: Math.PI / 3,
             rotateZ: 0,
             scaleX: isMobile ? 0.9 : 1,
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
           8: {
-            y: -viewport.height * 8 + 1,
-            x: isMobile ? 0 : 0.24,
-            z: isMobile ? 6.5 : 8.5,
+            y: 1,
+            x: isMobile ? 0 : 0,
+            z: isMobile ? 6 : 7,
             rotateX: 0,
-            rotateY: -Math.PI / 4,
+            rotateY: 0,
             rotateZ: 0,
             scaleX: isMobile ? 0.9 : 1,
             scaleY: isMobile ? 0.9 : 1,
