@@ -10,7 +10,7 @@ export const projects = [
 	{
 		title: "Arhan Sales",
 		url: "https://arhan-sales.infinityfreeapp.com/",
-		github: "https://github.com/ArhanAnsari/arhan-sales",
+		github: "https://github.com/ArhanAnsari/Arhan-Sales-Main",
 		image: "projects/arhansales.png",
 		description: "Professional business website with modern design and contact management.",
 		category: "client",
