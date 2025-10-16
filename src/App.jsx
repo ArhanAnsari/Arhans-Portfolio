@@ -47,20 +47,20 @@ function App() {
           ...framerMotionConfig,
         }}
       >
-        {/* Fixed Canvas for 3D Scene */}
-        <div className="fixed inset-0 z-0 pointer-events-none">
+        {/* Fixed Canvas for 3D Scene - Behind Everything */}
+        <div className="fixed top-0 left-0 w-screen h-screen z-0 pointer-events-none">
           <Canvas 
             shadows 
             camera={{ position: [0, 3, 10], fov: 42 }}
             gl={{ 
               antialias: true,
               alpha: true,
-              powerPreference: "high-performance",
-              preserveDrawingBuffer: true
+              powerPreference: "high-performance"
             }}
+            style={{ display: 'block', width: '100%', height: '100%' }}
           >
-            <color attach="background" args={["transparent"]} />
-            <fog attach="fog" args={["#0f172a", 15, 60]} />
+            <color attach="background" args={["#0f172a"]} />
+            <fog attach="fog" args={["#0f172a", 20, 50]} />
           
             <Suspense fallback={null}>
               {started && (
@@ -70,9 +70,9 @@ function App() {
           </Canvas>
         </div>
 
-        {/* Scrollable Content */}
+        {/* Scrollable Content - On Top with transparency */}
         {started && (
-          <div className="relative z-10 pointer-events-auto">
+          <div className="relative z-10 w-full pointer-events-auto">
             <Interface setSection={setSection} />
           </div>
         )}

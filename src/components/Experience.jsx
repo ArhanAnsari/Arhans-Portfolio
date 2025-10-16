@@ -69,7 +69,7 @@ export const Experience = (props) => {
 
   return (
     <>
-      <Background />
+      <Background section={section} />
       <motion.group
         ref={characterGroup}
         rotation={[-3.141592653589793, 1.2053981633974482, 3.141592653589793]}
@@ -194,6 +194,8 @@ export const Experience = (props) => {
         <Avatar animation={characterAnimation} wireframe={section === 1} />
       </motion.group>
       <ambientLight intensity={1} />
+      <directionalLight position={[5, 5, 5]} intensity={0.8} castShadow />
+      <directionalLight position={[-5, 3, -5]} intensity={0.4} />
       <motion.group
         position={[
           isMobile ? 0 : 1.5 * officeScaleRatio,

@@ -85,33 +85,33 @@ const education = {
 
 const certifications = [
   {
-    title: "Advanced React Development",
-    issuer: "Meta",
-    date: "2024",
+    title: "Data Structures & Algorithms Essentials using C++",
+    issuer: "Udemy",
+    date: "Nov. 3, 2024",
     link: "#",
     badge: "🏆"
   },
   {
-    title: "Three.js & WebGL Mastery",
-    issuer: "Bruno Simon",
-    date: "2024",
+    title: "Mastering Github Copilot",
+    issuer: "Udemy",
+    date: "Feb. 2, 2025",
     link: "#",
     badge: "🎮"
   },
   {
+    title: "DevOps for Data Scientists",
+    issuer: "Udemy",
+    date: "Feb. 2, 2025",
+    link: "#",
+    badge: "🎨"
+  },
+  {
     title: "Full Stack Web Development",
-    issuer: "freeCodeCamp",
-    date: "2023",
+    issuer: "JS Mastery",
+    date: "March 3, 2025",
     link: "#",
     badge: "💻"
   },
-  {
-    title: "UI/UX Design Fundamentals",
-    issuer: "Google",
-    date: "2023",
-    link: "#",
-    badge: "🎨"
-  }
 ];
 
 const services = [
@@ -162,7 +162,7 @@ export const Interface = (props) => {
       </div>
       
       {/* Main Content with proper spacing for 3D character */}
-      <div className="w-full relative z-20">
+      <div className="w-full relative z-0">
         <AboutSection setSection={setSection} />
         <SkillsSection />
         <ProjectsSection />
@@ -866,73 +866,152 @@ const TestimonialsSection = () => {
 
 const CurrentWorkSection = () => {
   return (
-    <Section>
-      <motion.div className="w-full max-w-[90vw] md:max-w-[800px]" whileInView={"visible"}>
-        <h2 className="text-3xl md:text-5xl font-bold text-black mb-8">Currently Working On</h2>
-        <motion.div
-          className="bg-white bg-opacity-10 p-6 md:p-8 rounded-lg backdrop-blur-sm"
-          initial={{ opacity: 0, y: 20 }}
-          variants={{
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: {
-                duration: 1,
-                delay: 0.5,
-              },
-            },
-          }}
-        >
-          <h3 className="text-xl md:text-2xl font-bold text-indigo-500 mb-4">{currentWork.title}</h3>
-          <p className="text-indigo-400 text-sm md:text-base mb-6 leading-relaxed">{currentWork.description}</p>
-          
-          <div className="mb-6">
-            <div className="flex justify-between text-sm md:text-base text-indigo-400 mb-2">
-              <span>Progress</span>
-              <span>{currentWork.progress}%</span>
-            </div>
-            <div className="h-2 md:h-3 w-full bg-gray-200 bg-opacity-20 rounded-full">
-              <motion.div
-                className="h-full bg-indigo-500 rounded-full"
-                style={{ width: `${currentWork.progress}%` }}
-                initial={{ scaleX: 0, originX: 0 }}
-                variants={{
-                  visible: {
-                    scaleX: 1,
-                    transition: {
-                      duration: 1,
-                      delay: 1,
-                    },
-                  },
-                }}
-              />
-            </div>
-          </div>
+    <Section className="bg-gradient-to-b from-transparent via-neutral-950/30 to-transparent">
+      <motion.div className="w-full space-y-12" whileInView="visible" viewport={{ once: true }}>
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <motion.h2 
+            className="text-responsive-lg font-display font-bold text-gradient"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            Currently Working On
+          </motion.h2>
+          <motion.p 
+            className="text-neutral-400 max-w-2xl mx-auto text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            Exploring new opportunities and ready to bring innovative ideas to life
+          </motion.p>
+        </div>
 
-          <div className="flex flex-wrap gap-2 md:gap-3">
-            {currentWork.technologies.map((tech, index) => (
-              <motion.span
-                key={index}
-                className="px-3 py-1 bg-indigo-500 bg-opacity-20 rounded-full text-indigo-300 text-xs md:text-sm"
-                initial={{ opacity: 0, scale: 0.9 }}
-                variants={{
-                  visible: {
-                    opacity: 1,
-                    scale: 1,
-                    transition: {
-                      duration: 0.4,
-                      delay: 1.2 + index * 0.1,
-                    },
-                  },
-                }}
-              >
-                {tech}
-              </motion.span>
-            ))}
+        {/* Current Work Card */}
+        <motion.div
+          className="card-modern max-w-4xl mx-auto"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          viewport={{ once: true }}
+        >
+          <div className="space-y-6">
+            {/* Title and Status */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+              <h3 className="text-2xl font-bold text-neutral-100">
+                {currentWork.title}
+              </h3>
+              <span className="px-4 py-2 bg-green-500/20 text-green-300 rounded-full text-sm font-medium border border-green-500/30 w-fit">
+                {currentWork.status}
+              </span>
+            </div>
+
+            {/* Description */}
+            <p className="text-neutral-300 leading-relaxed">
+              {currentWork.description}
+            </p>
+
+            {/* Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm text-neutral-400">
+                <span>Availability</span>
+                <span className="text-primary-400 font-medium">{currentWork.progress}% Ready</span>
+              </div>
+              <div className="h-2 w-full bg-neutral-800 rounded-full overflow-hidden">
+                <motion.div
+                  className="h-full bg-gradient-to-r from-primary-500 to-accent-500 rounded-full"
+                  initial={{ width: 0 }}
+                  whileInView={{ width: `${currentWork.progress}%` }}
+                  transition={{ duration: 1.2, delay: 0.5 }}
+                  viewport={{ once: true }}
+                />
+              </div>
+            </div>
+
+            {/* Technologies */}
+            <div className="space-y-3">
+              <h4 className="text-neutral-300 font-medium text-sm">Tech Stack I'm Excited About:</h4>
+              <div className="flex flex-wrap gap-2">
+                {currentWork.technologies.map((tech, index) => (
+                  <motion.span
+                    key={index}
+                    className="px-3 py-1 bg-primary-500/10 text-primary-300 text-sm rounded-full border border-primary-500/20"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    {tech}
+                  </motion.span>
+                ))}
+              </div>
+            </div>
+
+            {/* Call to Action */}
+            <div className="pt-6 border-t border-neutral-700/30 flex flex-col sm:flex-row gap-4">
+              <button className="btn-primary flex-1 sm:flex-initial">
+                Start a Project
+              </button>
+              <button className="btn-secondary flex-1 sm:flex-initial">
+                View My Work
+              </button>
+            </div>
+
+            {/* Meta Info */}
+            <div className="flex items-center justify-between text-sm text-neutral-500 pt-4">
+              <span>Status: {currentWork.startDate}</span>
+              <span className="text-accent-400">• Open for Collaboration</span>
+            </div>
           </div>
-          
-          <p className="text-gray-400 text-xs md:text-sm mt-6">Started: {currentWork.startDate}</p>
         </motion.div>
+
+        {/* Additional Info Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
+          <motion.div
+            className="card-modern text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.7 }}
+            viewport={{ once: true }}
+          >
+            <div className="w-12 h-12 bg-primary-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">💡</span>
+            </div>
+            <h4 className="font-semibold text-neutral-200 mb-2">Innovation First</h4>
+            <p className="text-sm text-neutral-400">Bringing fresh perspectives to every project</p>
+          </motion.div>
+
+          <motion.div
+            className="card-modern text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            viewport={{ once: true }}
+          >
+            <div className="w-12 h-12 bg-accent-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">⚡</span>
+            </div>
+            <h4 className="font-semibold text-neutral-200 mb-2">Fast Delivery</h4>
+            <p className="text-sm text-neutral-400">Quick turnaround without compromising quality</p>
+          </motion.div>
+
+          <motion.div
+            className="card-modern text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.9 }}
+            viewport={{ once: true }}
+          >
+            <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
+              <span className="text-2xl">🎯</span>
+            </div>
+            <h4 className="font-semibold text-neutral-200 mb-2">Result Focused</h4>
+            <p className="text-sm text-neutral-400">Delivering solutions that exceed expectations</p>
+          </motion.div>
+        </div>
       </motion.div>
     </Section>
   );
