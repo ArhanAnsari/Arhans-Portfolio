@@ -80,11 +80,11 @@ export const Experience = (props) => {
         }}
         variants={{
           0: {
-            x: 0,
+            x: isMobile ? 0 : 2,
             y: 0,
             z: 0,
             rotateX: 0,
-            rotateY: 0,
+            rotateY: Math.PI / 2,
             rotateZ: 0,
             scaleX: officeScaleRatio,
             scaleY: officeScaleRatio,
@@ -92,8 +92,8 @@ export const Experience = (props) => {
           },
           1: {
             y: 0.5,
-            x: isMobile ? 0.3 : -1,
-            z: 7,
+            x: isMobile ? 0.3 : -2,
+            z: 5,
             rotateX: 0,
             rotateY: isMobile ? -Math.PI / 2 : Math.PI / 4,
             rotateZ: 0,
@@ -102,11 +102,11 @@ export const Experience = (props) => {
             scaleZ: isMobile ? 1.2 : 1,
           },
           2: {
-            x: isMobile ? -1.4 : -2,
+            x: isMobile ? -1.4 : 2.5,
             y: 0.5,
-            z: 3,
+            z: 4,
             rotateX: 0,
-            rotateY: Math.PI / 2,
+            rotateY: -Math.PI / 4,
             rotateZ: 0,
             scaleX: 1,
             scaleY: 1,
@@ -114,7 +114,18 @@ export const Experience = (props) => {
           },
           3: {
             y: 1,
-            x: isMobile ? 1 : 2,
+            x: isMobile ? 1 : -2,
+            z: isMobile ? 4 : 5,
+            rotateX: 0,
+            rotateY: Math.PI / 3,
+            rotateZ: 0,
+            scaleX: isMobile ? 0.9 : 1,
+            scaleY: isMobile ? 0.9 : 1,
+            scaleZ: isMobile ? 0.9 : 1,
+          },
+          4: {
+            y: 1,
+            x: isMobile ? -1 : 2,
             z: isMobile ? 4 : 5,
             rotateX: 0,
             rotateY: -Math.PI / 6,
@@ -123,23 +134,12 @@ export const Experience = (props) => {
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
-          4: {
-            y: 1,
-            x: isMobile ? -1 : -1.5,
-            z: isMobile ? 4 : 5,
-            rotateX: 0,
-            rotateY: Math.PI / 6,
-            rotateZ: 0,
-            scaleX: isMobile ? 0.9 : 1,
-            scaleY: isMobile ? 0.9 : 1,
-            scaleZ: isMobile ? 0.9 : 1,
-          },
           5: {
             y: 1,
-            x: isMobile ? 0 : 0.5,
+            x: isMobile ? 0 : -2.5,
             z: isMobile ? 5 : 6,
             rotateX: 0,
-            rotateY: 0,
+            rotateY: Math.PI / 4,
             rotateZ: 0,
             scaleX: isMobile ? 0.9 : 1,
             scaleY: isMobile ? 0.9 : 1,
@@ -150,7 +150,7 @@ export const Experience = (props) => {
             x: isMobile ? 1.5 : 2,
             z: isMobile ? 4 : 5,
             rotateX: 0,
-            rotateY: -Math.PI / 4,
+            rotateY: -Math.PI / 3,
             rotateZ: 0,
             scaleX: isMobile ? 0.9 : 1,
             scaleY: isMobile ? 0.9 : 1,
@@ -158,10 +158,10 @@ export const Experience = (props) => {
           },
           7: {
             y: 1,
-            x: isMobile ? -1 : -1.5,
+            x: isMobile ? -1 : -2,
             z: isMobile ? 5 : 6,
             rotateX: 0,
-            rotateY: Math.PI / 3,
+            rotateY: Math.PI / 5,
             rotateZ: 0,
             scaleX: isMobile ? 0.9 : 1,
             scaleY: isMobile ? 0.9 : 1,
@@ -169,26 +169,15 @@ export const Experience = (props) => {
           },
           8: {
             y: 1,
-            x: isMobile ? 0 : 0,
+            x: isMobile ? 0 : 1.5,
             z: isMobile ? 6 : 7,
             rotateX: 0,
-            rotateY: 0,
+            rotateY: -Math.PI / 6,
             rotateZ: 0,
             scaleX: isMobile ? 0.9 : 1,
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
-          // 9: {
-          //   y: -viewport.height * 9 + 1,
-          //   x: isMobile ? 0 : 0.24,
-          //   z: isMobile ? 6.5 : 8.5,
-          //   rotateX: 0,
-          //   rotateY: -Math.PI / 4,
-          //   rotateZ: 0,
-          //   scaleX: isMobile ? 0.9 : 1,
-          //   scaleY: isMobile ? 0.9 : 1,
-          //   scaleZ: isMobile ? 0.9 : 1,
-          // },
         }}
       >
         <Avatar animation={characterAnimation} wireframe={section === 1} />
@@ -198,9 +187,9 @@ export const Experience = (props) => {
       <directionalLight position={[-5, 3, -5]} intensity={0.4} />
       <motion.group
         position={[
-          isMobile ? 0 : 1.5 * officeScaleRatio,
-          isMobile ? -viewport.height / 6 : 2,
-          3,
+          isMobile ? 0 : 2.5 * officeScaleRatio,
+          isMobile ? -viewport.height / 6 : 0,
+          2,
         ]}
         scale={[officeScaleRatio, officeScaleRatio, officeScaleRatio]}
         rotation-y={-Math.PI / 4}

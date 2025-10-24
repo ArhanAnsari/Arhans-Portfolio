@@ -118,22 +118,18 @@
   @media (min-width: 640px) {
     .section-padding {
       padding: 80px 24px;
-      padding-left: max(24px, 20vw);
-      padding-right: 24px;
     }
   }
   
   @media (min-width: 1024px) {
     .section-padding {
       padding: 100px 32px;
-      padding-left: max(32px, 25vw);
-      padding-right: 32px;
     }
   }
   
   @media (min-width: 1400px) {
     .section-padding {
-      padding-left: max(32px, 30vw);
+      padding: 100px 32px;
     }
   }
   

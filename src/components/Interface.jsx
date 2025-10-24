@@ -7,13 +7,13 @@ import { currentProjectAtom, projects } from "./Projects";
 import axios from "axios";
 
 const Section = (props) => {
-  const { children, mobileTop, className = "" } = props;
+  const { children, mobileTop, className = "", alignRight = false } = props;
 
   return (
     <motion.section
       className={`
         relative min-h-screen w-full section-padding
-        flex flex-col items-center
+        flex flex-col ${alignRight ? 'items-end' : 'items-start'}
         ${mobileTop ? "justify-start md:justify-center" : "justify-center"}
         ${className}
       `}
@@ -31,8 +31,8 @@ const Section = (props) => {
       }}
       viewport={{ once: true }}
     >
-      {/* Section background overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-neutral-950/10 to-transparent -z-10" />
+      {/* Section background overlay - Transparent to show 3D scene */}
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/5 to-transparent -z-10" />
       {children}
     </motion.section>
   );
@@ -149,9 +149,7 @@ export const Interface = (props) => {
   const { setSection } = props;
   return (
     <div className="flex flex-col items-center w-full relative interface-content">
-      {/* Enhanced Background Coverage */}
-      <div className="fixed inset-0 bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 -z-50" style={{ pointerEvents: 'none' }} />
-      <div className="fixed inset-0 hero-pattern opacity-30 -z-40" style={{ pointerEvents: 'none' }} />
+      {/* Removed fixed background overlays - Canvas is now visible behind content */}
       
       {/* Floating particles background */}
       <div className="particles-container" style={{ pointerEvents: 'none' }}>
@@ -163,15 +161,15 @@ export const Interface = (props) => {
       
       {/* Main Content with proper spacing for 3D character */}
       <div className="w-full relative z-0">
-        <AboutSection setSection={setSection} />
-        <SkillsSection />
-        <ProjectsSection />
-        <EducationSection />
-        <AchievementsSection />
-        <CurrentWorkSection />
-        <ServicesSection />
-        <TestimonialsSection />
-        <ContactSection />
+        <div id="section-0"><AboutSection setSection={setSection} /></div>
+        <div id="section-1"><SkillsSection /></div>
+        <div id="section-2"><ProjectsSection /></div>
+        <div id="section-3"><EducationSection /></div>
+        <div id="section-4"><AchievementsSection /></div>
+        <div id="section-5"><CurrentWorkSection /></div>
+        <div id="section-6"><ServicesSection /></div>
+        <div id="section-7"><TestimonialsSection /></div>
+        <div id="section-8"><ContactSection /></div>
       </div>
     </div>
   );
@@ -196,7 +194,7 @@ const AboutSection = (props) => {
       </motion.div>
 
       {/* Hero Content */}
-      <div className="flex flex-col items-start justify-center h-full space-y-8">
+      <div className="flex flex-col items-start justify-center h-full space-y-8 w-full max-w-4xl pl-8 md:pl-16 lg:pl-24">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
@@ -376,8 +374,8 @@ const SkillsSection = () => {
   const categories = [...new Set(skills.map(skill => skill.category))];
   
   return (
-    <Section className="bg-gradient-to-b from-transparent via-neutral-950/20 to-transparent">
-      <motion.div className="w-full space-y-12" whileInView="visible" viewport={{ once: true }}>
+    <Section alignRight className="bg-gradient-to-b from-transparent via-neutral-950/20 to-transparent">
+      <motion.div className="w-full max-w-4xl pr-8 md:pr-16 lg:pr-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
         {/* Header */}
         <div className="text-center space-y-4">
           <motion.h2 
@@ -530,7 +528,7 @@ const ProjectsSection = () => {
 
   return (
     <Section className="bg-gradient-to-b from-transparent via-neutral-950/30 to-transparent">
-      <motion.div className="w-full space-y-12" whileInView="visible" viewport={{ once: true }}>
+      <motion.div className="w-full max-w-6xl pl-8 md:pl-16 lg:pl-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
         {/* Header */}
         <div className="text-center space-y-6">
           <motion.h2 
@@ -803,8 +801,8 @@ const ProjectCard = ({ project, index, onClick }) => {
 
 const TestimonialsSection = () => {
   return (
-    <Section>
-      <motion.div className="w-full" whileInView={"visible"}>
+    <Section className="bg-gradient-to-b from-transparent via-neutral-950/20 to-transparent">
+      <motion.div className="w-full max-w-5xl pl-8 md:pl-16 lg:pl-24" whileInView={"visible"}>
         <div className="text-center space-y-4 mb-12">
           <motion.h2 
             className="text-responsive-lg font-display font-bold text-gradient"
@@ -866,8 +864,8 @@ const TestimonialsSection = () => {
 
 const CurrentWorkSection = () => {
   return (
-    <Section className="bg-gradient-to-b from-transparent via-neutral-950/30 to-transparent">
-      <motion.div className="w-full space-y-12" whileInView="visible" viewport={{ once: true }}>
+    <Section alignRight className="bg-gradient-to-b from-transparent via-neutral-950/30 to-transparent">
+      <motion.div className="w-full max-w-5xl pr-8 md:pr-16 lg:pr-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
         {/* Header */}
         <div className="text-center space-y-4">
           <motion.h2 
@@ -1019,8 +1017,8 @@ const CurrentWorkSection = () => {
 
 const EducationSection = () => {
   return (
-    <Section className="bg-gradient-to-b from-transparent via-neutral-950/20 to-transparent">
-      <motion.div className="w-full space-y-8" whileInView="visible" viewport={{ once: true }}>
+    <Section alignRight className="bg-gradient-to-b from-transparent via-neutral-950/20 to-transparent">
+      <motion.div className="w-full max-w-5xl pr-8 md:pr-16 lg:pr-24 space-y-8" whileInView="visible" viewport={{ once: true }}>
         {/* Header */}
         <div className="text-center space-y-4">
           <motion.h2 
@@ -1168,7 +1166,7 @@ const AchievementsSection = () => {
 
   return (
     <Section className="bg-gradient-to-b from-transparent via-neutral-950/30 to-transparent">
-      <motion.div className="w-full space-y-12" whileInView="visible" viewport={{ once: true }}>
+      <motion.div className="w-full max-w-6xl pl-8 md:pl-16 lg:pl-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
         {/* Header */}
         <div className="text-center space-y-4">
           <motion.h2 
@@ -1291,8 +1289,8 @@ const AchievementsSection = () => {
 
 const ServicesSection = () => {
   return (
-    <Section className="bg-gradient-to-b from-transparent via-neutral-950/20 to-transparent">
-      <motion.div className="w-full space-y-12" whileInView="visible" viewport={{ once: true }}>
+    <Section alignRight className="bg-gradient-to-b from-transparent via-neutral-950/20 to-transparent">
+      <motion.div className="w-full max-w-6xl pr-8 md:pr-16 lg:pr-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
         {/* Header */}
         <div className="text-center space-y-4">
           <motion.h2 
@@ -1487,8 +1485,8 @@ const ContactSection = () => {
   };
 
   return (
-    <Section>
-      <motion.div className="w-full max-w-6xl mx-auto space-y-12">
+    <Section alignRight className="bg-gradient-to-b from-transparent via-neutral-950/30 to-transparent">
+      <motion.div className="w-full max-w-6xl pr-8 md:pr-16 lg:pr-24 space-y-12">
         {/* Header */}
         <div className="text-center space-y-4">
           <motion.h2 
