@@ -10,6 +10,7 @@ import { Menu } from "./components/Menu";
 import { ParticleBackground } from "./components/ParticleBackground";
 import { framerMotionConfig } from "./config";
 import { Analytics } from '@vercel/analytics/react';
+import AiTwin from "./components/AiTwin";
 
 function App() {
   const [section, setSection] = useState(0);
@@ -86,6 +87,8 @@ function App() {
         )}
         <Cursor />
       </MotionConfig>
+      
+      <AiTwin />
       
       <Leva hidden />
       <Analytics />
