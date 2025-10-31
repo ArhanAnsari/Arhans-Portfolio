@@ -1,13 +1,15 @@
-/**
- * AI Twin Backend Handler
- * This API route handles conversations with the AI Twin using Claude API
- * 
- * Setup Instructions:
- * 1. Get your API key from https://console.anthropic.com
- * 2. Set the VITE_ANTHROPIC_API_KEY environment variable
- * 3. Or replace with your preferred AI service (OpenAI, Ollama, etc.)
- */
+// =============================================
+// AI Twin API (Gemini 2.5 Integration - Vercel AI SDK)
+// =============================================
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { streamText } from "ai";
+import express from "express";
 
+const router = express.Router();
+
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+
+// 🧠 System Prompt (DO NOT EDIT)
 const SYSTEM_PROMPT = `You are Arhan's AI Twin, an intelligent assistant that knows everything about Arhan Ansari. You are available 24/7 to answer questions about Arhan's skills, projects, experience, and availability.
 
 About Arhan:
@@ -70,106 +72,41 @@ When answering questions:
 
 IMPORTANT: You represent Arhan. Be authentic, honest, and helpful. If you don't know something specific, admit it and suggest checking the portfolio or contacting directly.`;
 
-export async function handleAiTwinQuery(message, conversationHistory = []) {
+const google = createGoogleGenerativeAI({
+  apiKey: GEMINI_API_KEY,
+});
+
+router.post("/api/ai-twin", async (req, res) => {
   try {
-    const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
-    
-    if (!apiKey) {
-      throw new Error(
-        "API key not configured. Please set VITE_ANTHROPIC_API_KEY environment variable."
-      );
+    const { message, conversationHistory } = req.body;
+
+    if (!message) {
+      return res.status(400).json({ error: "Message required." });
     }
 
-    // Format conversation history for API
-    const messages = [
-      ...conversationHistory.filter((m) => m.role && m.content),
-      { role: "user", content: message },
-    ];
-
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "claude-3-5-sonnet-20241022",
-        max_tokens: 1024,
-        system: SYSTEM_PROMPT,
-        messages: messages,
-      }),
+    const result = await streamText({
+      model: google("gemini-2.5-flash"),
+      system: SYSTEM_PROMPT,
+      messages: [
+        ...(conversationHistory || []),
+        { role: "user", content: message },
+      ],
+      maxOutputTokens: 1024,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || "API request failed");
+    let responseText = "";
+    for await (const text of result.textStream) {
+      responseText += text;
     }
 
-    const data = await response.json();
-    const aiResponse =
-      data.content[0]?.text || "Sorry, I couldn't generate a response.";
-
-    return {
-      success: true,
-      response: aiResponse,
-    };
+    res.json({ response: responseText });
   } catch (error) {
     console.error("AI Twin Error:", error);
-    return {
-      success: false,
-      error: error.message,
+    res.status(500).json({
       response:
-        "I'm having trouble connecting right now. Please try again later or contact Arhan directly.",
-    };
-  }
-}
-
-/**
- * Alternative: Use this function for local Ollama setup (no API key needed)
- * First install Ollama and run: ollama run mistral (or llama2)
- */
-export async function handleAiTwinQueryLocal(
-  message,
-  conversationHistory = []
-) {
-  try {
-    const messages = [
-      ...conversationHistory.filter((m) => m.role && m.content),
-      { role: "user", content: message },
-    ];
-
-    const response = await fetch("http://localhost:11434/api/chat", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "mistral",
-        messages: messages,
-        system: SYSTEM_PROMPT,
-        stream: false,
-      }),
+        "Sorry, I'm having trouble connecting to Gemini right now. Please try again later or visit my contact page.",
     });
-
-    if (!response.ok) {
-      throw new Error("Local AI connection failed. Is Ollama running?");
-    }
-
-    const data = await response.json();
-    const aiResponse = data.message?.content || "Sorry, I couldn't generate a response.";
-
-    return {
-      success: true,
-      response: aiResponse,
-    };
-  } catch (error) {
-    console.error("Local AI Twin Error:", error);
-    return {
-      success: false,
-      error: error.message,
-      response:
-        "I'm having trouble connecting. Make sure Ollama is running on localhost:11434",
-    };
   }
-}
+});
+
+export default router;
