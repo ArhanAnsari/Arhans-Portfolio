@@ -1,7 +1,14 @@
 /**
- * Vite Server Plugin for AI Twin API Route
- * Add this to your vite.config.js as middleware
+ * AI Twin Route — Gemini 2.5 Integration (Vercel AI SDK)
+ * Add this to vite.config.js as middleware
  */
+
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { streamText } from "ai";
+
+const google = createGoogleGenerativeAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
 
 export function aiTwinRoute(app) {
   app.post("/api/ai-twin", async (req, res) => {
@@ -14,56 +21,42 @@ export function aiTwinRoute(app) {
         });
       }
 
-      const apiKey = process.env.ANTHROPIC_API_KEY;
-
-      if (!apiKey) {
-        console.warn("ANTHROPIC_API_KEY not set, using demo response");
+      if (!process.env.GEMINI_API_KEY) {
+        console.warn("⚠️ GEMINI_API_KEY not set, using demo response");
         return res.json({
           response: getDemoResponse(message),
         });
       }
 
-      // Call Anthropic API
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: {
-          "x-api-key": apiKey,
-          "anthropic-version": "2023-06-01",
-          "content-type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "claude-3-5-sonnet-20241022",
-          max_tokens: 1024,
-          system: getSystemPrompt(),
-          messages: [
-            ...(conversationHistory || []),
-            {
-              role: "user",
-              content: message,
-            },
-          ],
-        }),
+      // Set streaming headers (Server-Sent Events)
+      res.setHeader("Content-Type", "text/event-stream");
+      res.setHeader("Cache-Control", "no-cache");
+      res.setHeader("Connection", "keep-alive");
+
+      const stream = await streamText({
+        model: google("gemini-2.5-flash"), // or "gemini-2.5-pro" if preferred
+        system: getSystemPrompt(),
+        messages: [
+          ...(conversationHistory || []),
+          { role: "user", content: message },
+        ],
+        temperature: 0.8,
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error?.message || "Claude API error");
+      for await (const delta of stream.textStream) {
+        res.write(`data: ${JSON.stringify({ text: delta })}\n\n`);
       }
 
-      const data = await response.json();
-      const aiResponse =
-        data.content[0]?.text || "I couldn't generate a response.";
-
-      res.json({
-        response: aiResponse,
-      });
+      res.write(`data: [DONE]\n\n`);
+      res.end();
     } catch (error) {
       console.error("AI Twin API Error:", error);
-      res.status(500).json({
-        error: "Failed to process request",
-        response:
-          "Sorry, I'm having trouble right now. Please try again later.",
-      });
+      res.write(
+        `data: ${JSON.stringify({
+          text: "⚠️ Oops! Something went wrong while talking to Gemini. Try again later!",
+        })}\n\n`
+      );
+      res.end();
     }
   });
 }
@@ -110,17 +103,19 @@ Be friendly, professional, and authentic. Show enthusiasm about development and 
 
 function getDemoResponse(message) {
   const responses = {
-    default: "I'm currently in demo mode. Please set up an API key to enable full AI Twin functionality!",
-    skills: "Arhan is skilled in React, Three.js, Node.js, and modern web development! What else would you like to know?",
-    projects: "Arhan has completed 250+ projects including interactive 3D portfolios and enterprise applications!",
-    availability: "Arhan is currently open for new opportunities! You can contact him through the portfolio.",
+    default:
+      "I'm currently in demo mode. Please set up your GEMINI_API_KEY to enable full AI Twin functionality!",
+    skills:
+      "Arhan is skilled in React, Three.js, Node.js, and modern web development! What else would you like to know?",
+    projects:
+      "Arhan has completed 250+ projects including interactive 3D portfolios and enterprise applications!",
+    availability:
+      "Arhan is currently open for new opportunities! You can contact him through the portfolio.",
   };
 
-  const messageLower = message.toLowerCase();
-  for (const [key, response] of Object.entries(responses)) {
-    if (key !== "default" && messageLower.includes(key)) {
-      return response;
-    }
+  const msg = message.toLowerCase();
+  for (const [key, value] of Object.entries(responses)) {
+    if (msg.includes(key)) return value;
   }
   return responses.default;
 }

@@ -1,7 +1,6 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, X, Minimize2, Maximize2, Loader } from "lucide-react";
-import axios from "axios";
 
 const AiTwin = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -9,28 +8,25 @@ const AiTwin = () => {
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "👋 Hey there! I'm Arhan's AI Twin — your smart assistant that knows everything about him. Ask me anything about Arhan’s projects, skills, or experience! 💡",
+      text: "👋 Hey there! I'm Arhan's AI Twin — your smart assistant who knows all about him. Ask me anything!",
       sender: "ai",
       timestamp: new Date(),
     },
   ]);
   const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef(null);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = () =>
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  useEffect(scrollToBottom, [messages]);
 
-  const handleSendMessage = async () => {
+  const sendMessage = async () => {
     if (!input.trim()) return;
 
     const userMessage = {
-      id: messages.length + 1,
+      id: Date.now(),
       text: input,
       sender: "user",
       timestamp: new Date(),
@@ -38,42 +34,72 @@ const AiTwin = () => {
 
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
-    setLoading(true);
+    setIsStreaming(true);
 
-    try {
-      const response = await axios.post("/api/ai-twin", {
-        message: input,
+    const aiMessage = {
+      id: Date.now() + 1,
+      text: "",
+      sender: "ai",
+      timestamp: new Date(),
+    };
+    setMessages((prev) => [...prev, aiMessage]);
+
+    const response = await fetch("/api/ai-twin", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        message: userMessage.text,
         conversationHistory: messages.map((m) => ({
           role: m.sender === "user" ? "user" : "assistant",
           content: m.text,
         })),
-      });
+      }),
+    });
 
-      const aiMessage = {
-        id: messages.length + 2,
-        text: response.data.response,
-        sender: "ai",
-        timestamp: new Date(),
-      };
+    const reader = response.body.getReader();
+    const decoder = new TextDecoder();
 
-      setMessages((prev) => [...prev, aiMessage]);
-    } catch (error) {
-      const errorMessage = {
-        id: messages.length + 2,
-        text: "⚠️ Oops! Gemini seems to be taking a break. Try again later or contact Arhan directly!",
-        sender: "ai",
-        timestamp: new Date(),
-      };
-      setMessages((prev) => [...prev, errorMessage]);
-    } finally {
-      setLoading(false);
+    let buffer = "";
+    while (true) {
+      const { value, done } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+
+      const parts = buffer.split("\n\n");
+      buffer = parts.pop();
+
+      for (const part of parts) {
+        if (part.startsWith("data: ")) {
+          const data = part.replace("data: ", "").trim();
+          if (data === "[DONE]") {
+            setIsStreaming(false);
+            return;
+          }
+          try {
+            const parsed = JSON.parse(data);
+            setMessages((prev) => {
+              const updated = [...prev];
+              const last = updated[updated.length - 1];
+              if (last.sender === "ai") {
+                last.text += parsed.text;
+              }
+              return [...updated];
+            });
+          } catch {
+            // ignore JSON parse errors
+          }
+        }
+      }
     }
+
+    setIsStreaming(false);
   };
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSendMessage();
+      sendMessage();
     }
   };
 
@@ -116,7 +142,7 @@ const AiTwin = () => {
                 <div>
                   <h3 className="text-white font-bold">Arhan’s AI Twin</h3>
                   <p className="text-xs text-purple-200">
-                    Online • Powered by Gemini
+                    {isStreaming ? "Typing..." : "Online • Gemini 2.5"}
                   </p>
                 </div>
               </div>
@@ -138,31 +164,27 @@ const AiTwin = () => {
 
             {!isMinimized && (
               <>
-                {/* Chat Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900/40 scroll-smooth">
-                  {messages.map((message) => (
+                {/* Messages */}
+                <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900/40">
+                  {messages.map((m) => (
                     <motion.div
-                      key={message.id}
-                      initial={{ opacity: 0, y: 10 }}
+                      key={m.id}
+                      initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       className={`flex ${
-                        message.sender === "user"
-                          ? "justify-end"
-                          : "justify-start"
+                        m.sender === "user" ? "justify-end" : "justify-start"
                       }`}
                     >
                       <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-xl ${
-                          message.sender === "user"
+                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-xl whitespace-pre-line ${
+                          m.sender === "user"
                             ? "bg-blue-600 text-white rounded-br-none shadow-lg"
                             : "bg-slate-700 text-slate-100 rounded-bl-none shadow-md"
                         }`}
                       >
-                        <p className="text-sm leading-relaxed whitespace-pre-line">
-                          {message.text}
-                        </p>
+                        <p className="text-sm leading-relaxed">{m.text}</p>
                         <span className="text-xs mt-1 block opacity-60 text-right">
-                          {message.timestamp.toLocaleTimeString([], {
+                          {m.timestamp.toLocaleTimeString([], {
                             hour: "2-digit",
                             minute: "2-digit",
                           })}
@@ -171,7 +193,7 @@ const AiTwin = () => {
                     </motion.div>
                   ))}
 
-                  {loading && (
+                  {isStreaming && (
                     <div className="flex justify-start">
                       <div className="bg-slate-700 text-slate-100 px-4 py-2 rounded-lg rounded-bl-none flex items-center gap-2 animate-pulse">
                         <Loader size={16} className="animate-spin" />
@@ -179,28 +201,27 @@ const AiTwin = () => {
                       </div>
                     </div>
                   )}
-
                   <div ref={messagesEndRef} />
                 </div>
 
                 {/* Input */}
-                <div className="border-t border-slate-700 p-4 bg-slate-900/70 backdrop-blur-sm">
+                <div className="border-t border-slate-700 p-4 bg-slate-900/70">
                   <div className="flex gap-2">
                     <textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
-                      onKeyPress={handleKeyPress}
+                      onKeyDown={handleKeyPress}
                       placeholder="Ask something about Arhan..."
                       rows="2"
                       className="flex-1 bg-slate-800 text-white rounded-lg px-4 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition"
-                      disabled={loading}
+                      disabled={isStreaming}
                     />
                     <button
-                      onClick={handleSendMessage}
-                      disabled={loading || !input.trim()}
+                      onClick={sendMessage}
+                      disabled={isStreaming || !input.trim()}
                       className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 text-white p-3 rounded-lg transition flex items-center justify-center shadow-lg"
                     >
-                      {loading ? (
+                      {isStreaming ? (
                         <Loader size={20} className="animate-spin" />
                       ) : (
                         <Send size={20} />
