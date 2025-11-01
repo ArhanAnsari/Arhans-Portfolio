@@ -1,20 +1,19 @@
 /**
  * AI Twin Backend Server - Powered by Google Gemini 2.5 Flash
- * Advanced Express server with streaming, analytics, and memory management
- * 
+ * Express Server with Streaming, Analytics, and Memory Management
+ *
  * Setup:
- * 1. npm install express cors dotenv axios
- * 2. Create .env file with GOOGLE_GEMINI_API_KEY
- * 3. Get key from: https://ai.google.dev
+ * 1. npm install express cors dotenv
+ * 2. npm install ai @ai-sdk/google
+ * 3. Create .env file with GEMINI_API_KEY
  * 4. Run: node ai-twin-server.js
  */
 
-import express from 'express';
-import cors from 'cors';
-import dotenv from 'dotenv';
-import axios from 'axios';
-import fs from 'fs';
-import path from 'path';
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { streamText } from "ai";
 
 dotenv.config();
 
@@ -22,14 +21,27 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
-// Middleware
-app.use(cors({
-  origin: ['http://localhost:5173', 'http://localhost:3000', 'http://localhost:4173', 'https://arhanansari.me', 'https://arhanansari.is-a.dev'].filter(Boolean),
-  credentials: true,
-}));
-app.use(express.json({ limit: '10mb' }));
+// Initialize Gemini client
+const google = createGoogleGenerativeAI({
+  apiKey: GEMINI_API_KEY,
+});
 
-// In-memory store for conversation sessions (use Redis in production)
+// Middleware
+app.use(
+  cors({
+    origin: [
+      "http://localhost:5173",
+      "http://localhost:3000",
+      "http://localhost:4173",
+      "https://arhanansari.me",
+      "https://arhanansari.is-a.dev",
+    ],
+    credentials: true,
+  })
+);
+app.use(express.json({ limit: "10mb" }));
+
+// Simple in-memory stores
 const conversationStore = new Map();
 const analyticsStore = [];
 
@@ -76,98 +88,90 @@ PERSONALITY:
 - Professional yet friendly
 - Enthusiastic about teaching others
 
-When answering questions:
+When answering:
 1. Be friendly and professional
-2. Provide specific examples when relevant
+2. Provide examples when relevant
 3. For project inquiries, suggest contacting through the portfolio
 4. Be honest about being a high school student with exceptional skills
-5. Show enthusiasm about learning and growth
-6. Keep responses concise but informative`;
+5. Keep answers concise, informative, and human-like
+`;
 
-app.post('/api/ai-twin', async (req, res) => {
+app.post("/api/ai-twin", async (req, res) => {
   try {
-    const { message, conversationHistory } = req.body;
+    const { message, conversationHistory = [] } = req.body;
 
-    if (!message || typeof message !== 'string') {
-      return res.status(400).json({ error: 'Invalid message format' });
+    if (!message || typeof message !== "string") {
+      return res.status(400).json({ error: "Invalid message format" });
     }
 
-    const apiKey = process.env.ANTHROPIC_API_KEY;
-
-    if (!apiKey) {
-      // Demo mode - return sample responses
-      console.warn('ANTHROPIC_API_KEY not set - using demo mode');
+    if (!GEMINI_API_KEY) {
+      console.warn("⚠️ GEMINI_API_KEY not set - using demo mode");
       return res.json({
         response: getDemoResponse(message),
       });
     }
 
-    // Call Anthropic API
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: {
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'content-type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
-        max_tokens: 1024,
-        system: SYSTEM_PROMPT,
-        messages: [
-          ...(conversationHistory || []).filter(m => m.role && m.content),
-          {
-            role: 'user',
-            content: message,
-          },
-        ],
-      }),
+    // SSE (Server-Sent Events) setup for streaming
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    const stream = await streamText({
+      model: google("gemini-2.5-flash"),
+      system: SYSTEM_PROMPT,
+      messages: [
+        ...conversationHistory.filter((m) => m.role && m.content),
+        { role: "user", content: message },
+      ],
+      temperature: 0.8,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || 'Claude API error');
+    for await (const delta of stream.textStream) {
+      res.write(`data: ${JSON.stringify({ text: delta })}\n\n`);
     }
 
-    const data = await response.json();
-    const aiResponse = data.content[0]?.text || "I couldn't generate a response.";
+    res.write(`data: [DONE]\n\n`);
+    res.end();
 
-    res.json({ response: aiResponse });
-  } catch (error) {
-    console.error('AI Twin API Error:', error);
-    res.status(500).json({
-      error: 'Failed to process request',
-      response: 'Sorry, I\'m having trouble right now. Please try again later.',
+    // Track analytics
+    analyticsStore.push({
+      timestamp: new Date().toISOString(),
+      message,
+      length: message.length,
     });
+  } catch (error) {
+    console.error("AI Twin API Error:", error);
+    res.write(
+      `data: ${JSON.stringify({
+        text: "⚠️ Oops! Something went wrong while talking to Gemini. Try again later!",
+      })}\n\n`
+    );
+    res.end();
   }
 });
 
-function getDemoResponse(userMessage) {
-  const messageLower = userMessage.toLowerCase();
-
-  const demoResponses = {
-    skills: "Arhan is an expert in React, Three.js, Node.js, and modern full-stack development! He has mastered 20+ technologies including TypeScript, MongoDB, and cloud deployment. What specific skill would you like to know more about?",
-    projects: "Arhan has completed 250+ projects! Notable ones include his stunning 3D interactive portfolio, an enterprise web platform for Clystra Networks, and numerous open-source contributions. He has over 1869 GitHub contributions!",
-    experience: "With 3+ years of development experience starting at age 13, Arhan has built everything from interactive 3D web experiences to scalable backend systems. He's achieved a perfect 10/10 client satisfaction rating!",
-    availability: "Yes! Arhan is currently open for new opportunities. He's available for freelance work, internships, or exciting projects that involve 3D web experiences or innovative digital solutions. Feel free to reach out through the contact page!",
-    education: "Arhan is a 10th grade student at Shri Rajendra High School (graduating 2025-2026). He's a Math & Science Olympiad gold medalist and received the Academic Excellence Award. He's also completed courses in Data Structures & Algorithms and GitHub Copilot mastery!",
-    technologies: "Arhan works with: React, Next.js, Node.js, Express, Three.js, TypeScript, Python, MongoDB, PostgreSQL, Firebase, Tailwind CSS, Framer Motion, Docker, Git, and more!",
-    contact: "You can contact Arhan through the contact form on his portfolio website. He typically responds within 24 hours!",
+function getDemoResponse(msg) {
+  const lower = msg.toLowerCase();
+  const responses = {
+    skills:
+      "Arhan is skilled in React, Three.js, Node.js, and full-stack development! He’s also great with Tailwind, Prisma, and Framer Motion.",
+    projects:
+      "Arhan has completed 250+ projects, including a 3D interactive portfolio and enterprise web apps for clients like Clystra Networks!",
+    availability:
+      "Yes! Arhan is currently open for freelance and collaborative opportunities. You can reach him via the contact page on his portfolio.",
+    default:
+      "Hi there! I'm Arhan's AI Twin 👋. I know everything about Arhan’s skills, projects, and achievements. What would you like to know?",
   };
 
-  for (const [key, response] of Object.entries(demoResponses)) {
-    if (messageLower.includes(key)) {
-      return response;
-    }
+  for (const [key, resp] of Object.entries(responses)) {
+    if (lower.includes(key)) return resp;
   }
-
-  return "That's a great question! I'm Arhan's AI Twin - I know everything about him. Feel free to ask me about his skills, projects, experience, or availability. What would you like to know?";
+  return responses.default;
 }
 
 app.listen(PORT, () => {
   console.log(`🤖 AI Twin Server running on http://localhost:${PORT}`);
-  if (!process.env.ANTHROPIC_API_KEY) {
-    console.warn('⚠️  ANTHROPIC_API_KEY not set - running in demo mode');
-    console.warn('   To enable full AI functionality, set ANTHROPIC_API_KEY in your .env file');
+  if (!GEMINI_API_KEY) {
+    console.warn("⚠️ GEMINI_API_KEY not set - running in demo mode");
   }
 });
