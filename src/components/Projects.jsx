@@ -14,7 +14,7 @@ export const projects = [
 		image: "projects/arhansales.png",
 		description: "Professional business website with modern design and contact management.",
 		category: "client",
-		type: "original",
+		type: "client",
 		technologies: ["HTML", "CSS", "JavaScript", "PHP"]
 	},
 	{
@@ -282,210 +282,315 @@ export const projects = [
 		url: "https://arhanansari.github.io/Emoji_Dice_Roller/",
 		image: "projects/emoji-dice-roller.jpg",
 		description: "A simple Emoji Dice Roller using HTML,CSS,JS.",
+		category: "game",
+		type: "learning",
+		technologies: ["HTML5", "CSS3", "JavaScript"]
 	},
 	{
 		title: "Arhan Laptop.in",
 		url: "https://arhanansari.github.io/Arhan-Laptop.in/",
 		image: "projects/ArhanLaptop.in.jpg",
 		description: "A simple shopping website made with HTML,CSS,JS.",
+		category: "web",
+		type: "learning",
+		technologies: ["HTML5", "CSS3", "JavaScript"]
 	},
 	{
 		title: "Quiz App",
 		url: "https://arhanansari.github.io/Quiz_App/",
 		image: "projects/quizapp.png",
-		description: "This project is created with HTML, CSS and JavaScript that allows user to answer given questions.It includes sections for starting the quiz, displaying quiz information. There’s a timer, for each question and its options. If the user doesn’t answer within the time limit, then the next question appears automatically. After selecting an option, it checks if it’s correct or not. At the end,it displays your score with a result message.It also has the option to restart the quiz or quit.",
+		description: "This project is created with HTML, CSS and JavaScript that allows user to answer given questions.It includes sections for starting the quiz, displaying quiz information. There's a timer, for each question and its options. If the user doesn't answer within the time limit, then the next question appears automatically. After selecting an option, it checks if it's correct or not. At the end,it displays your score with a result message.It also has the option to restart the quiz or quit.",
+		category: "education",
+		type: "learning",
+		technologies: ["HTML5", "CSS3", "JavaScript"]
 	},
 	{
 		title: "Aaiza Cosmetics",
 		url: "https://aaizacosmetics.vercel.app/",
 		image: "projects/Aaiza-Cosmetics.jpg",
 		description: "This is a website of my client. This is a Shopping Website made with HTML,CSS,JS.",
+		category: "client",
+		type: "client",
+		technologies: ["HTML5", "CSS3", "JavaScript"]
 	},
 	{
 		title: "Father's Day",
 		url: "https://fathers-day-tau.vercel.app/",
 		image: "projects/Fathers-Day.png",
 		description: "This is a professional Father's Day wishing website designed with HTML, CSS, and JavaScript.The clean and modern design ensures a delightful user experience, making it a perfect way to celebrate and honor fathers. The responsive layout ensures compatibility across various devices, while the simple JavaScript functionality adds a touch of interactivity.",
+		category: "web",
+		type: "original",
+		technologies: ["HTML5", "CSS3", "JavaScript"]
 	},
 	{
 		title: "Password Generator",
 		url: "https://arhanansari.github.io/Password-Generator-YT/",
 		image: "projects/Password-Generator.jpg",
-		description: "A simple and beautiful Password Generator built with HTML,CSS,JS. ",
+		description: "A simple and beautiful Password Generator built with HTML,CSS,JS.",
+		category: "productivity",
+		type: "original",
+		technologies: ["HTML5", "CSS3", "JavaScript"]
 	},
 	{
 		title: "Password Validator",
 		url: "https://password-validator-yt.vercel.app/",
 		image: "projects/Password-Validator.jpg",
 		description: "A simple and beautiful Password Validator built with HTML,CSS,JS.",
+		category: "security",
+		type: "original",
+		technologies: ["HTML5", "CSS3", "JavaScript"]
 	},
 	{
 		title: "Kanban Task Management",
 		url: "https://kanban-task-management-project.vercel.app/",
 		image: "projects/Karban-Task-Management.jpg",
 		description: "This project is a recreation of the famous task management application Karban.It aims to provide a user-friendly and efficient interface for organizing your daily tasks.",
+		category: "productivity",
+		type: "inspired",
+		technologies: ["React", "CSS3", "JavaScript"]
 	},
 	{
 		title: "Colour Flipper",
 		url: "https://simple-colour-flipper-app-yt.vercel.app/",
 		image: "projects/Colour-Flipper.jpg",
 		description: "A simple and beautiful Colour Flipper built with HTML,CSS,JS.",
+		category: "game",
+		type: "original",
+		technologies: ["HTML5", "CSS3", "JavaScript"]
 	},
 	{
 		title: "Chat to PDF",
 		url: "https://arhans-chat-to-pdf.vercel.app/",
 		image: "projects/chattopdf.jpg",
 		description: "My first AI SaaS app made with using Next.js, Clerk, React Dropzone, Shadcn UI, Pinecone, Langchain, Gemini, OpenAI, Stripe. Chat to PDF let's you PDF and then you can chat with AI if you any problems with PDF.",
+		category: "ai",
+		type: "original",
+		technologies: ["Next.js", "TypeScript", "Shadcn UI", "Stripe", "Langchain"]
 	},
 	{
 		title: "SoundStream",
 		url: "https://soundstream.vercel.app/",
 		image: "projects/soundstream.jpg",
 		description: "This is a Spotify Clone made with Vite, Vue 3, Tailwind CSS, and Pinia.",
+		category: "web",
+		type: "inspired",
+		technologies: ["Vue 3", "Vite", "Tailwind CSS", "Pinia"]
 	},
 	{
 		title: "hexta/ui",
 		url: "https://ui-hexta.vercel.app/",
 		image: "projects/ui-hexta.jpg",
 		description: "HextaUI is a user interface library that offers contemporary components, making it effortless to integrate into your projects. With the HextaUI CLI, you can quickly install and utilize these components without any hassle.",
+		category: "web",
+		type: "original",
+		technologies: ["React", "CLI", "TypeScript", "Tailwind CSS"]
 	},
 	{
 		title: "Language Translator",
 		url: "https://language-translator-app-phi.vercel.app/",
 		image: "projects/language-translator.jpg",
 		description: "Language translator is a program that is used to translate text into multiple languages like Nepali, Hindi, Spanish, etc. In my language translator app, users can easily translate text into different languages, copy translated text, and convert text to speech. It is similar to Google Translate. Made with HTML, CSS, JS and MyMemory API",
+		category: "productivity",
+		type: "original",
+		technologies: ["HTML5", "CSS3", "JavaScript", "Translation API"]
 	},
 	{
 		title: "Google Translate",
 		url: "https://arhans-google-translate.vercel.app/",
 		image: "projects/Google-Translate.jpg",
 		description: "A simple Google Translate Clone made with HTML, CSS, JS and Google Translate API. It has a Dark mode feature too.",
+		category: "productivity",
+		type: "inspired",
+		technologies: ["HTML5", "CSS3", "JavaScript", "Google Translate API"]
 	},
 	{
 		title: "Gemini",
 		url: "https://gemini-ai-chatbot-pchm.vercel.app/",
 		image: "projects/Gemini.jpg",
 		description: "A Gemini Chatbot built with Next.js, Vercel AI SDK and Google Gemini.",
+		category: "ai",
+		type: "original",
+		technologies: ["Next.js", "Vercel AI SDK", "Google Gemini", "React"]
 	},
 	{
 		title: "Carrefour",
 		url: "https://arhans-ecommerce.vercel.app/",
 		image: "projects/CareeFour.jpg",
 		description: "This is a full stack Ecommerce website.",
+		category: "web",
+		type: "original",
+		technologies: ["React", "Node.js", "MongoDB", "Express", "Stripe"]
 	},
 	{
 		title: "Windows 11",
 		url: "https://arhans-windows11.vercel.app/",
 		image: "projects/Windows11.jpg",
 		description: "A Windows 11 Clone app built with React, Tailwind CSS, Framer Motion, React Draggable, React Router DOM.",
+		category: "game",
+		type: "inspired",
+		technologies: ["React", "Tailwind CSS", "Framer Motion", "React Draggable"]
 	},
 	{
 		title: "RentUP",
 		url: "https://arhans-rentup.vercel.app/",
 		image: "projects/RentUP.png",
-		description: "A Real Estate Website built with React. ",
+		description: "A Real Estate Website built with React.",
+		category: "web",
+		type: "original",
+		technologies: ["React", "Tailwind CSS", "JavaScript"]
 	},
 	{
 		title: "Crousal Maker",
 		url: "https://crousalmaker.vercel.app/",
 		image: "projects/Crousal Maker.jpg",
 		description: "My 2nd SaaS App. Crousal maker is a simple crousal editing platform with in-built crousals templates only you can edit heading , descriptions and Images and download it in both format PDF and JPEG. Built with Nextjs, Typescript, Shadcn UI, js-pdf, Html2canvas and tinyColor2.",
+		category: "productivity",
+		type: "original",
+		technologies: ["Next.js", "TypeScript", "Shadcn UI", "js-pdf", "HTML2Canvas"]
 	},
 	{
 		title: "ArhanBlog",
 		url: "https://arhanblog.vercel.app/",
 		image: "projects/ArhanBlog.jpg",
 		description: "A Markdown blog made with using Next.js, TailwindCSS, Shadcn, Pieces, Remark and Rehype.",
+		category: "web",
+		type: "original",
+		technologies: ["Next.js", "Tailwind CSS", "Markdown", "Remark", "Rehype"]
 	},
 	{
 		title: "Mixcnui",
 		url: "https://mixcnui.vercel.app/",
 		image: "projects/Mixcnui.jpg",
 		description: "My 3rd SaaS App. Mixcnui is 20+ free and open-source animated components built with React, Typescript, Tailwind CSS, and Framer Motion. Built with React, Next.js, TailwindCSS, Framer Motion. ",
+		category: "web",
+		type: "original",
+		technologies: ["React", "Next.js", "Tailwind CSS", "Framer Motion", "TypeScript"]
 	},
 	{
 		title: "Metaverse",
 		url: "https://arhans-metaverse.vercel.app/",
 		image: "projects/Metaverse.jpg",
 		description: "A Metaverse Website made with Next.js, TailwindCSS & Framer Motion.",
+		category: "web",
+		type: "original",
+		technologies: ["Next.js", "Tailwind CSS", "Framer Motion"]
 	},
 	{
 		title: "Evogym",
 		url: "https://evogym-brown-mu.vercel.app/",
 		image: "projects/Evogym.png",
 		description: "A Gym Website made with React.",
+		category: "web",
+		type: "original",
+		technologies: ["React", "Tailwind CSS", "JavaScript"]
 	},
 	{
 		title: "Nike Landing Page",
 		url: "https://nike-landing-page-seven-tan.vercel.app/",
 		image: "projects/Nike-Landing-Page.png",
 		description: "A Nike Landing Page made with TailwindCSS.",
+		category: "web",
+		type: "inspired",
+		technologies: ["React", "Tailwind CSS", "JavaScript"]
 	},
 	{
 		title: "InspireGem",
 		url: "https://inspiregem.vercel.app/",
 		image: "projects/InspireGem.png",
 		description: "InspireGem is a AI Powered Website made with Next.js, TailwindCSS, Google Gemini, Stripe amnd Google Firebase",
+		category: "ai",
+		type: "original",
+		technologies: ["Next.js", "Tailwind CSS", "Google Gemini", "Stripe", "Firebase"]
 	},
 	{
 		title: "YC DIRECTORY",
 		url: "https://yc-directory-red.vercel.app/",
 		image: "projects/YC-DIRECTORY.jpg",
 		description: "A Next.js 15 platform where entrepreneurs can submit their startup ideas for virtual pitch competitions, browse other pitches, and gain exposure through a clean minimalistic design for a smooth user experience. It is made with React 19, Next.js 15, Sanity, TailwindCSS, ShadCN, TypeScript",
+		category: "web",
+		type: "original",
+		technologies: ["Next.js 15", "React 19", "Sanity", "Tailwind CSS", "TypeScript"]
 	},
 	{
 		title: "StoreIt",
 		url: "https://storeit-five.vercel.app/",
 		image: "projects/StoreIt.png",
 		description: "A storage management and file sharing platform that lets users effortlessly upload, organize, and share files. Built with the latest Next.js 15 and the Appwrite Node SDK, utilizing advanced features for seamless file management. It is made with React 19, Next.js 15, Appwrite, TailwindCSS, ShadCN, TypeScript.",
+		category: "web",
+		type: "original",
+		technologies: ["Next.js 15", "React 19", "Appwrite", "Tailwind CSS", "TypeScript"]
 	},
 	{
 		title: "An Awwwards Winning Website",
 		url: "https://award-winning-website-iota.vercel.app/",
 		image: "projects/Award-Winning-Website.png",
 		description: "Build a visually captivating website inspired by Zentry, featuring scroll-triggered animations, geometric transitions, and engaging video storytelling. Learn how to deliver a luxurious, modern feel, focusing on engaging UI/UX and smooth responsiveness, capturing the essence of what makes an Awwwards winner. It is made with GSAP, React.js, Tailwind CSS",
+		category: "web",
+		type: "inspired",
+		technologies: ["React", "GSAP", "Tailwind CSS", "JavaScript"]
 	},
 	{
 		title: "Restyled",
 		url: "https://restyled-ecru.vercel.app/",
 		image: "projects/restyled.png",
 		description: "Restyled is a Image Editor & Video Editor also having AI support and is made with Next.js, TailwindCSS and Cloudinary.",
+		category: "ai",
+		type: "original",
+		technologies: ["Next.js", "Tailwind CSS", "Cloudinary", "TypeScript"]
 	},
 	{
 		title: "Immersilearn",
 		url: "https://immersilearn.vercel.app/",
 		image: "projects/immersilearn.png",
 		description: "Immersilearn is a platform for learning and it has a clean and minimalistic design for a smooth user experience. It is made with React 19, Next.js 15, TailwindCSS, TypeScript and Appwrite.",
+		category: "education",
+		type: "original",
+		technologies: ["Next.js 15", "React 19", "Tailwind CSS", "Appwrite", "TypeScript"]
 	},
 	{
 		title: "CodeFount",
 		url: "https://codefount.vercel.app/",
 		image: "projects/CodeFount.png",
 		description: "A sleek and modern online IDE built with Next.js 15, Convex, Sentry, Lemon Squeezy, Clerk and EmailJS, offering multi-language support, customization, and community-driven collaboration. Perfect for developers seeking a powerful and seamless coding environment. ",
+		category: "productivity",
+		type: "original",
+		technologies: ["Next.js 15", "Convex", "Clerk", "TypeScript", "EmailJS"]
 	},
 	{
 		title: "Happy New Year 2025",
 		url: "https://happynewyear2025-olive.vercel.app/",
 		image: "projects/happynewyear2025.png",
 		description: "A Happy New Year 2025 Website made with HTML, CSS, JS.",
+		category: "web",
+		type: "original",
+		technologies: ["HTML5", "CSS3", "JavaScript"]
 	},
 	{
 		title: "Happy Republic Day 2025",
 		url: "https://happy-republic-day-one.vercel.app/",
 		image: "projects/happyrepublicday2025.png",
 		description: "A Happy Republic Day 2025 Website made with HTML, CSS, JS.",
+		category: "web",
+		type: "original",
+		technologies: ["HTML5", "CSS3", "JavaScript"]
 	},
 	{
 		title: "Moodflix",
 		url : "https://moodflix-theta.vercel.app/",
 		image : "projects/moodflix.png",
 		description : "Moodflix is a platform that allows users to discover movies based on their mood. It is made with React 19, Tailwind CSS, and the TMDb API.",
+		category: "web",
+		type: "original",
+		technologies: ["React 19", "Tailwind CSS", "TMDb API", "JavaScript"]
 	},
 	{
 		title: "Synthara",
 		url: "https://synthara.is-a.dev/",
 		image: "projects/Synthara.png",
 		description: "Synthara is an advanced AI-powered application designed to process and generate insights from various types of files. Initially focused on image processing. Made with Next.js, Tailwind CSS, Gemini, Shadcn/ui and Together AI.",
+		category: "ai",
+		type: "original",
+		technologies: ["Next.js", "Tailwind CSS", "Gemini", "Together AI", "Shadcn/ui"]
 	},
 	{
 		title: "Clipgen AI",
@@ -514,7 +619,7 @@ export const projects = [
 		image: "projects/Clystra-Networks.png",
 		description: "This is a website of my client. This is a Network Infrastructure Provider Company made with Next.js 15, TailwindCSS, ShadCN, TypeScript, Framer Motion, React, Sentry and Resend.",
 		category: "client",
-		type: "original",
+		type: "client",
 		technologies: ["NextJS", "TailwindCSS", "Sentry", "ShadCN", "TypeScript"] 
 	},
 ];
