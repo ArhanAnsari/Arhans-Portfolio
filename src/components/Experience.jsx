@@ -23,8 +23,8 @@ export const Experience = (props) => {
 
   const [section, setSection] = useState(0);
 
-  const cameraPositionX = useMotionValue();
-  const cameraLookAtX = useMotionValue();
+  const cameraPositionX = useMotionValue(0);
+  const cameraLookAtX = useMotionValue(0);
 
   useEffect(() => {
     animate(cameraPositionX, menuOpened ? -5 : 0, {
@@ -55,12 +55,14 @@ export const Experience = (props) => {
   const characterGroup = useRef();
 
   useFrame((state) => {
+    // Check if refs exist before accessing
+    if (!characterGroup.current) return;
 
     state.camera.position.x = cameraPositionX.get();
     state.camera.lookAt(cameraLookAtX.get(), 0, 0);
 
     // const position = new THREE.Vector3();
-    if (section === 0) {
+    if (section === 0 && characterContainerAboutRef.current) {
       characterContainerAboutRef.current.getWorldPosition(
         characterGroup.current.position
       );

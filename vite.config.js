@@ -7,8 +7,11 @@ export default defineConfig({
   server: {
     proxy: {
       '/api/ai-twin': {
-        target: 'http://localhost:3001', // Change to your backend server if using one
+        target: process.env.VITE_API_URL || 'http://localhost:3001',
         changeOrigin: true,
+        secure: false,
+        ws: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
       }
     }
   }

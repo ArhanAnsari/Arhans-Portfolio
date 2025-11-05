@@ -49,12 +49,13 @@ export function Office(props) {
   });
 
   return (
-    <group {...props} dispose={null}>
+    <group {...props} dispose={null} frustumCulled={false}>
       <mesh
         name="Screen"
         geometry={nodes.Screen.geometry}
         position={[0.45, 0.94, -1.72]}
         rotation={[Math.PI, -1.1, Math.PI]}
+        frustumCulled={false}
       >
         <meshBasicMaterial map={textureVSCode} toneMapped={false} />
       </mesh>

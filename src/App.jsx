@@ -52,12 +52,20 @@ function App() {
         <div className="fixed top-0 left-0 w-screen h-screen z-0 pointer-events-none">
           <Canvas 
             shadows 
-            camera={{ position: [0, 3, 10], fov: 42 }}
+            camera={{ 
+              position: [0, 3, 10], 
+              fov: window.innerWidth < 768 ? 50 : 42,
+              near: 0.1,
+              far: 1000
+            }}
             gl={{ 
               antialias: true,
               alpha: true,
-              powerPreference: "high-performance"
+              powerPreference: "high-performance",
+              logarithmicDepthBuffer: true,
+              precision: "mediump"
             }}
+            dpr={window.innerWidth < 768 ? 1 : window.devicePixelRatio}
             style={{ display: 'block', width: '100%', height: '100%' }}
           >
             <color attach="background" args={["#0f172a"]} />

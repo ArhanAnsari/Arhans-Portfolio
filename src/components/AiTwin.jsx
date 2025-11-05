@@ -22,6 +22,70 @@ const AiTwin = () => {
 
   useEffect(scrollToBottom, [messages]);
 
+  // Demo responses when API key is not available
+  const getDemoResponse = (msg) => {
+    const lower = msg.toLowerCase();
+    const responses = {
+      skills:
+        "Arhan is skilled in React, Three.js, Node.js, and full-stack development! He's also great with Tailwind, Prisma, and Framer Motion.",
+      projects:
+        "Arhan has completed 250+ projects, including a 3D interactive portfolio and enterprise web apps for clients like Clystra Networks!",
+      availability:
+        "Yes! Arhan is currently open for freelance and collaborative opportunities. You can reach him via the contact page on his portfolio.",
+      experience:
+        "Arhan has 3+ years of development experience with 1869 GitHub contributions and 10/10 client satisfaction rating!",
+      default:
+        "Hi there! I'm Arhan's AI Twin 👋. I know everything about Arhan's skills, projects, and achievements. What would you like to know?",
+    };
+
+    for (const [key, resp] of Object.entries(responses)) {
+      if (lower.includes(key)) return resp;
+    }
+    return responses.default;
+  };
+
+  // System prompt for Arhan
+  const SYSTEM_PROMPT = `You are Arhan's AI Twin, a sophisticated AI assistant with deep knowledge of Arhan Ansari. You are available 24/7 to answer questions about Arhan's skills, projects, experience, and availability.
+
+About Arhan:
+- Full Stack Developer with expertise in modern web technologies
+- Passionate about 3D web experiences and interactive design
+- Strong background in React, Node.js, Three.js, and AI integration
+
+Key Skills:
+- Frontend: React, Three.js, Framer Motion, Tailwind CSS, Next.js, Vite
+- Backend: Node.js, Express, Prisma, MongoDB, PostgreSQL
+- 3D/Graphics: Three.js, Babylon.js, WebGL, React Three Fiber
+- AI/ML: LLM integration, Gemini, Claude, prompt engineering
+- DevOps: Docker, Git, Vercel, Railway, serverless functions
+
+Notable Achievements:
+- 250+ projects completed
+- 1869 GitHub contributions
+- 3+ years of development experience
+- 10/10 client satisfaction
+- 20+ technologies mastered
+- Gold medalist in Math & Science Olympiads
+
+Current Status:
+- Open for new opportunities
+- Available for freelance work
+- Interested in 3D web and scalable applications
+- Always learning new technologies
+
+Personality:
+- Friendly and professional
+- Detail-oriented with focus on UX
+- Quick learner and adaptable
+- Passionate about web development
+
+When answering:
+1. Be friendly and professional
+2. Keep answers concise and informative
+3. For inquiries, suggest contacting via portfolio
+4. Be helpful and human-like
+5. Show genuine interest in helping`;
+
   const sendMessage = async () => {
     if (!input.trim()) return;
 
@@ -44,56 +108,116 @@ const AiTwin = () => {
     };
     setMessages((prev) => [...prev, aiMessage]);
 
-    const response = await fetch("/api/ai-twin", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        message: userMessage.text,
-        conversationHistory: messages.map((m) => ({
-          role: m.sender === "user" ? "user" : "assistant",
-          content: m.text,
-        })),
-      }),
-    });
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
-
-    let buffer = "";
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-
-      buffer += decoder.decode(value, { stream: true });
-
-      const parts = buffer.split("\n\n");
-      buffer = parts.pop();
-
-      for (const part of parts) {
-        if (part.startsWith("data: ")) {
-          const data = part.replace("data: ", "").trim();
-          if (data === "[DONE]") {
-            setIsStreaming(false);
-            return;
+      // If no API key, use demo mode
+      if (!apiKey) {
+        const demoResponse = getDemoResponse(userMessage.text);
+        setMessages((prev) => {
+          const updated = [...prev];
+          const last = updated[updated.length - 1];
+          if (last.sender === "ai") {
+            last.text = demoResponse;
           }
-          try {
-            const parsed = JSON.parse(data);
-            setMessages((prev) => {
-              const updated = [...prev];
-              const last = updated[updated.length - 1];
-              if (last.sender === "ai") {
-                last.text += parsed.text;
+          return updated;
+        });
+        setIsStreaming(false);
+        return;
+      }
+
+      // Call Google Gemini API directly from frontend
+      const response = await fetch(
+        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse&key=" +
+          apiKey,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            system_instruction: {
+              parts: [{ text: SYSTEM_PROMPT }],
+            },
+            contents: [
+              ...messages
+                .filter((m) => m.sender !== undefined)
+                .map((m) => ({
+                  role: m.sender === "user" ? "user" : "model",
+                  parts: [{ text: m.text }],
+                })),
+              {
+                role: "user",
+                parts: [{ text: userMessage.text }],
+              },
+            ],
+            generationConfig: {
+              temperature: 0.8,
+              maxOutputTokens: 1000,
+            },
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n");
+
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            try {
+              const data = JSON.parse(line.slice(6));
+
+              if (
+                data.candidates &&
+                data.candidates[0] &&
+                data.candidates[0].content
+              ) {
+                const text =
+                  data.candidates[0].content.parts[0]?.text || "";
+                if (text) {
+                  setMessages((prev) => {
+                    const updated = [...prev];
+                    const last = updated[updated.length - 1];
+                    if (last.sender === "ai") {
+                      last.text += text;
+                    }
+                    return [...updated];
+                  });
+                }
               }
-              return [...updated];
-            });
-          } catch {
-            // ignore JSON parse errors
+            } catch (e) {
+              // Ignore parsing errors
+            }
           }
         }
       }
-    }
 
-    setIsStreaming(false);
+      setIsStreaming(false);
+    } catch (error) {
+      console.error("AI Twin Error:", error);
+      setMessages((prev) => {
+        const updated = [...prev];
+        const last = updated[updated.length - 1];
+        if (last.sender === "ai") {
+          last.text =
+            "⚠️ Sorry! I couldn't connect to Gemini. Running in demo mode.\n\n" +
+            getDemoResponse(userMessage.text);
+        }
+        return updated;
+      });
+      setIsStreaming(false);
+    }
   };
 
   const handleKeyPress = (e) => {
