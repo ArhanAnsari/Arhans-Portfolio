@@ -644,8 +644,8 @@ export const projects = [
 	},
 	{
 		title: "New Year Wishing 2026",
-		url: "https://new-year-2026-five.vercel.app/",
-		github: "https://github.com/ArhanAnsari/New-Year-2026",
+		url: "https://new-year-wishing-website-2026.vercel.app/",
+		github: "https://github.com/ArhanAnsari/New-Year-Wishing-Website-2026",
 		image: "projects/New-Year-2026.png",
 		description: "A New Year 2026 Wishing Website made with HTML, CSS and JavaScript.",
 		category: "web",
