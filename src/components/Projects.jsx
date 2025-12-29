@@ -622,6 +622,36 @@ export const projects = [
 		type: "client",
 		technologies: ["NextJS", "TailwindCSS", "Sentry", "ShadCN", "TypeScript"] 
 	},
+	{
+		title: "EduSync",
+		url: "https://edusync.appwrite.network/",
+		github: "https://github.com/ArhanAnsari/edusync",
+		image: "projects/EduSync.png",
+		description: "EduSync is an online learning platform that connects students and educators. It offers a variety of courses, interactive lessons, and real-time collaboration features. Built with Next.js 15, React 19, Appwrite, TailwindCSS, Shadcn/ui, TypeScript and Framer Motion.",
+		category: "education",
+		type: "original",
+		technologies: ["NextJS", "React", "Appwrite", "TailwindCSS", "TypeScript"]
+	},
+	{
+		title: "TruthMatrix",
+		url: "https://truthmatrix.vercel.app/",
+		github: "https://github.com/ArhanAnsari/TruthMatrix",
+		image: "projects/TruthMatrix.png",
+		description: "TruthMatrix is an AI-powered fact-checking platform that helps users verify the authenticity of information. It uses advanced AI algorithms to analyze text, images, and videos, providing users with accurate and reliable fact-checking results. Built with Next.js 15, React 19, TailwindCSS, Shadcn/ui, TypeScript, Gemini and Together AI.",
+		category: "ai",
+		type: "original",
+		technologies: ["NextJS", "React", "TailwindCSS", "TypeScript", "Gemini", "Framer Motion"]
+	},
+	{
+		title: "New Year Wishing 2026",
+		url: "https://new-year-2026-five.vercel.app/",
+		github: "https://github.com/ArhanAnsari/New-Year-2026",
+		image: "projects/New-Year-2026.png",
+		description: "A New Year 2026 Wishing Website made with HTML, CSS and JavaScript.",
+		category: "web",
+		type: "original",
+		technologies: ["HTML", "CSS", "JavaScript"]
+	},
 ];
 
 const Project = (props) => {

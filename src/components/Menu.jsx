@@ -20,7 +20,8 @@ export const Menu = (props) => {
     { label: "Current Work", section: 5, icon: "💼" },
     { label: "Services", section: 6, icon: "🛠️" },
     { label: "Testimonials", section: 7, icon: "💬" },
-    { label: "Contact", section: 8, icon: "📬" },
+    { label: "Blog", section: 8, icon: "✍️" },
+    { label: "Contact", section: 9, icon: "📬" },
   ];
 
   // 🔥 Smooth scroll handler

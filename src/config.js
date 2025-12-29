@@ -1,3 +1,5 @@
+import { atom } from "jotai";
+
 export const framerMotionConfig = {
   type: "spring",
   mass: 5,
@@ -5,3 +7,5 @@ export const framerMotionConfig = {
   damping: 55,
   restDelta: 0.0001,
 };
+
+export const themeAtom = atom("dark");

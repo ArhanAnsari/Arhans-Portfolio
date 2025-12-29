@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, X, Minimize2, Maximize2, Loader } from "lucide-react";
+import { Send, X, Minimize2, Maximize2, Loader, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
 
 const AiTwin = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  const [isSpeaking, setIsSpeaking] = useState(true);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -16,6 +18,52 @@ const AiTwin = () => {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef(null);
+
+  // Voice Recognition Setup
+  const recognitionRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition)) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognitionRef.current = new SpeechRecognition();
+      recognitionRef.current.continuous = false;
+      recognitionRef.current.interimResults = false;
+
+      recognitionRef.current.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        setInput(transcript);
+        setIsListening(false);
+        // Automatically send if transcript is long enough or just set it
+      };
+
+      recognitionRef.current.onerror = () => {
+        setIsListening(false);
+      };
+
+      recognitionRef.current.onend = () => {
+        setIsListening(false);
+      };
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (isListening) {
+      recognitionRef.current?.stop();
+    } else {
+      setInput("");
+      recognitionRef.current?.start();
+      setIsListening(true);
+    }
+  };
+
+  const speak = (text) => {
+    if (!isSpeaking || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel();
+    const utterance = new SpeechSynthesisUtterance(text);
+    utterance.rate = 1;
+    utterance.pitch = 1;
+    window.speechSynthesis.speak(utterance);
+  };
 
   const scrollToBottom = () =>
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -123,6 +171,7 @@ When answering:
           return updated;
         });
         setIsStreaming(false);
+        speak(demoResponse);
         return;
       }
 
@@ -165,6 +214,7 @@ When answering:
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
+      let fullResponse = "";
 
       while (true) {
         const { value, done } = await reader.read();
@@ -186,6 +236,7 @@ When answering:
                 const text =
                   data.candidates[0].content.parts[0]?.text || "";
                 if (text) {
+                  fullResponse += text;
                   setMessages((prev) => {
                     const updated = [...prev];
                     const last = updated[updated.length - 1];
@@ -204,19 +255,20 @@ When answering:
       }
 
       setIsStreaming(false);
+      speak(fullResponse);
     } catch (error) {
       console.error("AI Twin Error:", error);
+      const errorResponse = "⚠️ Sorry! I couldn't connect to Gemini. Running in demo mode.\n\n" + getDemoResponse(userMessage.text);
       setMessages((prev) => {
         const updated = [...prev];
         const last = updated[updated.length - 1];
         if (last.sender === "ai") {
-          last.text =
-            "⚠️ Sorry! I couldn't connect to Gemini. Running in demo mode.\n\n" +
-            getDemoResponse(userMessage.text);
+          last.text = errorResponse;
         }
         return updated;
       });
       setIsStreaming(false);
+      speak(errorResponse);
     }
   };
 
@@ -271,6 +323,13 @@ When answering:
                 </div>
               </div>
               <div className="flex gap-2">
+                <button
+                  onClick={() => setIsSpeaking(!isSpeaking)}
+                  className="text-white hover:bg-white/20 p-2 rounded"
+                  title={isSpeaking ? "Mute AI" : "Unmute AI"}
+                >
+                  {isSpeaking ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                </button>
                 <button
                   onClick={() => setIsMinimized(!isMinimized)}
                   className="text-white hover:bg-white/20 p-2 rounded"
@@ -331,6 +390,15 @@ When answering:
                 {/* Input */}
                 <div className="border-t border-slate-700 p-4 bg-slate-900/70">
                   <div className="flex gap-2">
+                    <button
+                      onClick={toggleListening}
+                      className={`p-3 rounded-lg transition flex items-center justify-center shadow-lg ${
+                        isListening ? "bg-red-500 animate-pulse" : "bg-slate-700 hover:bg-slate-600"
+                      }`}
+                      title={isListening ? "Stop Listening" : "Start Voice Input"}
+                    >
+                      {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+                    </button>
                     <textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}

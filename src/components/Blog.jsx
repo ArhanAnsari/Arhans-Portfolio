@@ -1,33 +1,34 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const blogPosts = [
+export const blogPosts = [
   {
     id: 1,
-    title: "Getting Started with React",
-    excerpt: "Learn the fundamentals of React and build your first application",
-    date: "2023-12-15",
-    readTime: "5 min read",
+    title: "The Future of Web Development",
+    excerpt: "Exploring the latest trends in React, Three.js, and AI integration.",
+    date: "March 15, 2024",
     category: "Web Development",
-    image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+    image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=800",
+    readTime: "5 min read"
   },
   {
     id: 2,
-    title: "Building Responsive Websites",
-    excerpt: "Master the art of creating websites that work on all devices",
-    date: "2023-12-10",
-    readTime: "7 min read",
+    title: "Mastering UI/UX Design",
+    excerpt: "How to create immersive user experiences that captivate and engage.",
+    date: "March 10, 2024",
     category: "UI/UX",
-    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1415&q=80"
+    image: "https://images.unsplash.com/photo-1558655146-d09347e92766?auto=format&fit=crop&q=80&w=800",
+    readTime: "8 min read"
   },
   {
     id: 3,
-    title: "JavaScript Best Practices",
-    excerpt: "Write clean and maintainable JavaScript code",
-    date: "2023-12-05",
-    readTime: "6 min read",
+    title: "The Power of 3D in Browser",
+    excerpt: "Why WebGL and Three.js are changing the way we think about websites.",
+    date: "March 5, 2024",
     category: "Programming",
-    image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80"
+    image: "https://images.unsplash.com/photo-1633356122544-f134324a6cee?auto=format&fit=crop&q=80&w=800",
+    readTime: "6 min read"
   }
 ];
 
@@ -36,13 +37,14 @@ const categories = ["All", "Web Development", "UI/UX", "Programming"];
 export const Blog = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [hoveredPost, setHoveredPost] = useState(null);
+  const navigate = useNavigate();
 
   const filteredPosts = selectedCategory === "All" 
     ? blogPosts 
     : blogPosts.filter(post => post.category === selectedCategory);
 
   return (
-    <Section>
+    <div className="w-full">
       <motion.div 
         className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8"
         whileInView={"visible"}
@@ -72,13 +74,14 @@ export const Blog = () => {
           {filteredPosts.map((post) => (
             <motion.article
               key={post.id}
-              className="bg-white bg-opacity-10 rounded-lg overflow-hidden backdrop-blur-sm hover:bg-opacity-20 transition-all duration-300"
+              className="bg-white bg-opacity-10 rounded-lg overflow-hidden backdrop-blur-sm hover:bg-opacity-20 transition-all duration-300 cursor-pointer"
               initial={{ opacity: 0, y: 20 }}
               whileInView={{
                 opacity: 1,
                 y: 0,
                 transition: { duration: 0.5 }
               }}
+              onClick={() => navigate(`/blog/${post.id}`)}
               onHoverStart={() => setHoveredPost(post.id)}
               onHoverEnd={() => setHoveredPost(null)}
             >
@@ -103,10 +106,14 @@ export const Blog = () => {
                   <span className="text-gray-400 text-sm">{post.readTime}</span>
                 </div>
                 <h3 className="text-xl font-bold text-white mb-2">{post.title}</h3>
-                <p className="text-gray-300 mb-4">{post.excerpt}</p>
+                <p className="text-gray-300 mb-4 line-clamp-2">{post.excerpt}</p>
                 <motion.button
                   className="text-indigo-400 font-medium hover:text-indigo-300"
                   whileHover={{ x: 5 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigate(`/blog/${post.id}`);
+                  }}
                 >
                   Read More →
                 </motion.button>
@@ -115,6 +122,6 @@ export const Blog = () => {
           ))}
         </div>
       </motion.div>
-    </Section>
+    </div>
   );
 }; 

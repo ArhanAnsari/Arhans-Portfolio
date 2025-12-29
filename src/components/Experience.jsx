@@ -14,14 +14,14 @@ import { Office } from "./Office";
 import { Projects } from "./Projects";
 
 export const Experience = (props) => {
-  const { menuOpened, section: parentSection } = props;
+  const { menuOpened, section: parentSection, setSection } = props;
   const { viewport } = useThree();
 
   const isMobile = window.innerWidth < 768;
   const responsiveRatio = viewport.width / 12;
   const officeScaleRatio = Math.max(0.5, Math.min(0.9 * responsiveRatio, 0.9));
 
-  const [section, setSection] = useState(0);
+  const [localSection, setLocalSection] = useState(0);
 
   const cameraPositionX = useMotionValue(0);
   const cameraLookAtX = useMotionValue(0);
@@ -37,8 +37,8 @@ export const Experience = (props) => {
 
   // Update section from parent
   useEffect(() => {
-    if (parentSection !== undefined && parentSection !== section) {
-      setSection(parentSection);
+    if (parentSection !== undefined && parentSection !== localSection) {
+      setLocalSection(parentSection);
     }
   }, [parentSection]);
 
@@ -48,9 +48,9 @@ export const Experience = (props) => {
   useEffect(() => {
     setCharacterAnimation("Falling");
     setTimeout(() => {
-      setCharacterAnimation(section === 0 ? "Typing" : "Standing");
+      setCharacterAnimation(localSection === 0 ? "Typing" : "Standing");
     }, 600);
-  }, [section]);
+  }, [localSection]);
 
   const characterGroup = useRef();
 
@@ -62,7 +62,7 @@ export const Experience = (props) => {
     state.camera.lookAt(cameraLookAtX.get(), 0, 0);
 
     // const position = new THREE.Vector3();
-    if (section === 0 && characterContainerAboutRef.current) {
+    if (localSection === 0 && characterContainerAboutRef.current) {
       characterContainerAboutRef.current.getWorldPosition(
         characterGroup.current.position
       );
@@ -71,12 +71,12 @@ export const Experience = (props) => {
 
   return (
     <>
-      <Background section={section} />
+      <Background section={localSection} />
       <motion.group
         ref={characterGroup}
         rotation={[-3.141592653589793, 1.2053981633974482, 3.141592653589793]}
         scale={[officeScaleRatio, officeScaleRatio, officeScaleRatio]}
-        animate={"" + section}
+        animate={"" + localSection}
         transition={{
           duration: 0.6,
         }}
@@ -182,7 +182,7 @@ export const Experience = (props) => {
           },
         }}
       >
-        <Avatar animation={characterAnimation} wireframe={section === 1} />
+        <Avatar animation={characterAnimation} wireframe={localSection === 1} />
       </motion.group>
       <ambientLight intensity={1} />
       <directionalLight position={[5, 5, 5]} intensity={0.8} castShadow />
@@ -202,7 +202,7 @@ export const Experience = (props) => {
           duration: 0.8,
         }}
       >
-        <Office section={section} />
+        <Office section={localSection} setSection={setSection} />
         <group
           ref={characterContainerAboutRef}
           name="CharacterSpot"
@@ -219,9 +219,9 @@ export const Experience = (props) => {
           -10,
         ]}
         animate={{
-          z: section === 1 ? 0 : -10,
+          z: localSection === 1 ? 0 : -10,
           y:
-            section === 1
+            localSection === 1
               ? -viewport.height
               : isMobile
               ? -viewport.height

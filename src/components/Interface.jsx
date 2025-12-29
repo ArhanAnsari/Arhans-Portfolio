@@ -1,9 +1,10 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import emailjs from "@emailjs/browser";
 import { ValidationError, useForm } from "@formspree/react";
 import { motion } from "framer-motion";
 import { useAtom } from "jotai";
 import { currentProjectAtom, projects } from "./Projects";
+import { Blog } from "./Blog";
 import axios from "axios";
 
 const Section = (props) => {
@@ -147,6 +148,31 @@ const services = [
 
 export const Interface = (props) => {
   const { setSection } = props;
+  const [githubStats, setGithubStats] = useState({
+    contributions: 1869,
+    repos: 250,
+    stars: 0
+  });
+
+  useEffect(() => {
+    const fetchGithubStats = async () => {
+      try {
+        const response = await axios.get("https://api.github.com/users/ArhanAnsari");
+        const reposResponse = await axios.get("https://api.github.com/users/ArhanAnsari/repos");
+        const stars = reposResponse.data.reduce((acc, repo) => acc + repo.stargazers_count, 0);
+        
+        setGithubStats({
+          contributions: 1869, // Note: Contributions require GraphQL API or scraping, keeping hardcoded for now
+          repos: response.data.public_repos,
+          stars: stars
+        });
+      } catch (error) {
+        console.error("Error fetching GitHub stats:", error);
+      }
+    };
+    fetchGithubStats();
+  }, []);
+
   return (
     <div className="flex flex-col items-center w-full relative interface-content">
       {/* Removed fixed background overlays - Canvas is now visible behind content */}
@@ -165,13 +191,22 @@ export const Interface = (props) => {
         <div id="section-1"><SkillsSection /></div>
         <div id="section-2"><ProjectsSection /></div>
         <div id="section-3"><EducationSection /></div>
-        <div id="section-4"><AchievementsSection /></div>
+        <div id="section-4"><AchievementsSection stats={githubStats} /></div>
         <div id="section-5"><CurrentWorkSection /></div>
         <div id="section-6"><ServicesSection /></div>
         <div id="section-7"><TestimonialsSection /></div>
-        <div id="section-8"><ContactSection /></div>
+        <div id="section-8"><BlogSection /></div>
+        <div id="section-9"><ContactSection /></div>
       </div>
     </div>
+  );
+};
+
+const BlogSection = () => {
+  return (
+    <Section>
+      <Blog />
+    </Section>
   );
 };
 
@@ -215,6 +250,10 @@ const AboutSection = (props) => {
             <span className="px-3 py-1 bg-accent-500/20 text-accent-300 rounded-full text-sm font-medium border border-accent-500/30">
               3D Artist
             </span>
+            <span className="px-3 py-1 bg-green-500/20 text-green-300 rounded-full text-sm font-medium border border-green-500/30 flex items-center gap-1">
+              <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              Lighthouse: 98+
+            </span>
             <span className="px-3 py-1 bg-neutral-600/20 text-neutral-300 rounded-full text-sm font-medium border border-neutral-600/30">
               Student
             </span>
@@ -249,7 +288,7 @@ const AboutSection = (props) => {
           className="flex flex-col sm:flex-row gap-4 pt-4"
         >
           <button
-            onClick={() => setSection(8)}
+            onClick={() => setSection(9)}
             className="btn-primary group"
           >
             <span>Let's Collaborate</span>
@@ -1018,7 +1057,7 @@ const CurrentWorkSection = () => {
 const EducationSection = () => {
   return (
     <Section alignRight className="bg-gradient-to-b from-transparent via-neutral-950/20 to-transparent">
-      <motion.div className="w-full max-w-5xl pr-8 md:pr-16 lg:pr-24 space-y-8" whileInView="visible" viewport={{ once: true }}>
+      <motion.div className="w-full max-w-5xl pr-8 md:pr-16 lg:pr-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
         {/* Header */}
         <div className="text-center space-y-4">
           <motion.h2 
@@ -1030,135 +1069,69 @@ const EducationSection = () => {
           >
             Education & Learning
           </motion.h2>
-          <motion.p 
-            className="text-neutral-400 max-w-2xl mx-auto text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            viewport={{ once: true }}
-          >
-            Balancing academic excellence with passion for technology and innovation
-          </motion.p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        {/* Vertical Timeline */}
+        <div className="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-primary-500/50 before:to-transparent">
+          
           {/* Current Education */}
-          <motion.div
-            className="card-modern"
-            initial={{ opacity: 0, x: -30 }}
+          <motion.div 
+            className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group"
+            initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
           >
-            <div className="flex items-center space-x-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-accent-500 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">🎓</span>
-              </div>
-              <div>
-                <h3 className="text-xl font-bold text-neutral-100">Current Education</h3>
-                <p className="text-neutral-400 text-sm">Academic Journey</p>
-              </div>
+            <div className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-primary-500 bg-slate-900 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+              🎓
             </div>
-
-            <div className="space-y-4">
-              <div>
-                <h4 className="text-lg font-semibold text-neutral-200 mb-1">
-                  {education.current.school}
-                </h4>
-                <p className="text-primary-300 font-medium">{education.current.grade}</p>
-                <p className="text-neutral-400 text-sm">{education.current.year}</p>
+            <div className="w-[calc(100%-4rem)] md:w-[45%] card-modern !p-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-2">
+                <h3 className="font-bold text-neutral-100">{education.current.school}</h3>
+                <span className="text-primary-400 text-sm font-mono">{education.current.year}</span>
               </div>
-
-              <div>
-                <h5 className="text-neutral-300 font-medium mb-3">Achievements & Recognition</h5>
-                <ul className="space-y-2">
-                  {education.current.achievements.map((achievement, index) => (
-                    <motion.li
-                      key={index}
-                      className="flex items-center space-x-3 text-neutral-300"
-                      initial={{ opacity: 0, x: -20 }}
-                      whileInView={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.5, delay: 0.5 + index * 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      <span className="w-2 h-2 bg-accent-400 rounded-full flex-shrink-0"></span>
-                      <span>{achievement}</span>
-                    </motion.li>
-                  ))}
-                </ul>
+              <p className="text-accent-300 text-sm mb-3">{education.current.grade}</p>
+              <div className="flex flex-wrap gap-2">
+                {education.current.achievements.slice(0, 3).map((a, i) => (
+                  <span key={i} className="text-[10px] px-2 py-0.5 bg-neutral-800 rounded-full text-neutral-400 border border-neutral-700">
+                    {a}
+                  </span>
+                ))}
               </div>
             </div>
           </motion.div>
 
           {/* Certifications */}
-          <motion.div
-            className="card-modern"
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-            viewport={{ once: true }}
-          >
-            <div className="flex items-center space-x-4 mb-6">
-              <div className="w-12 h-12 bg-gradient-to-br from-accent-500 to-primary-500 rounded-xl flex items-center justify-center">
-                <span className="text-2xl">📜</span>
+          {certifications.map((cert, index) => (
+            <motion.div 
+              key={index}
+              className="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group"
+              initial={{ opacity: 0, x: index % 2 === 0 ? 50 : -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.1 }}
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-full border-2 border-accent-500 bg-slate-900 text-white shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
+                {cert.badge}
               </div>
-              <div>
-                <h3 className="text-xl font-bold text-neutral-100">Certifications</h3>
-                <p className="text-neutral-400 text-sm">Professional Development</p>
+              <div className="w-[calc(100%-4rem)] md:w-[45%] card-modern !p-4">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-1">
+                  <h3 className="font-bold text-neutral-100 text-sm">{cert.title}</h3>
+                  <span className="text-accent-400 text-[10px] font-mono">{cert.date}</span>
+                </div>
+                <p className="text-neutral-400 text-xs">{cert.issuer}</p>
               </div>
-            </div>
-
-            <div className="space-y-4">
-              {certifications.map((cert, index) => (
-                <motion.div
-                  key={cert.title}
-                  className="p-4 bg-neutral-800/30 rounded-xl hover:bg-neutral-700/30 transition-colors group"
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.6 + index * 0.1 }}
-                  viewport={{ once: true }}
-                >
-                  <div className="flex items-start space-x-3">
-                    <span className="text-xl group-hover:scale-110 transition-transform">
-                      {cert.badge}
-                    </span>
-                    <div className="flex-1">
-                      <h4 className="font-semibold text-neutral-200 group-hover:text-primary-300 transition-colors">
-                        {cert.title}
-                      </h4>
-                      <p className="text-sm text-neutral-400">{cert.issuer} • {cert.date}</p>
-                    </div>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          </motion.div>
+            </motion.div>
+          ))}
         </div>
-
-        {/* Learning Philosophy */}
-        <motion.div
-          className="mt-8 p-8 glass-morphism rounded-2xl text-center"
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6 }}
-          viewport={{ once: true }}
-        >
-          <blockquote className="text-lg text-neutral-300 italic mb-4">
-            "Learning is a lifelong journey. Every day brings new opportunities to grow, 
-            innovate, and push the boundaries of what's possible."
-          </blockquote>
-          <div className="text-primary-400 font-semibold">— My Learning Philosophy</div>
-        </motion.div>
       </motion.div>
     </Section>
   );
 };
 
-const AchievementsSection = () => {
+const AchievementsSection = ({ stats }) => {
   const achievementEntries = [
-    { key: "Projects Completed", value: achievements.projectsCompleted, suffix: "+", icon: "🚀", color: "text-primary-400" },
+    { key: "Projects Completed", value: stats?.repos || achievements.projectsCompleted, suffix: "+", icon: "🚀", color: "text-primary-400" },
     { key: "Years of Experience", value: achievements.yearsOfExperience, suffix: "+", icon: "⏱️", color: "text-accent-400" },
-    { key: "Client Satisfaction", value: achievements.clientSatisfaction, suffix: "/10", icon: "⭐", color: "text-yellow-400" },
+    { key: "GitHub Stars", value: stats?.stars || 0, suffix: "", icon: "⭐", color: "text-yellow-400" },
     { key: "GitHub Contributions", value: achievements.githubContributions, suffix: "+", icon: "💻", color: "text-green-400" },
     { key: "Technologies Mastered", value: achievements.technologiesMastered, suffix: "+", icon: "🛠️", color: "text-blue-400" },
     { key: "Awards Won", value: achievements.awards || 5, suffix: "", icon: "🏆", color: "text-orange-400" },

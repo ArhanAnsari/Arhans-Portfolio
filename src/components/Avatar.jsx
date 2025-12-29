@@ -9,9 +9,10 @@ import * as THREE from "three";
 
 export function Avatar(props) {
   const { animation, wireframe } = props;
-  const { headFollow, cursorFollow } = useControls({
+  const { headFollow, cursorFollow, shirtColor } = useControls({
     headFollow: false,
     cursorFollow: false,
+    shirtColor: "#ffffff",
   });
   const group = useRef();
   const { nodes, materials } = useGLTF("/models/646d9dcdc8a5f5bddbfac913.glb");
@@ -55,6 +56,12 @@ export function Avatar(props) {
       material.wireframe = wireframe;
     });
   }, [wireframe]);
+
+  useEffect(() => {
+    if (materials.Wolf3D_Outfit_Top) {
+      materials.Wolf3D_Outfit_Top.color.set(shirtColor);
+    }
+  }, [shirtColor]);
 
   return (
     <group {...props} ref={group} dispose={null}>
