@@ -366,6 +366,12 @@ When answering:
                         m.sender === "user" ? "justify-end" : "justify-start"
                       }`}
                     >
+                      {m.sender === "ai" && (
+                      <img
+                        src="/AI%20Twin%20PP.jpg"
+                        alt="AI Twin PP"
+                        className="w-8 h-8 rounded-full object-cover border border-slate-600"
+                      />
                       <div
                         className={`max-w-xs lg:max-w-md px-4 py-2 rounded-xl whitespace-pre-line ${
                           m.sender === "user"
