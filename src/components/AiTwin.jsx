@@ -293,7 +293,11 @@ When answering:
             onClick={() => setIsOpen(true)}
             className="fixed bottom-6 right-6 z-40 w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 text-white shadow-lg flex items-center justify-center hover:shadow-[0_0_15px_rgba(124,58,237,0.6)] transition-shadow"
           >
-            🤖
+            <img
+               src="/AI%20Twin%20PP.jpg"
+               alt="Arhan AI Twin"
+               className="w-10 h-10 rounded-full object-cover border-2 border-white/30 shadow-md"
+            />
           </motion.button>
         )}
       </AnimatePresence>
