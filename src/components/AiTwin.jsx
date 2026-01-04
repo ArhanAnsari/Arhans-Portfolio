@@ -313,12 +313,16 @@ When answering:
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <div className="text-2xl">🤖</div>
+             <div className="flex items-center gap-3">
+              <img
+               src="/AI%20Twin%20PP.jpg"
+               alt="Arhan AI Twin"
+               className="w-10 h-10 rounded-full object-cover border-2 border-white/30 shadow-md"
+              />
                 <div>
                   <h3 className="text-white font-bold">Arhan’s AI Twin</h3>
                   <p className="text-xs text-purple-200">
-                    {isStreaming ? "Typing..." : "Online • Gemini 2.5"}
+                   {isStreaming ? "Typing..." : "Online • Gemini 2.5"}
                   </p>
                 </div>
               </div>
