@@ -5,6 +5,7 @@ import { animate, useMotionValue } from "framer-motion";
 import { motion } from "framer-motion-3d";
 import { atom, useAtom } from "jotai";
 import { useEffect, useRef } from "react";
+import { themeAtom } from "../config";
 
 export const projects = [
 	{
@@ -656,6 +657,7 @@ export const projects = [
 
 const Project = (props) => {
 	const { project, highlighted } = props;
+	const [theme] = useAtom(themeAtom);
 
 	const background = useRef();
 	const bgOpacity = useMotionValue(0.4);
@@ -679,7 +681,7 @@ const Project = (props) => {
 			>
 				<planeGeometry args={[2.2, 2]} />
 				<meshBasicMaterial
-					color="black"
+					color={theme === "light" ? "#f1f5f9" : "#000000"}
 					transparent
 					opacity={0.4}
 				/>
@@ -696,6 +698,7 @@ const Project = (props) => {
 				anchorY={"top"}
 				fontSize={0.2}
 				position={[-1, -0.4, 0]}
+				color={theme === "light" ? "#0f172a" : "#ffffff"}
 			>
 				{project.title.toUpperCase()}
 			</Text>
@@ -705,6 +708,7 @@ const Project = (props) => {
 				anchorY="top"
 				fontSize={0.1}
 				position={[-1, -0.6, 0]}
+				color={theme === "light" ? "#334155" : "#cbd5e1"}
 			>
 				{project.description}
 			</Text>

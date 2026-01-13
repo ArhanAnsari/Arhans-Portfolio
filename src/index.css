@@ -23,8 +23,24 @@
   }
 
   html.light body {
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #f8fafc 100%);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
     color: #0f172a;
+  }
+
+  /* Force light mode text visibility for common light-text classes */
+  html.light .text-neutral-50,
+  html.light .text-neutral-100,
+  html.light .text-neutral-200 {
+    color: #0f172a !important;
+  }
+  
+  html.light .text-neutral-300,
+  html.light .text-neutral-400 {
+    color: #334155 !important;
+  }
+
+  html.light .text-slate-200 {
+    color: #1e293b !important;
   }
 
   * {
@@ -112,14 +128,20 @@
   }
   
   .card-modern {
-    backdrop-filter: blur(4px);
-    border: 1px solid rgba(51, 65, 85, 0.5);
-    border-radius: 16px;
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(51, 65, 85, 0.3);
+    border-radius: 20px;
     padding: 24px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform-origin: center;
-    background: linear-gradient(135deg, rgba(15, 23, 42, 0.5), rgba(30, 41, 59, 0.3));
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.6), rgba(30, 41, 59, 0.4));
+  }
+
+  html.light .card-modern {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(248, 250, 252, 0.7));
+    border: 1px solid rgba(203, 213, 225, 0.5);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
   }
   
   .card-modern:hover {
@@ -185,6 +207,10 @@
 
 ::-webkit-scrollbar-track {
   background: #0f172a;
+}
+
+html.light ::-webkit-scrollbar-track {
+  background: #f1f5f9;
 }
 
 ::-webkit-scrollbar-thumb {

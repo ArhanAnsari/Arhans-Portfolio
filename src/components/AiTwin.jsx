@@ -395,7 +395,7 @@ When answering:
                     <div className="flex justify-start">
                       <div className="bg-slate-700 text-slate-100 px-4 py-2 rounded-lg rounded-bl-none flex items-center gap-2 animate-pulse">
                         <Loader size={16} className="animate-spin" />
-                        <span className="text-sm">Gemini is thinking...</span>
+                        <span className="text-sm">Arhan is thinking...</span>
                       </div>
                     </div>
                   )}
