@@ -191,13 +191,14 @@ export const Interface = (props) => {
         <div id="section-0"><AboutSection setSection={setSection} /></div>
         <div id="section-1"><SkillsSection /></div>
         <div id="section-2"><ProjectsSection /></div>
-        <div id="section-3"><EducationSection /></div>
-        <div id="section-4"><AchievementsSection stats={githubStats} /></div>
-        <div id="section-5"><CurrentWorkSection /></div>
-        <div id="section-6"><ServicesSection /></div>
-        <div id="section-7"><TestimonialsSection /></div>
-        <div id="section-8"><BlogSection /></div>
-        <div id="section-9"><ContactSection /></div>
+        <div id="section-3"><ReactNativeProjectsSection /></div>
+        <div id="section-4"><EducationSection /></div>
+        <div id="section-5"><AchievementsSection stats={githubStats} /></div>
+        <div id="section-6"><CurrentWorkSection /></div>
+        <div id="section-7"><ServicesSection /></div>
+        <div id="section-8"><TestimonialsSection /></div>
+        <div id="section-9"><BlogSection /></div>
+        <div id="section-10"><ContactSection /></div>
       </div>
     </div>
   );
@@ -289,7 +290,7 @@ const AboutSection = (props) => {
           className="flex flex-col sm:flex-row gap-4 pt-4"
         >
           <button
-            onClick={() => setSection(9)}
+            onClick={() => setSection(10)}
             className="btn-primary group"
           >
             <span>Let's Collaborate</span>
@@ -735,6 +736,52 @@ const ProjectsSection = () => {
             </div>
           </div>
         </motion.div>
+      </motion.div>
+    </Section>
+  );
+};
+
+const ReactNativeProjectsSection = () => {
+  const [currentProject, setCurrentProject] = useAtom(currentProjectAtom);
+  const mobileProjects = projects.filter(p => p.category === "mobile");
+
+  return (
+    <Section className="bg-gradient-to-b from-transparent via-neutral-950/30 to-transparent">
+      <motion.div className="w-full max-w-6xl pl-8 md:pl-16 lg:pl-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
+        {/* Header */}
+        <div className="text-center space-y-6">
+          <motion.h2 
+            className="text-responsive-lg font-display font-bold text-gradient"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            React Native Projects
+          </motion.h2>
+          <motion.p 
+            className="text-neutral-400 max-w-3xl mx-auto text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            A collection of my cross-platform mobile applications built with React Native and Expo.
+            Specializing in performant, user-friendly mobile experiences.
+          </motion.p>
+        </div>
+
+        {/* Projects Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {mobileProjects.map((project, index) => (
+            <ProjectCard 
+              key={project.title} 
+              project={project} 
+              index={index}
+              onClick={() => setCurrentProject(projects.findIndex(p => p.title === project.title))}
+            />
+          ))}
+        </div>
       </motion.div>
     </Section>
   );
@@ -1246,7 +1293,7 @@ const AchievementsSection = ({ stats }) => {
             <div className="flex items-center space-x-4 mb-4">
               <span className="text-3xl">🎯</span>
               <div>
-                <h3 className="text-xl font-bold text-neutral-100">Goals for 2025</h3>
+                <h3 className="text-xl font-bold text-neutral-100">Goals for 2026</h3>
                 <p className="text-neutral-400 text-sm">Future milestones</p>
               </div>
             </div>

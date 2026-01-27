@@ -19,13 +19,14 @@ export const Background = ({ section = 0 }) => {
         "#f8fafc", // Section 0 - About
         "#f1f5f9", // Section 1 - Skills
         "#e2e8f0", // Section 2 - Projects
-        "#cbd5e1", // Section 3 - Education
-        "#f8fafc", // Section 4 - Achievements
-        "#f1f5f9", // Section 5 - Current Work
-        "#e2e8f0", // Section 6 - Services
-        "#cbd5e1", // Section 7 - Testimonials
-        "#f8fafc", // Section 8 - Blog
-        "#f1f5f9", // Section 9 - Contact
+        "#f1f5f9", // Section 3 - React Native
+        "#cbd5e1", // Section 4 - Education
+        "#f8fafc", // Section 5 - Achievements
+        "#f1f5f9", // Section 6 - Current Work
+        "#e2e8f0", // Section 7 - Services
+        "#cbd5e1", // Section 8 - Testimonials
+        "#f8fafc", // Section 9 - Blog
+        "#f1f5f9", // Section 10 - Contact
       ];
       return colors[Math.min(sec, colors.length - 1)];
     } else {
@@ -33,13 +34,14 @@ export const Background = ({ section = 0 }) => {
         "#1a1a1a", // Section 0 - About
         "#0f0f0f", // Section 1 - Skills
         "#1e1e1e", // Section 2 - Projects
-        "#252525", // Section 3 - Education
-        "#1a1a1a", // Section 4 - Achievements
-        "#2a2a2a", // Section 5 - Current Work
-        "#1e1e1e", // Section 6 - Services
-        "#252525", // Section 7 - Testimonials
-        "#1a1a1a", // Section 8 - Blog
-        "#0f0f0f", // Section 9 - Contact
+        "#0f0f0f", // Section 3 - React Native
+        "#252525", // Section 4 - Education
+        "#1a1a1a", // Section 5 - Achievements
+        "#2a2a2a", // Section 6 - Current Work
+        "#1e1e1e", // Section 7 - Services
+        "#252525", // Section 8 - Testimonials
+        "#1a1a1a", // Section 9 - Blog
+        "#0f0f0f", // Section 10 - Contact
       ];
       return colors[Math.min(sec, colors.length - 1)];
     }

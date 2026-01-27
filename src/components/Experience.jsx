@@ -115,6 +115,17 @@ export const Experience = (props) => {
             scaleZ: 1,
           },
           3: {
+            x: isMobile ? 1.4 : -2.5,
+            y: 0.5,
+            z: 4,
+            rotateX: 0,
+            rotateY: Math.PI / 4,
+            rotateZ: 0,
+            scaleX: 1,
+            scaleY: 1,
+            scaleZ: 1,
+          },
+          4: {
             y: 1,
             x: isMobile ? 1 : -2,
             z: isMobile ? 4 : 5,
@@ -125,7 +136,7 @@ export const Experience = (props) => {
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
-          4: {
+          5: {
             y: 1,
             x: isMobile ? -1 : 2,
             z: isMobile ? 4 : 5,
@@ -136,7 +147,7 @@ export const Experience = (props) => {
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
-          5: {
+          6: {
             y: 1,
             x: isMobile ? 0 : -2.5,
             z: isMobile ? 5 : 6,
@@ -147,7 +158,7 @@ export const Experience = (props) => {
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
-          6: {
+          7: {
             y: 1,
             x: isMobile ? 1.5 : 2,
             z: isMobile ? 4 : 5,
@@ -158,7 +169,7 @@ export const Experience = (props) => {
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
-          7: {
+          8: {
             y: 1,
             x: isMobile ? -1 : -2,
             z: isMobile ? 5 : 6,
@@ -169,7 +180,18 @@ export const Experience = (props) => {
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
-          8: {
+          9: {
+            y: 1,
+            x: isMobile ? 0 : 1.5,
+            z: isMobile ? 6 : 7,
+            rotateX: 0,
+            rotateY: -Math.PI / 6,
+            rotateZ: 0,
+            scaleX: isMobile ? 0.9 : 1,
+            scaleY: isMobile ? 0.9 : 1,
+            scaleZ: isMobile ? 0.9 : 1,
+          },
+          10: {
             y: 1,
             x: isMobile ? 0 : 1.5,
             z: isMobile ? 6 : 7,

@@ -99,7 +99,7 @@ export function Office(props) {
       <group
         name="SM_ShelfSM_Shelf1"
         position={[-0.87, 1.69, -2.04]}
-        onClick={() => setSection(8)}
+        onClick={() => setSection(9)}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       >
@@ -347,7 +347,7 @@ export function Office(props) {
         name="Plane001_1"
         geometry={nodes.Plane001_1.geometry}
         material={textureMaterial}
-        onClick={() => setSection(3)}
+        onClick={() => setSection(4)}
         onPointerOver={() => setHovered(true)}
         onPointerOut={() => setHovered(false)}
       />

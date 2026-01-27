@@ -61,7 +61,7 @@ function App() {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
-      const newSection = Math.min(Math.floor(scrollY / windowHeight), 9);
+      const newSection = Math.min(Math.floor(scrollY / windowHeight), 10);
       
       if (newSection !== section) {
         setSection(newSection);

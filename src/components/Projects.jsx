@@ -653,6 +653,16 @@ export const projects = [
 		type: "original",
 		technologies: ["HTML", "CSS", "JavaScript"]
 	},
+	{
+		title: "ResuMate",
+		url: "https://github.com/ArhanAnsari/ResuMate",
+		github: "https://github.com/ArhanAnsari/ResuMate",
+		image: "projects/resumate.jpg",
+		description: "A professional resume builder mobile application built with React Native. It features real-time preview, multiple templates, and easy export options.",
+		category: "mobile",
+		type: "original",
+		technologies: ["React Native", "Expo", "Appwrite", "TypeScript", "Gemini"]
+	},
 ];
 
 const Project = (props) => {

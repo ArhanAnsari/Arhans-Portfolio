@@ -15,13 +15,14 @@ export const Menu = (props) => {
     { label: "About", section: 0, icon: "👨‍💻" },
     { label: "Skills", section: 1, icon: "⚡" },
     { label: "Projects", section: 2, icon: "🚀" },
-    { label: "Education", section: 3, icon: "🎓" },
-    { label: "Achievements", section: 4, icon: "🏆" },
-    { label: "Current Work", section: 5, icon: "💼" },
-    { label: "Services", section: 6, icon: "🛠️" },
-    { label: "Testimonials", section: 7, icon: "💬" },
-    { label: "Blog", section: 8, icon: "✍️" },
-    { label: "Contact", section: 9, icon: "📬" },
+    { label: "React Native", section: 3, icon: "📱" },
+    { label: "Education", section: 4, icon: "🎓" },
+    { label: "Achievements", section: 5, icon: "🏆" },
+    { label: "Current Work", section: 6, icon: "💼" },
+    { label: "Services", section: 7, icon: "🛠️" },
+    { label: "Testimonials", section: 8, icon: "💬" },
+    { label: "Blog", section: 9, icon: "✍️" },
+    { label: "Contact", section: 10, icon: "📬" },
   ];
 
   // 🔥 Smooth scroll handler
