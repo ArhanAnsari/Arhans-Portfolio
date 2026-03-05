@@ -501,6 +501,7 @@ export const projects = [
 		description: "InspireGem is a AI Powered Website made with Next.js, TailwindCSS, Google Gemini, Stripe amnd Google Firebase",
 		category: "ai",
 		type: "original",
+		featured: true,
 		technologies: ["Next.js", "Tailwind CSS", "Google Gemini", "Stripe", "Firebase"]
 	},
 	{
@@ -591,6 +592,7 @@ export const projects = [
 		description: "Synthara is an advanced AI-powered application designed to process and generate insights from various types of files. Initially focused on image processing. Made with Next.js, Tailwind CSS, Gemini, Shadcn/ui and Together AI.",
 		category: "ai",
 		type: "original",
+		featured: true,
 		technologies: ["Next.js", "Tailwind CSS", "Gemini", "Together AI", "Shadcn/ui"]
 	},
 	{
@@ -601,6 +603,7 @@ export const projects = [
 		description: "This is an AI-powered content analysis platform that helps content creators get insights from their YouTube videos. The platform uses advanced AI to analyze video content, generate transcriptions, create thumbnails, and provide content recommendations. Made with Next.js 15, React 19, TailwindCSS, AI SDK, Gemini, Together AI, Clerk, Convex, Radix UI components and youtubei.js for video data extraction.",
 		category: "web",
 		type: "original",
+		featured: true,
 		technologies: ["NextJS", "TailwindCSS", "Sentry", "TypeScript", "Clerk", "Convex"]
 	},
 	{
@@ -621,6 +624,7 @@ export const projects = [
 		description: "This is a website of my client. This is a Network Infrastructure Provider Company made with Next.js 15, TailwindCSS, ShadCN, TypeScript, Framer Motion, React, Sentry and Resend.",
 		category: "client",
 		type: "client",
+		featured: true,
 		technologies: ["NextJS", "TailwindCSS", "Sentry", "ShadCN", "TypeScript"] 
 	},
 	{
@@ -631,6 +635,7 @@ export const projects = [
 		description: "EduSync is an online learning platform that connects students and educators. It offers a variety of courses, interactive lessons, and real-time collaboration features. Built with Next.js 15, React 19, Appwrite, TailwindCSS, Shadcn/ui, TypeScript and Framer Motion.",
 		category: "education",
 		type: "original",
+		featured: true,
 		technologies: ["NextJS", "React", "Appwrite", "TailwindCSS", "TypeScript"]
 	},
 	{

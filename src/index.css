@@ -340,6 +340,27 @@ textarea:focus {
   pointer-events: auto;
 }
 
+/* Featured project card hover glow */
+.featured-card-glow:hover {
+  box-shadow: 0 25px 50px rgba(14, 165, 233, 0.2), 0 0 0 1px rgba(14, 165, 233, 0.3);
+}
+
+/* Shine effect for buttons */
+@keyframes shine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+/* Animated gradient border for stat cards */
+@keyframes border-pulse {
+  0%, 100% { border-color: rgba(14, 165, 233, 0.2); }
+  50% { border-color: rgba(14, 165, 233, 0.5); }
+}
+
+.stat-card-animated {
+  animation: border-pulse 3s ease-in-out infinite;
+}
+
 /* Cursor positioning */
 .cursor-container {
   position: fixed;

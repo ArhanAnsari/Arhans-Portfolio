@@ -7,11 +7,39 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { animate, useMotionValue } from "framer-motion";
 import { motion } from "framer-motion-3d";
 import { useEffect, useRef, useState } from "react";
+import * as THREE from "three";
 import { framerMotionConfig } from "../config";
 import { Avatar } from "./Avatar";
 import { Background } from "./Background";
 import { Office } from "./Office";
 import { Projects } from "./Projects";
+
+// Lightweight floating shape for hero background
+const FloatingShape = ({ position, geometry, color, speed = 1, scale = 1 }) => {
+  const meshRef = useRef();
+  const timeOffset = useRef(Math.random() * Math.PI * 2);
+
+  useFrame((state) => {
+    if (!meshRef.current) return;
+    const t = state.clock.elapsedTime * speed + timeOffset.current;
+    meshRef.current.rotation.x = t * 0.2;
+    meshRef.current.rotation.y = t * 0.3;
+    meshRef.current.position.y = position[1] + Math.sin(t * 0.5) * 0.3;
+    meshRef.current.position.x = position[0] + Math.cos(t * 0.3) * 0.15;
+  });
+
+  return (
+    <mesh ref={meshRef} position={position} scale={scale}>
+      {geometry}
+      <meshStandardMaterial
+        color={color}
+        transparent
+        opacity={0.15}
+        wireframe
+      />
+    </mesh>
+  );
+};
 
 export const Experience = (props) => {
   const { menuOpened, section: parentSection, setSection } = props;
@@ -209,6 +237,46 @@ export const Experience = (props) => {
       <ambientLight intensity={1} />
       <directionalLight position={[5, 5, 5]} intensity={0.8} castShadow />
       <directionalLight position={[-5, 3, -5]} intensity={0.4} />
+
+      {/* Hero background floating shapes - only visible at section 0 */}
+      <motion.group
+        animate={{ opacity: localSection === 0 ? 1 : 0 }}
+        transition={{ duration: 0.8 }}
+      >
+        {!isMobile && (
+          <>
+            <FloatingShape
+              position={[-6, 2, -5]}
+              geometry={<octahedronGeometry args={[1, 0]} />}
+              color="#38bdf8"
+              speed={0.6}
+              scale={1.2}
+            />
+            <FloatingShape
+              position={[7, -1, -6]}
+              geometry={<icosahedronGeometry args={[1, 0]} />}
+              color="#d946ef"
+              speed={0.5}
+              scale={1.5}
+            />
+            <FloatingShape
+              position={[-4, -3, -8]}
+              geometry={<torusGeometry args={[0.8, 0.3, 8, 16]} />}
+              color="#38bdf8"
+              speed={0.7}
+              scale={1}
+            />
+            <FloatingShape
+              position={[5, 4, -7]}
+              geometry={<tetrahedronGeometry args={[1, 0]} />}
+              color="#8b5cf6"
+              speed={0.4}
+              scale={1.3}
+            />
+          </>
+        )}
+      </motion.group>
+
       <motion.group
         position={[
           isMobile ? 0 : 2.5 * officeScaleRatio,
