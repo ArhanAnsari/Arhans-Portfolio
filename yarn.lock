@@ -270,10 +270,10 @@
   resolved "https://registry.npmjs.org/@emotion/memoize/-/memoize-0.7.4.tgz"
   integrity sha512-Ja/Vfqe3HpuzRsG1oBtWTHk2PGZ7GR+2Vz5iYGelAw8dx32K0y7PjVuxK6z1nMpZOqAFsRUPCkK1YjJ56qJlgw==
 
-"@esbuild/win32-x64@0.18.20":
+"@esbuild/linux-x64@0.18.20":
   version "0.18.20"
-  resolved "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.18.20.tgz"
-  integrity sha512-kTdfRcSiDfQca/y9QIkng02avJ+NCaQvrMejlsB3RRv5sE9rRoeBPISaZpKxHELzRxZyLvNts1P27W3wV+8geQ==
+  resolved "https://registry.npmjs.org/@esbuild/linux-x64/-/linux-x64-0.18.20.tgz"
+  integrity sha512-UYqiqemphJcNsFEskc73jQ7B9jgwjWrSayxawS6UVFZGWrAAtkzjxSqnoclCXxWtfwLdzU+vTpcNYhpn43uP1w==
 
 "@floating-ui/core@^1.0.0":
   version "1.6.2"
