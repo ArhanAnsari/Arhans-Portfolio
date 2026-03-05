@@ -7,7 +7,6 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { animate, useMotionValue } from "framer-motion";
 import { motion } from "framer-motion-3d";
 import { useEffect, useRef, useState } from "react";
-import * as THREE from "three";
 import { framerMotionConfig } from "../config";
 import { Avatar } from "./Avatar";
 import { Background } from "./Background";

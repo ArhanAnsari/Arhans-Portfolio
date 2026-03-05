@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import emailjs from "@emailjs/browser";
 import { ValidationError, useForm } from "@formspree/react";
 import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
@@ -317,8 +317,7 @@ const AboutSection = (props) => {
         >
           <motion.button
             onClick={() => setSection(10)}
-            className="relative overflow-hidden flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-white group"
-            style={{ background: 'linear-gradient(135deg, #0ea5e9, #8b5cf6)' }}
+            className="relative overflow-hidden flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-white group btn-gradient-primary"
             whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(14,165,233,0.5)' }}
             whileTap={{ scale: 0.97 }}
           >
@@ -384,16 +383,54 @@ const AboutSection = (props) => {
 
 const AnimatedStatCard = ({ value, suffix, label, color, accentColor }) => {
   const { count, ref } = useAnimatedCounter(value);
+  const isPrimary = accentColor === "primary";
   return (
     <motion.div
       ref={ref}
-      className={`relative text-center px-5 py-3 rounded-2xl glass-morphism border border-${accentColor}-500/20 hover:border-${accentColor}-500/50 transition-all duration-300 group cursor-default`}
+      className={`relative text-center px-5 py-3 rounded-2xl glass-morphism transition-all duration-300 group cursor-default ${
+        isPrimary
+          ? "border border-primary-500/20 hover:border-primary-500/50"
+          : "border border-accent-500/20 hover:border-accent-500/50"
+      }`}
       whileHover={{ y: -3, scale: 1.05 }}
       transition={{ type: "spring", stiffness: 400, damping: 20 }}
     >
-      <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br from-${accentColor}-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+      <div className={`absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 ${
+        isPrimary
+          ? "bg-gradient-to-br from-primary-500/5 to-transparent"
+          : "bg-gradient-to-br from-accent-500/5 to-transparent"
+      }`} />
       <div className={`text-2xl font-bold ${color} tabular-nums`}>{count}{suffix}</div>
       <div className="text-xs text-neutral-500 mt-1 font-medium">{label}</div>
+    </motion.div>
+  );
+};
+
+const AchievementCountCard = ({ achievement, index }) => {
+  const { count, ref } = useAnimatedCounter(achievement.value, 2500);
+  return (
+    <motion.div
+      ref={ref}
+      className="card-modern text-center group"
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, delay: index * 0.1 }}
+      viewport={{ once: true }}
+      whileHover={{ y: -5, scale: 1.02 }}
+    >
+      <div className="space-y-4">
+        <div className="w-16 h-16 mx-auto bg-gradient-to-br from-neutral-800 to-neutral-700 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+          <span className="text-2xl">{achievement.icon}</span>
+        </div>
+        <div className="space-y-2">
+          <div className={`text-4xl font-bold ${achievement.color} tabular-nums group-hover:scale-110 transition-transform`}>
+            {count}{achievement.suffix}
+          </div>
+          <div className="text-neutral-300 font-medium">
+            {achievement.key}
+          </div>
+        </div>
+      </div>
     </motion.div>
   );
 };
@@ -468,6 +505,15 @@ const languages = [
     title: "🇮🇳 Marathi",
     level: 90,
   },
+];
+
+const techToolboxGroups = [
+  { label: "Frontend", icon: "⚛️", techs: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"] },
+  { label: "Backend", icon: "⚡", techs: ["Node.js", "Express", "MongoDB", "PostgreSQL", "REST APIs"] },
+  { label: "Mobile", icon: "📱", techs: ["React Native", "Expo", "iOS", "Android"] },
+  { label: "AI / ML", icon: "🤖", techs: ["Google Gemini", "Together AI", "OpenAI", "Langchain", "Vercel AI SDK"] },
+  { label: "3D / Creative", icon: "🎮", techs: ["Three.js", "React Three Fiber", "WebGL", "Blender", "GSAP"] },
+  { label: "DevOps", icon: "☁️", techs: ["Vercel", "Appwrite", "Firebase", "Convex", "Sentry"] },
 ];
 
 const SkillsSection = () => {
@@ -614,14 +660,7 @@ const SkillsSection = () => {
         >
           <h3 className="text-xl font-semibold text-neutral-200 mb-6 text-center">My Tech Toolbox</h3>
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {[
-              { label: "Frontend", icon: "⚛️", techs: ["React", "Next.js", "TypeScript", "Tailwind CSS", "Framer Motion"] },
-              { label: "Backend", icon: "⚡", techs: ["Node.js", "Express", "MongoDB", "PostgreSQL", "REST APIs"] },
-              { label: "Mobile", icon: "📱", techs: ["React Native", "Expo", "iOS", "Android"] },
-              { label: "AI / ML", icon: "🤖", techs: ["Google Gemini", "Together AI", "OpenAI", "Langchain", "Vercel AI SDK"] },
-              { label: "3D / Creative", icon: "🎮", techs: ["Three.js", "React Three Fiber", "WebGL", "Blender", "GSAP"] },
-              { label: "DevOps", icon: "☁️", techs: ["Vercel", "Appwrite", "Firebase", "Convex", "Sentry"] },
-            ].map((group, gIdx) => (
+            {techToolboxGroups.map((group, gIdx) => (
               <motion.div
                 key={group.label}
                 className="card-modern group p-4 hover:border-primary-500/40"
@@ -657,23 +696,32 @@ const ProjectsSection = () => {
   const [selectedCategory, setSelectedCategory] = useState("all");
 
   // Get unique categories from projects
-  const categories = ["all", ...new Set(projects.map(p => p.category || "web").filter(Boolean))];
+  const categories = useMemo(
+    () => ["all", ...new Set(projects.map(p => p.category || "web").filter(Boolean))],
+    []
+  );
 
-  // Separate featured and regular projects
-  const featuredProjects = projects.filter(p => p.featured);
+  // Separate featured and regular projects - memoized for performance
+  const featuredProjects = useMemo(() => projects.filter(p => p.featured), []);
   
-  const filteredProjects = selectedCategory === "all" 
-    ? projects.filter(p => !p.featured)
-    : projects.filter(p => (p.category || "web") === selectedCategory && !p.featured);
+  const nonFeaturedFilteredProjects = useMemo(() => 
+    selectedCategory === "all" 
+      ? projects.filter(p => !p.featured)
+      : projects.filter(p => (p.category || "web") === selectedCategory && !p.featured),
+    [selectedCategory]
+  );
   
-  const allFilteredProjects = selectedCategory === "all"
-    ? projects
-    : projects.filter(p => (p.category || "web") === selectedCategory);
+  const allFilteredProjects = useMemo(() =>
+    selectedCategory === "all"
+      ? projects
+      : projects.filter(p => (p.category || "web") === selectedCategory),
+    [selectedCategory]
+  );
 
-  const displayProjects = filteredProjects.slice(0, visibleProjects);
+  const displayProjects = nonFeaturedFilteredProjects.slice(0, visibleProjects);
 
   const loadMore = () => {
-    setVisibleProjects(prev => Math.min(prev + 6, filteredProjects.length));
+    setVisibleProjects(prev => Math.min(prev + 6, nonFeaturedFilteredProjects.length));
   };
 
   return (
@@ -780,7 +828,7 @@ const ProjectsSection = () => {
           </div>
 
           {/* Load More Button */}
-          {visibleProjects < filteredProjects.length && (
+          {visibleProjects < nonFeaturedFilteredProjects.length && (
             <motion.div
               className="text-center"
               initial={{ opacity: 0, y: 20 }}
@@ -794,7 +842,7 @@ const ProjectsSection = () => {
                 whileHover={{ scale: 1.03, boxShadow: '0 0 20px rgba(14,165,233,0.2)' }}
                 whileTap={{ scale: 0.97 }}
               >
-                Load More Projects ({filteredProjects.length - visibleProjects} remaining)
+                Load More Projects ({nonFeaturedFilteredProjects.length - visibleProjects} remaining)
               </motion.button>
             </motion.div>
           )}
@@ -1417,37 +1465,11 @@ const AchievementsSection = ({ stats }) => {
         {/* Metrics Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {achievementEntries.map((achievement, index) => (
-            <motion.div
+            <AchievementCountCard
               key={achievement.key}
-              className="card-modern text-center group hover:scale-105"
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              viewport={{ once: true }}
-              whileHover={{ y: -5 }}
-            >
-              <div className="space-y-4">
-                <div className="w-16 h-16 mx-auto bg-gradient-to-br from-neutral-800 to-neutral-700 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <span className="text-2xl">{achievement.icon}</span>
-                </div>
-                
-                <div className="space-y-2">
-                  <div className={`text-4xl font-bold ${achievement.color} group-hover:scale-110 transition-transform`}>
-                    <motion.span
-                      initial={{ opacity: 0 }}
-                      whileInView={{ opacity: 1 }}
-                      transition={{ duration: 1, delay: 0.5 + index * 0.1 }}
-                      viewport={{ once: true }}
-                    >
-                      {achievement.value}{achievement.suffix}
-                    </motion.span>
-                  </div>
-                  <div className="text-neutral-300 font-medium">
-                    {achievement.key}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
+              achievement={achievement}
+              index={index}
+            />
           ))}
         </div>
 

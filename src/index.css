@@ -340,6 +340,14 @@ textarea:focus {
   pointer-events: auto;
 }
 
+  .btn-gradient-primary {
+    background: linear-gradient(135deg, #0ea5e9, #8b5cf6);
+  }
+
+  .btn-gradient-primary:hover {
+    background: linear-gradient(135deg, #0284c7, #7c3aed);
+  }
+
 /* Featured project card hover glow */
 .featured-card-glow:hover {
   box-shadow: 0 25px 50px rgba(14, 165, 233, 0.2), 0 0 0 1px rgba(14, 165, 233, 0.3);
