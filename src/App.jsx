@@ -7,6 +7,7 @@ import { Experience } from "./components/Experience";
 import { Interface } from "./components/Interface";
 import { LoadingScreen } from "./components/LoadingScreen";
 import { Menu } from "./components/Menu";
+import { CommandPalette } from "./components/CommandPalette";
 import { ParticleBackground } from "./components/ParticleBackground";
 import { framerMotionConfig } from "./config";
 import { Analytics } from '@vercel/analytics/react';
@@ -61,7 +62,7 @@ function App() {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
-      const newSection = Math.min(Math.floor(scrollY / windowHeight), 10);
+      const newSection = Math.min(Math.floor(scrollY / windowHeight), 13);
       
       if (newSection !== section) {
         setSection(newSection);
@@ -189,7 +190,22 @@ function App() {
         </button>
       )}
 
+      {/* Command palette hint */}
+      {!isResumePage && started && (
+        <motion.div
+          className="fixed bottom-6 left-6 z-40 hidden md:flex items-center gap-2 px-3 py-2 glass-morphism-dark rounded-lg text-neutral-500 text-xs border border-neutral-700/30 select-none"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 3, duration: 0.5 }}
+        >
+          <kbd className="bg-neutral-800 border border-neutral-700 rounded px-1.5 py-0.5 text-[10px]">⌘</kbd>
+          <kbd className="bg-neutral-800 border border-neutral-700 rounded px-1.5 py-0.5 text-[10px]">K</kbd>
+          <span>command palette</span>
+        </motion.div>
+      )}
+
       {!isResumePage && <AiTwin />}
+      {!isResumePage && <CommandPalette onSectionChange={setSection} />}
       
       <Leva hidden />
       <Analytics />

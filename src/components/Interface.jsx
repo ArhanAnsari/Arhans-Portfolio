@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
 import emailjs from "@emailjs/browser";
 import { ValidationError, useForm } from "@formspree/react";
-import { motion, useInView, useMotionValue, useSpring } from "framer-motion";
+import { motion, AnimatePresence, useInView, useMotionValue, useSpring } from "framer-motion";
 import { useAtom } from "jotai";
 import { Link } from "react-router-dom";
 import { currentProjectAtom, projects } from "./Projects";
@@ -220,11 +220,14 @@ export const Interface = (props) => {
         <div id="section-3"><ReactNativeProjectsSection /></div>
         <div id="section-4"><EducationSection /></div>
         <div id="section-5"><AchievementsSection stats={githubStats} /></div>
-        <div id="section-6"><CurrentWorkSection /></div>
+        <div id="section-6"><CurrentlyBuildingSection /></div>
         <div id="section-7"><ServicesSection /></div>
         <div id="section-8"><TestimonialsSection /></div>
         <div id="section-9"><BlogSection /></div>
-        <div id="section-10"><ContactSection /></div>
+        <div id="section-10"><DeveloperJourneySection /></div>
+        <div id="section-11"><RecognitionsSection /></div>
+        <div id="section-12"><HireMeSection setSection={setSection} /></div>
+        <div id="section-13"><ContactSection /></div>
       </div>
     </div>
   );
@@ -316,7 +319,7 @@ const AboutSection = (props) => {
           className="flex flex-col sm:flex-row gap-4 pt-4"
         >
           <motion.button
-            onClick={() => setSection(10)}
+            onClick={() => setSection(13)}
             className="relative overflow-hidden flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-white group btn-gradient-primary"
             whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(14,165,233,0.5)' }}
             whileTap={{ scale: 0.97 }}
@@ -1029,17 +1032,144 @@ const FeaturedProjectCard = ({ project, index, onClick, compact = false }) => {
   );
 };
 
-const ProjectCard = ({ project, index, onClick }) => {
+const ProjectCaseStudyModal = ({ project, onClose }) => {
+  // Press Escape to close
+  useEffect(() => {
+    const handler = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [onClose]);
+
   return (
     <motion.div
-      className="card-modern group cursor-pointer overflow-hidden h-full"
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      viewport={{ once: true }}
-      whileHover={{ y: -5 }}
-      onClick={onClick}
+      className="fixed inset-0 z-[150] flex items-center justify-center p-4"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
     >
+      {/* Backdrop */}
+      <motion.div
+        className="absolute inset-0 bg-black/70 backdrop-blur-md"
+        onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+      />
+
+      {/* Modal */}
+      <motion.div
+        className="relative w-full max-w-2xl max-h-[85vh] overflow-y-auto rounded-2xl bg-neutral-900 border border-neutral-700/60 shadow-2xl"
+        initial={{ opacity: 0, scale: 0.92, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.92, y: 20 }}
+        transition={{ duration: 0.25 }}
+      >
+        {/* Header image */}
+        <div className="relative h-48 overflow-hidden rounded-t-2xl">
+          <img
+            src={project.image}
+            alt={project.title}
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-neutral-900/40 to-transparent" />
+          <button
+            onClick={onClose}
+            className="absolute top-4 right-4 p-2 bg-neutral-800/80 rounded-full text-neutral-300 hover:text-white hover:bg-neutral-700 transition-colors"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <div className="absolute bottom-4 left-5">
+            <h2 className="text-2xl font-bold text-white">{project.title}</h2>
+            {project.type && (
+              <span className={`text-xs px-2 py-0.5 rounded-full font-medium mt-1 inline-block ${
+                project.type === "original" ? "bg-green-500/80 text-white" :
+                project.type === "client" ? "bg-purple-500/80 text-white" :
+                "bg-blue-500/80 text-white"
+              }`}>
+                {project.type === "original" ? "✨ Original" : project.type === "client" ? "👨‍💼 Client Work" : "🎨 Inspired"}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Body */}
+        <div className="p-6 space-y-6">
+          {/* Overview */}
+          <div>
+            <h3 className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-2">Overview</h3>
+            <p className="text-neutral-300 text-sm leading-relaxed">{project.description}</p>
+          </div>
+
+          {/* Tech Stack */}
+          {project.technologies && (
+            <div>
+              <h3 className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-3">Tech Stack</h3>
+              <div className="flex flex-wrap gap-2">
+                {project.technologies.map((tech) => (
+                  <span key={tech} className="px-3 py-1 bg-primary-500/10 border border-primary-500/30 text-primary-300 text-xs rounded-full font-medium">
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Category */}
+          <div>
+            <h3 className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-2">Category</h3>
+            <span className="px-3 py-1 bg-neutral-800 text-neutral-300 text-xs rounded-full capitalize">
+              {project.category || "Web"}
+            </span>
+          </div>
+
+          {/* Actions */}
+          <div className="flex flex-wrap gap-3 pt-2 border-t border-neutral-700/50">
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-5 py-2.5 btn-gradient-primary text-white rounded-xl text-sm font-semibold"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+              </svg>
+              Live Demo
+            </a>
+            {project.github && (
+              <a
+                href={project.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-5 py-2.5 bg-neutral-800 border border-neutral-700 text-neutral-200 rounded-xl text-sm font-semibold hover:bg-neutral-700 transition-colors"
+              >
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                </svg>
+                GitHub
+              </a>
+            )}
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+const ProjectCard = ({ project, index, onClick }) => {
+  const [showModal, setShowModal] = useState(false);
+  return (
+    <>
+      <motion.div
+        className="card-modern group cursor-pointer overflow-hidden h-full flex flex-col"
+        initial={{ opacity: 0, y: 30 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: index * 0.1 }}
+        viewport={{ once: true }}
+        whileHover={{ y: -5 }}
+        onClick={onClick}
+      >
       {/* Project Image */}
       <div className="relative h-48 overflow-hidden rounded-xl mb-4 bg-neutral-800">
         <img
@@ -1133,8 +1263,24 @@ const ProjectCard = ({ project, index, onClick }) => {
             )}
           </div>
         )}
+
+        {/* Case study button */}
+        <button
+          onClick={(e) => { e.stopPropagation(); setShowModal(true); }}
+          className="mt-2 text-xs text-primary-400 hover:text-primary-300 underline underline-offset-2 transition-colors"
+        >
+          View details →
+        </button>
       </div>
     </motion.div>
+
+    {/* Case Study Modal */}
+    <AnimatePresence>
+      {showModal && (
+        <ProjectCaseStudyModal project={project} onClose={() => setShowModal(false)} />
+      )}
+    </AnimatePresence>
+    </>
   );
 };
 
@@ -1201,154 +1347,179 @@ const TestimonialsSection = () => {
   );
 };
 
-const CurrentWorkSection = () => {
+const CurrentlyBuildingSection = () => {
+  const activeProjects = [
+    {
+      title: "AutoYT",
+      description: "AI-powered YouTube automation platform that generates scripts, thumbnails, and metadata using advanced AI models. Fully automated content pipeline for creators.",
+      status: "🚀 Production",
+      statusColor: "text-green-400 bg-green-500/10 border-green-500/30",
+      accent: "from-green-500/20 to-emerald-500/10",
+      border: "border-green-500/20",
+      technologies: ["Next.js", "Google Gemini", "Together AI", "Vercel AI SDK", "Clerk"],
+      progress: 85,
+      link: null,
+    },
+    {
+      title: "CanvasCraft",
+      description: "AI-powered visual website builder — describe your vision and watch it materialize in real time. Drag-and-drop + AI generation hybrid workflow.",
+      status: "⚡ Active",
+      statusColor: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30",
+      accent: "from-yellow-500/20 to-orange-500/10",
+      border: "border-yellow-500/20",
+      technologies: ["React", "Three.js", "Google Gemini", "Cloudinary", "Node.js"],
+      progress: 60,
+      link: null,
+    },
+    {
+      title: "Clipgen AI v2",
+      description: "Next generation of the creator productivity tool with advanced video intelligence, automated clip selection, and multi-platform publishing.",
+      status: "🚧 In Development",
+      statusColor: "text-blue-400 bg-blue-500/10 border-blue-500/30",
+      accent: "from-blue-500/20 to-primary-500/10",
+      border: "border-blue-500/20",
+      technologies: ["Next.js 15", "Convex", "Clerk", "Together AI", "FFmpeg"],
+      progress: 40,
+      link: "https://clipgen-ai.vercel.app/",
+    },
+  ];
+
   return (
     <Section alignRight className="bg-gradient-to-b from-transparent via-neutral-950/30 to-transparent">
-      <motion.div className="w-full max-w-5xl pr-8 md:pr-16 lg:pr-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
-        {/* Header */}
+      <motion.div className="w-full max-w-6xl pr-8 md:pr-16 lg:pr-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
         <div className="text-center space-y-4">
-          <motion.h2 
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary-500/10 border border-primary-500/30 text-primary-400 text-sm font-medium mb-4"
+          >
+            <span className="w-2 h-2 rounded-full bg-primary-400 animate-pulse" />
+            Live Progress
+          </motion.div>
+          <motion.h2
             className="text-responsive-lg font-display font-bold text-gradient"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
             viewport={{ once: true }}
           >
-            Currently Working On
+            Currently Building
           </motion.h2>
-          <motion.p 
+          <motion.p
             className="text-neutral-400 max-w-2xl mx-auto text-center"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
             viewport={{ once: true }}
           >
-            Exploring new opportunities and ready to bring innovative ideas to life
+            Active projects in development — building the future one commit at a time
           </motion.p>
         </div>
 
-        {/* Current Work Card */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {activeProjects.map((project, index) => (
+            <motion.div
+              key={project.title}
+              className={`relative overflow-hidden rounded-2xl border ${project.border} bg-neutral-900/50 backdrop-blur-sm p-6 group hover:shadow-lg transition-all duration-500`}
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6, delay: index * 0.15 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -4, scale: 1.01 }}
+            >
+              {/* Gradient bg */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${project.accent} opacity-50 pointer-events-none`} />
+
+              <div className="relative space-y-4">
+                {/* Status badge */}
+                <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold border ${project.statusColor}`}>
+                  {project.status}
+                </span>
+
+                <div>
+                  <h3 className="text-xl font-bold text-neutral-100 mb-2 group-hover:text-primary-300 transition-colors">
+                    {project.title}
+                  </h3>
+                  <p className="text-neutral-400 text-sm leading-relaxed line-clamp-3">
+                    {project.description}
+                  </p>
+                </div>
+
+                {/* Progress bar */}
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs text-neutral-500">
+                    <span>Progress</span>
+                    <span className="text-primary-400 font-medium">{project.progress}%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-neutral-800 rounded-full overflow-hidden">
+                    <motion.div
+                      className="h-full bg-gradient-to-r from-primary-500 to-accent-500 rounded-full"
+                      initial={{ width: 0 }}
+                      whileInView={{ width: `${project.progress}%` }}
+                      transition={{ duration: 1.2, delay: 0.4 + index * 0.1 }}
+                      viewport={{ once: true }}
+                    />
+                  </div>
+                </div>
+
+                {/* Tech stack */}
+                <div className="flex flex-wrap gap-1.5">
+                  {project.technologies.slice(0, 3).map((tech) => (
+                    <span key={tech} className="px-2 py-0.5 bg-neutral-800/80 text-neutral-300 text-[10px] rounded border border-neutral-700/50">
+                      {tech}
+                    </span>
+                  ))}
+                  {project.technologies.length > 3 && (
+                    <span className="px-2 py-0.5 bg-primary-500/15 text-primary-400 text-[10px] rounded">
+                      +{project.technologies.length - 3}
+                    </span>
+                  )}
+                </div>
+
+                {project.link && (
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 text-xs text-primary-400 hover:text-primary-300 transition-colors"
+                  >
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                    </svg>
+                    View current version
+                  </a>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Open for collaboration note */}
         <motion.div
-          className="card-modern max-w-4xl mx-auto"
-          initial={{ opacity: 0, y: 30 }}
+          className="mt-8 p-6 glass-morphism rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-4"
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
           viewport={{ once: true }}
         >
-          <div className="space-y-6">
-            {/* Title and Status */}
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <h3 className="text-2xl font-bold text-neutral-100">
-                {currentWork.title}
-              </h3>
-              <span className="px-4 py-2 bg-green-500/20 text-green-300 rounded-full text-sm font-medium border border-green-500/30 w-fit">
-                {currentWork.status}
-              </span>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-500/20 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-xl">💡</span>
             </div>
-
-            {/* Description */}
-            <p className="text-neutral-300 leading-relaxed">
-              {currentWork.description}
-            </p>
-
-            {/* Progress Bar */}
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm text-neutral-400">
-                <span>Availability</span>
-                <span className="text-primary-400 font-medium">{currentWork.progress}% Ready</span>
-              </div>
-              <div className="h-2 w-full bg-neutral-800 rounded-full overflow-hidden">
-                <motion.div
-                  className="h-full bg-gradient-to-r from-primary-500 to-accent-500 rounded-full"
-                  initial={{ width: 0 }}
-                  whileInView={{ width: `${currentWork.progress}%` }}
-                  transition={{ duration: 1.2, delay: 0.5 }}
-                  viewport={{ once: true }}
-                />
-              </div>
-            </div>
-
-            {/* Technologies */}
-            <div className="space-y-3">
-              <h4 className="text-neutral-300 font-medium text-sm">Tech Stack I'm Excited About:</h4>
-              <div className="flex flex-wrap gap-2">
-                {currentWork.technologies.map((tech, index) => (
-                  <motion.span
-                    key={index}
-                    className="px-3 py-1 bg-primary-500/10 text-primary-300 text-sm rounded-full border border-primary-500/20"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.4, delay: 0.6 + index * 0.1 }}
-                    viewport={{ once: true }}
-                  >
-                    {tech}
-                  </motion.span>
-                ))}
-              </div>
-            </div>
-
-            {/* Call to Action */}
-            <div className="pt-6 border-t border-neutral-700/30 flex flex-col sm:flex-row gap-4">
-              <button className="btn-primary flex-1 sm:flex-initial">
-                Start a Project
-              </button>
-              <button className="btn-secondary flex-1 sm:flex-initial">
-                View My Work
-              </button>
-            </div>
-
-            {/* Meta Info */}
-            <div className="flex items-center justify-between text-sm text-neutral-500 pt-4">
-              <span>Status: {currentWork.startDate}</span>
-              <span className="text-accent-400">• Open for Collaboration</span>
+            <div>
+              <h4 className="font-semibold text-neutral-200">Have an idea?</h4>
+              <p className="text-sm text-neutral-400">Let's collaborate and build something amazing together.</p>
             </div>
           </div>
+          <a
+            href="mailto:arhanansari2009@gmail.com"
+            className="flex-shrink-0 px-5 py-2.5 btn-gradient-primary text-white font-semibold text-sm rounded-xl"
+          >
+            Let's Talk
+          </a>
         </motion.div>
-
-        {/* Additional Info Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-12">
-          <motion.div
-            className="card-modern text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.7 }}
-            viewport={{ once: true }}
-          >
-            <div className="w-12 h-12 bg-primary-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">💡</span>
-            </div>
-            <h4 className="font-semibold text-neutral-200 mb-2">Innovation First</h4>
-            <p className="text-sm text-neutral-400">Bringing fresh perspectives to every project</p>
-          </motion.div>
-
-          <motion.div
-            className="card-modern text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            viewport={{ once: true }}
-          >
-            <div className="w-12 h-12 bg-accent-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">⚡</span>
-            </div>
-            <h4 className="font-semibold text-neutral-200 mb-2">Fast Delivery</h4>
-            <p className="text-sm text-neutral-400">Quick turnaround without compromising quality</p>
-          </motion.div>
-
-          <motion.div
-            className="card-modern text-center"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.9 }}
-            viewport={{ once: true }}
-          >
-            <div className="w-12 h-12 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-3">
-              <span className="text-2xl">🎯</span>
-            </div>
-            <h4 className="font-semibold text-neutral-200 mb-2">Result Focused</h4>
-            <p className="text-sm text-neutral-400">Delivering solutions that exceed expectations</p>
-          </motion.div>
-        </div>
       </motion.div>
     </Section>
   );
@@ -1963,6 +2134,330 @@ const ContactSection = () => {
             </div>
           </motion.div>
         </div>
+      </motion.div>
+    </Section>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// DEVELOPER JOURNEY (section 10)
+// ─────────────────────────────────────────────────────────────────────────────
+const journeyMilestones = [
+  {
+    year: "2021",
+    title: "First Lines of Code",
+    description: "Started with HTML & CSS, building simple static pages. Discovered the magic of creating things from nothing but text.",
+    icon: "💻",
+    color: "primary",
+  },
+  {
+    year: "2022",
+    title: "JavaScript Mastery",
+    description: "Dived deep into JavaScript — DOM manipulation, APIs, and building interactive web apps. First real projects went live.",
+    icon: "⚡",
+    color: "accent",
+  },
+  {
+    year: "2022",
+    title: "MERN Stack Developer",
+    description: "Learned MongoDB, Express, React, and Node.js. Started building full-stack applications with real databases and backends.",
+    icon: "🚀",
+    color: "primary",
+  },
+  {
+    year: "2023",
+    title: "3D Web & Three.js",
+    description: "Discovered Three.js and React Three Fiber. Built immersive 3D experiences — car racing games, multiplayer 3D apps, and this portfolio.",
+    icon: "🎮",
+    color: "accent",
+  },
+  {
+    year: "2024",
+    title: "AI-Powered Tools",
+    description: "Integrated Google Gemini, OpenAI, and Together AI into production apps. Built SaaS platforms: Chat to PDF, InspireGem, Synthara.",
+    icon: "🤖",
+    color: "primary",
+  },
+  {
+    year: "2024",
+    title: "React Native Mobile Dev",
+    description: "Expanded into mobile development with React Native & Expo. Built cross-platform apps for iOS and Android.",
+    icon: "📱",
+    color: "accent",
+  },
+  {
+    year: "2025",
+    title: "SaaS & Client Platforms",
+    description: "Shipped multiple SaaS products and built production websites for real clients including Clystra Networks. 250+ projects total.",
+    icon: "🏆",
+    color: "primary",
+  },
+];
+
+const DeveloperJourneySection = () => (
+  <Section className="bg-gradient-to-b from-transparent via-neutral-950/20 to-transparent">
+    <motion.div className="w-full max-w-4xl pl-8 md:pl-16 lg:pl-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
+      <div className="text-center space-y-4">
+        <motion.h2
+          className="text-responsive-lg font-display font-bold text-gradient"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
+          Developer Journey
+        </motion.h2>
+        <motion.p
+          className="text-neutral-400 max-w-2xl mx-auto text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+        >
+          From first Hello World to building production SaaS platforms — the story so far
+        </motion.p>
+      </div>
+
+      <div className="relative">
+        <div className="absolute left-6 md:left-1/2 top-0 bottom-0 w-px bg-gradient-to-b from-primary-500/80 via-accent-500/50 to-primary-500/20" />
+
+        <div className="space-y-10">
+          {journeyMilestones.map((milestone, index) => {
+            const isLeft = index % 2 === 0;
+            return (
+              <motion.div
+                key={milestone.title}
+                className={`relative flex items-start gap-6 md:gap-0 ${isLeft ? "md:flex-row" : "md:flex-row-reverse"}`}
+                initial={{ opacity: 0, x: isLeft ? -40 : 40 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.08 }}
+                viewport={{ once: true }}
+              >
+                <div className={`md:w-5/12 pl-14 md:pl-0 ${isLeft ? "md:pr-12" : "md:pl-12"}`}>
+                  <motion.div
+                    className={`card-modern p-5 group hover:shadow-lg ${
+                      milestone.color === "primary" ? "hover:border-primary-500/40" : "hover:border-accent-500/40"
+                    } transition-all duration-300`}
+                    whileHover={{ y: -3, scale: 1.01 }}
+                  >
+                    <div className="flex items-center gap-3 mb-3">
+                      <span className="text-2xl">{milestone.icon}</span>
+                      <div>
+                        <span className={`text-xs font-bold px-2 py-0.5 rounded-full ${
+                          milestone.color === "primary"
+                            ? "bg-primary-500/15 text-primary-400"
+                            : "bg-accent-500/15 text-accent-400"
+                        }`}>
+                          {milestone.year}
+                        </span>
+                        <h3 className="font-bold text-neutral-100 mt-1 group-hover:text-primary-300 transition-colors">
+                          {milestone.title}
+                        </h3>
+                      </div>
+                    </div>
+                    <p className="text-sm text-neutral-400 leading-relaxed">{milestone.description}</p>
+                  </motion.div>
+                </div>
+
+                <div className="absolute left-6 md:left-1/2 -translate-x-1/2 z-10 mt-6">
+                  <motion.div
+                    className={`w-4 h-4 rounded-full border-2 ${
+                      milestone.color === "primary"
+                        ? "border-primary-400 bg-primary-500/30 shadow-[0_0_12px_rgba(14,165,233,0.6)]"
+                        : "border-accent-400 bg-accent-500/30 shadow-[0_0_12px_rgba(217,70,239,0.6)]"
+                    }`}
+                    initial={{ scale: 0 }}
+                    whileInView={{ scale: 1 }}
+                    transition={{ duration: 0.4, delay: index * 0.08 + 0.2 }}
+                    viewport={{ once: true }}
+                  />
+                </div>
+
+                <div className="hidden md:block md:w-5/12" />
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </motion.div>
+  </Section>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// RECOGNITIONS (section 11)
+// ─────────────────────────────────────────────────────────────────────────────
+const recognitionsList = [
+  { title: "Urjaa Brain Arithmetic Winner", description: "First-place winner demonstrating exceptional mathematical problem-solving speed and accuracy.", icon: "🥇", category: "Competition", year: "2023", colorClass: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30" },
+  { title: "Math Olympiad Gold Medalist", description: "Gold medal in the school Mathematics Olympiad, achieving the highest score among all competitors.", icon: "🏅", category: "Academic", year: "2024", colorClass: "text-yellow-400 bg-yellow-500/10 border-yellow-500/30" },
+  { title: "Science Olympiad Gold Medalist", description: "Top performer in the Science Olympiad, excelling in Physics, Chemistry, and Biology.", icon: "🔬", category: "Academic", year: "2024", colorClass: "text-blue-400 bg-blue-500/10 border-blue-500/30" },
+  { title: "Programming Club President", description: "Elected President of the school Programming Club — organizing workshops and mentoring junior developers.", icon: "👨‍💻", category: "Leadership", year: "2024", colorClass: "text-primary-400 bg-primary-500/10 border-primary-500/30" },
+  { title: "Digital Art Competition Winner", description: "First place in the school Digital Art Competition, blending coding creativity with visual design skills.", icon: "🎨", category: "Creative", year: "2023", colorClass: "text-accent-400 bg-accent-500/10 border-accent-500/30" },
+  { title: "250+ Open Source Projects", description: "Built and published over 250 projects across web, mobile, AI, and 3D on GitHub.", icon: "🐙", category: "Community", year: "2021–2025", colorClass: "text-green-400 bg-green-500/10 border-green-500/30" },
+  { title: "1869+ GitHub Contributions", description: "Consistent daily contributions to repositories reflecting a deep passion for shipping code.", icon: "🔥", category: "Community", year: "2024", colorClass: "text-orange-400 bg-orange-500/10 border-orange-500/30" },
+  { title: "Academic Excellence Award", description: "Recognized for outstanding overall academic performance combined with technical achievements.", icon: "🏆", category: "Academic", year: "2024", colorClass: "text-purple-400 bg-purple-500/10 border-purple-500/30" },
+];
+
+const RecognitionsSection = () => (
+  <Section alignRight className="bg-gradient-to-b from-transparent via-neutral-950/30 to-transparent">
+    <motion.div className="w-full max-w-6xl pr-8 md:pr-16 lg:pr-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
+      <div className="text-center space-y-4">
+        <motion.h2
+          className="text-responsive-lg font-display font-bold text-gradient"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
+          Recognitions
+        </motion.h2>
+        <motion.p
+          className="text-neutral-400 max-w-2xl mx-auto text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+        >
+          Awards, achievements, and milestones that mark the journey
+        </motion.p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+        {recognitionsList.map((item, index) => (
+          <motion.div
+            key={item.title}
+            className={`relative p-5 rounded-2xl border ${item.colorClass} bg-neutral-900/40 backdrop-blur-sm group hover:shadow-lg transition-all duration-300`}
+            initial={{ opacity: 0, y: 30, scale: 0.95 }}
+            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+            transition={{ duration: 0.5, delay: index * 0.07 }}
+            viewport={{ once: true }}
+            whileHover={{ y: -4, scale: 1.02 }}
+          >
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-3xl">{item.icon}</span>
+                <div className="text-right">
+                  <span className="text-[10px] font-semibold text-neutral-500 block">{item.category}</span>
+                  <span className="text-[10px] text-neutral-600">{item.year}</span>
+                </div>
+              </div>
+              <h3 className="font-bold text-neutral-100 text-sm leading-snug group-hover:text-primary-300 transition-colors">
+                {item.title}
+              </h3>
+              <p className="text-neutral-500 text-xs leading-relaxed line-clamp-3">{item.description}</p>
+            </div>
+          </motion.div>
+        ))}
+      </div>
+    </motion.div>
+  </Section>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HIRE ME (section 12)
+// ─────────────────────────────────────────────────────────────────────────────
+const HireMeSection = ({ setSection }) => {
+  const availableFor = [
+    { icon: "⚡", label: "Full-Stack Web Development", description: "MERN, Next.js, React applications" },
+    { icon: "📱", label: "Mobile App Development", description: "React Native for iOS & Android" },
+    { icon: "🤖", label: "AI Integrations & SaaS", description: "LLM-powered tools & platforms" },
+    { icon: "🎮", label: "3D Web Experiences", description: "Three.js, React Three Fiber, WebGL" },
+    { icon: "🎨", label: "UI/UX Design", description: "Figma, Framer Motion, Tailwind" },
+    { icon: "🚀", label: "Freelance Projects", description: "Short-term and long-term contracts" },
+  ];
+
+  return (
+    <Section className="bg-gradient-to-b from-transparent via-neutral-950/20 to-transparent">
+      <motion.div className="w-full max-w-5xl pl-8 md:pl-16 lg:pl-24 space-y-12" whileInView="visible" viewport={{ once: true }}>
+        <div className="text-center space-y-4">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-green-500/10 border border-green-500/30 text-green-400 text-sm font-semibold"
+          >
+            <span className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+            Open to Work
+          </motion.div>
+          <motion.h2
+            className="text-responsive-lg font-display font-bold text-gradient"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            Work With Me
+          </motion.h2>
+          <motion.p
+            className="text-neutral-400 max-w-2xl mx-auto text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            Available for freelance work, collaborative projects, and full-time opportunities.
+          </motion.p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {availableFor.map((item, index) => (
+            <motion.div
+              key={item.label}
+              className="flex items-start gap-4 p-5 rounded-2xl glass-morphism border border-neutral-700/30 hover:border-primary-500/40 transition-all duration-300 group"
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.08 }}
+              viewport={{ once: true }}
+              whileHover={{ y: -3 }}
+            >
+              <span className="text-2xl flex-shrink-0 group-hover:scale-110 transition-transform">{item.icon}</span>
+              <div>
+                <h3 className="font-semibold text-neutral-200 text-sm group-hover:text-primary-300 transition-colors">{item.label}</h3>
+                <p className="text-neutral-500 text-xs mt-0.5">{item.description}</p>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        <motion.div
+          className="text-center space-y-6 pt-4"
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          viewport={{ once: true }}
+        >
+          <p className="text-neutral-400 text-lg">Ready to start a project? Let's connect.</p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <motion.button
+              onClick={() => {
+                setSection(13);
+                document.getElementById("section-13")?.scrollIntoView({ behavior: "smooth" });
+              }}
+              className="btn-gradient-primary flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-white text-lg shadow-lg"
+              whileHover={{ scale: 1.05, boxShadow: "0 0 30px rgba(14,165,233,0.5)" }}
+              whileTap={{ scale: 0.97 }}
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+              Start a Project
+            </motion.button>
+            <a
+              href="https://calendly.com/arhanansari2009"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 px-8 py-4 rounded-xl font-bold text-neutral-200 border border-neutral-700/50 glass-morphism hover:border-primary-500/50 transition-all duration-300 text-lg"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+              Schedule a Call
+            </a>
+          </div>
+          <p className="text-neutral-600 text-sm">
+            💬 Usually responds within 24 hours &nbsp;·&nbsp; 🌏 Available for remote work worldwide
+          </p>
+        </motion.div>
       </motion.div>
     </Section>
   );
