@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, X, Minimize2, Maximize2, Loader, Mic, MicOff, Volume2, VolumeX, StopCircle } from "lucide-react";
+import { Send, X, Minimize2, Maximize2, Loader, Mic, MicOff, Volume2, VolumeX, StopCircle, Beaker, Users, Briefcase } from "lucide-react";
+import AiPlayground from "./playground/AiPlayground";
 
 // ─── Quick suggestion prompts ─────────────────────────────────────────────────
 const QUICK_PROMPTS = [
@@ -69,8 +70,54 @@ const FOLLOW_UP_MAP = {
   default:      ["What projects have you built?", "Tell me about your tech stack", "Are you available for freelance?"],
 };
 
+// ─── AI Portfolio Modes ───────────────────────────────────────────────────────
+const USER_MODES = {
+  visitor: {
+    label: "Visitor",
+    icon: Users,
+    promptAddition: "CURRENT_MODE: Visitor — Focus on showcasing projects, technologies, developer journey, and portfolio exploration. Be friendly and enthusiastic. Encourage exploration of the portfolio.",
+    quickPrompts: [
+      "What projects has Arhan built?",
+      "What's Arhan's tech stack?",
+      "Tell me about your AI projects",
+      "Show me the 3D projects",
+    ],
+    followUpDefault: ["Show me the projects section", "What 3D projects have you built?", "Open the AI Playground"],
+  },
+  recruiter: {
+    label: "Recruiter",
+    icon: Briefcase,
+    promptAddition: "CURRENT_MODE: Recruiter — Focus on professional experience, years of practice, tech stack depth, architecture decisions, quantifiable achievements, and freelance availability. Be professional, concise, and results-focused.",
+    quickPrompts: [
+      "How many years of experience does Arhan have?",
+      "What's Arhan's strongest tech stack?",
+      "Is Arhan available for hire?",
+      "What architecture patterns does Arhan use?",
+    ],
+    followUpDefault: ["What's your experience with React?", "Tell me about your freelance work", "How do I contact you for a project?"],
+  },
+};
+
+// ─── AI Action map (action name → behavior) ───────────────────────────────────
+const AI_ACTIONS = {
+  open_projects:    { section: 2 },
+  open_skills:      { section: 1 },
+  scroll_skills:    { section: 1 },
+  open_contact:     { section: 13 },
+  open_experience:  { section: 4 },
+  open_resume:      { url: "/resume" },
+  open_github:      { url: "https://github.com/ArhanAnsari" },
+  open_playground:  { modal: "playground" },
+  highlight_project: { section: 2 }, // scrolls to projects section
+};
+
+// ─── Action timing constants ───────────────────────────────────────────────────
+const ACTION_SCROLL_DELAY = 600;  // ms before scrolling (lets message render first)
+const ACTION_COOLDOWN_MS  = 1500; // ms cooldown between consecutive actions
+
 // ─── Build Gemini system prompt with full portfolio context ───────────────────
-const buildSystemPrompt = ({ sessionCtx = null, activeProject = null } = {}) => {
+const buildSystemPrompt = ({ sessionCtx = null, activeProject = null, mode = "visitor" } = {}) => {
+  const modeConfig = USER_MODES[mode] ?? USER_MODES.visitor;
   const sessionLines = [];
   if (activeProject) {
     sessionLines.push(`CURRENT VIEW: The user is currently viewing the "${activeProject}" project. If asked about it, provide detail.`);
@@ -88,6 +135,8 @@ const buildSystemPrompt = ({ sessionCtx = null, activeProject = null } = {}) => 
   return `You are Arhan Ansari's AI Twin — a conversational AI assistant and digital representation of Arhan, a full stack developer who builds modern web apps, mobile apps, AI tools, and interactive 3D experiences.
 
 Speak in FIRST PERSON as Arhan. Say "I", "my projects", "I built this", etc. Be knowledgeable, confident, friendly, and enthusiastic about technology. Format responses with **bold** for project names and key terms. Keep answers concise (under 200 words) unless detail is specifically requested.
+
+${modeConfig.promptAddition}
 
 === PORTFOLIO KNOWLEDGE ===
 
@@ -118,12 +167,29 @@ ${KNOWLEDGE_BASE.availability}
 CONTACT:
 ${KNOWLEDGE_BASE.contact}
 
+=== AI ACTIONS (OPTIONAL) ===
+You CAN trigger portfolio UI actions by responding with ONLY a JSON object:
+{"message": "Your friendly message here", "action": "action_name"}
+{"message": "Let me show you Clipgen AI.", "action": "highlight_project", "payload": "Clipgen AI"}
+
+Available actions (use ONLY when the user explicitly asks to navigate or open something):
+- open_projects: Scroll to Projects section
+- open_skills / scroll_skills: Scroll to Skills section
+- open_contact: Scroll to Contact section
+- open_experience: Scroll to Experience section
+- open_resume: Open resume/CV
+- open_github: Open GitHub profile
+- open_playground: Open the AI Playground
+- highlight_project: Highlight a specific project (add payload: "ProjectName")
+
+For regular conversation, respond ONLY in plain text (NOT JSON).
+ONLY use JSON format when the user explicitly requests navigation or opening a section/link.
+
 === BEHAVIOR RULES ===
 1. Answer using the portfolio information above — never invent projects or facts not listed
 2. Speak as Arhan: "I built X to solve Y" rather than "Arhan built X"
-3. If a user asks to navigate (e.g., "show projects", "open skills"), respond naturally and confirm
-4. Keep responses focused and professional but warm
-5. Use bullet points for lists and **bold** for emphasis${sessionLines.length ? "\n\n=== SESSION CONTEXT ===\n" + sessionLines.join("\n") : ""}`;
+3. Keep responses focused and professional but warm
+4. Use bullet points for lists and **bold** for emphasis${sessionLines.length ? "\n\n=== SESSION CONTEXT ===\n" + sessionLines.join("\n") : ""}`;
 };
 
 // ─── Parse basic markdown (bold, newlines) ────────────────────────────────────
@@ -158,6 +224,8 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
   const [isSpeakingActive, setIsSpeakingActive] = useState(false);
   const [thinkingPhase, setThinkingPhase] = useState(0);
   const [followUpSuggestions, setFollowUpSuggestions] = useState([]);
+  const [mode, setMode] = useState("visitor"); // "visitor" | "recruiter"
+  const [isPlaygroundOpen, setIsPlaygroundOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -180,6 +248,8 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
     lastTopic: null,
     lastSectionVisited: SECTION_NAMES[section] ?? SECTION_NAMES[0],
   });
+  // Prevents multiple simultaneous action executions
+  const isExecutingActionRef = useRef(false);
 
   useEffect(() => {
     isSpeakingRef.current = isSpeaking;
@@ -216,17 +286,27 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
   }, []);
 
   // ─── Voice Recognition Setup ─────────────────────────────────────────────────
+  // Use a ref so the onresult callback can call the latest sendMessage
+  const sendMessageRef = useRef(null);
+
   useEffect(() => {
     if (typeof window === "undefined") return;
     const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognitionAPI) return;
 
     const recognition = new SpeechRecognitionAPI();
+    recognition.lang = "en-US";
     recognition.continuous = false;
     recognition.interimResults = false;
     recognition.onresult = (event) => {
-      setInput(event.results[0][0].transcript);
+      const transcript = event.results[0][0].transcript;
       setIsListening(false);
+      // Auto-submit via sendMessage override (bypasses stale input state)
+      if (transcript.trim() && sendMessageRef.current) {
+        sendMessageRef.current(transcript);
+      } else {
+        setInput(transcript);
+      }
     };
     recognition.onerror = () => setIsListening(false);
     recognition.onend = () => setIsListening(false);
@@ -283,6 +363,33 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
     if (isSpeaking) stopSpeaking();
     setIsSpeaking((prev) => !prev);
   }, [isSpeaking, stopSpeaking]);
+
+  // ─── Execute AI action — maps action name to real UI behavior ─────────────────
+  const executeAction = useCallback((action, payload) => {
+    if (!action || isExecutingActionRef.current) return;
+    const actionDef = AI_ACTIONS[action];
+    if (!actionDef) {
+      console.warn(`[AiTwin] Unknown action: ${action}`);
+      return;
+    }
+    isExecutingActionRef.current = true;
+    console.log(`[AiTwin] Action: ${action}`, payload ?? "");
+
+    if (actionDef.section !== undefined) {
+      setTimeout(() => {
+        document.getElementById(`section-${actionDef.section}`)?.scrollIntoView({ behavior: "smooth" });
+      }, ACTION_SCROLL_DELAY);
+    } else if (actionDef.url) {
+      // Open all URLs in new tab (internal pages open in new tab too for overlay-free UX)
+      window.open(actionDef.url, "_blank", "noopener,noreferrer");
+    } else if (actionDef.modal === "playground") {
+      setIsPlaygroundOpen(true);
+    }
+
+    setTimeout(() => {
+      isExecutingActionRef.current = false;
+    }, ACTION_COOLDOWN_MS);
+  }, []);
 
   const scrollToBottom = () =>
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -429,7 +536,7 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             system_instruction: {
-              parts: [{ text: buildSystemPrompt({ sessionCtx: sessionContextRef.current, activeProject }) }],
+              parts: [{ text: buildSystemPrompt({ sessionCtx: sessionContextRef.current, activeProject, mode }) }],
             },
             contents: [
               ...historyMessages,
@@ -476,10 +583,33 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
         }
       }
 
-      updateSessionContext(userText, fullResponse);
+      // ── Post-stream: try to parse JSON action format ────────────────────────
+      let displayText = fullResponse.trim();
+      let aiAction = null;
+      let aiPayload = null;
+      try {
+        const parsed = JSON.parse(displayText);
+        if (parsed && typeof parsed.message === "string") {
+          displayText = parsed.message;
+          aiAction = parsed.action ?? null;
+          aiPayload = parsed.payload ?? null;
+          // Replace streamed raw JSON with clean message text
+          setMessages((prev) => {
+            const updated = [...prev];
+            const last = updated[updated.length - 1];
+            if (last.sender === "ai") last.text = displayText;
+            return [...updated];
+          });
+        }
+      } catch {
+        // Not JSON — plain text response, display as-is
+      }
+
+      updateSessionContext(userText, displayText);
       setFollowUpSuggestions(computeFollowUpSuggestions());
       setIsStreaming(false);
-      speak(fullResponse);
+      if (aiAction) executeAction(aiAction, aiPayload);
+      speak(displayText);
     } catch (error) {
       console.error("AI Twin Error:", error);
       const errorMsg =
@@ -493,7 +623,12 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
       });
       setIsStreaming(false);
     }
-  }, [input, isStreaming, messages, activeProject, getDemoResponse, handleNavigation, speak, updateSessionContext, computeFollowUpSuggestions]);
+  }, [input, isStreaming, messages, activeProject, mode, getDemoResponse, handleNavigation, speak, updateSessionContext, computeFollowUpSuggestions, executeAction]);
+
+  // Keep sendMessageRef pointing to the latest sendMessage so voice recognition can call it
+  useEffect(() => {
+    sendMessageRef.current = sendMessage;
+  }, [sendMessage]);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -545,53 +680,88 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
             aria-label="Arhan AI Twin chat"
           >
             {/* Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
+            <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-4 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
                 <img
                   src="/AI%20Twin%20PP.jpg"
                   alt="Arhan AI Twin"
-                  className="w-10 h-10 rounded-full object-cover border-2 border-white/30 shadow-md"
+                  className="w-9 h-9 rounded-full object-cover border-2 border-white/30 shadow-md"
                 />
                 <div>
-                  <h3 className="text-white font-bold">Arhan's AI Twin</h3>
+                  <h3 className="text-white font-bold text-sm">Arhan's AI Twin</h3>
                   <p className="text-xs text-purple-200">
                     {isStreaming ? "Thinking…" : "Online • Gemini 2.5"}
                   </p>
                 </div>
               </div>
-              <div className="flex gap-1">
+              <div className="flex items-center gap-1">
+                {/* Mode toggle — Visitor / Recruiter */}
+                <div className="flex rounded-lg overflow-hidden border border-white/20 mr-1">
+                  {Object.keys(USER_MODES).map((m) => {
+                    const cfg = USER_MODES[m];
+                    const Icon = cfg.icon;
+                    return (
+                      <button
+                        key={m}
+                        onClick={() => setMode(m)}
+                        className={`flex items-center gap-1 px-2 py-1 text-[10px] font-medium transition-colors ${
+                          mode === m
+                            ? "bg-white/25 text-white"
+                            : "text-white/60 hover:text-white hover:bg-white/10"
+                        }`}
+                        title={`${cfg.label} mode`}
+                        aria-label={`Switch to ${cfg.label} mode`}
+                        aria-pressed={mode === m}
+                      >
+                        <Icon size={10} />
+                        <span className="hidden sm:inline">{cfg.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Playground button */}
+                <button
+                  onClick={() => setIsPlaygroundOpen(true)}
+                  className="text-white hover:bg-white/20 p-1.5 rounded"
+                  title="Open AI Playground"
+                  aria-label="Open AI Playground"
+                >
+                  <Beaker size={16} />
+                </button>
+
                 {/* Stop Speaking — visible only while TTS is active */}
                 {isSpeakingActive && (
                   <button
                     onClick={stopSpeaking}
-                    className="text-white hover:bg-white/20 p-2 rounded"
+                    className="text-white hover:bg-white/20 p-1.5 rounded"
                     title="Stop Speaking"
                     aria-label="Stop speaking"
                   >
-                    <StopCircle size={18} />
+                    <StopCircle size={16} />
                   </button>
                 )}
                 <button
                   onClick={toggleMute}
-                  className="text-white hover:bg-white/20 p-2 rounded"
+                  className="text-white hover:bg-white/20 p-1.5 rounded"
                   title={isSpeaking ? "Mute AI voice" : "Unmute AI voice"}
                   aria-label={isSpeaking ? "Mute AI voice" : "Unmute AI voice"}
                 >
-                  {isSpeaking ? <Volume2 size={18} /> : <VolumeX size={18} />}
+                  {isSpeaking ? <Volume2 size={16} /> : <VolumeX size={16} />}
                 </button>
                 <button
                   onClick={() => setIsMinimized(!isMinimized)}
-                  className="text-white hover:bg-white/20 p-2 rounded"
+                  className="text-white hover:bg-white/20 p-1.5 rounded"
                   aria-label={isMinimized ? "Expand chat" : "Minimise chat"}
                 >
-                  {isMinimized ? <Maximize2 size={18} /> : <Minimize2 size={18} />}
+                  {isMinimized ? <Maximize2 size={16} /> : <Minimize2 size={16} />}
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
-                  className="text-white hover:bg-white/20 p-2 rounded"
+                  className="text-white hover:bg-white/20 p-1.5 rounded"
                   aria-label="Close chat"
                 >
-                  <X size={18} />
+                  <X size={16} />
                 </button>
               </div>
             </div>
@@ -683,9 +853,11 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
                   {/* Quick prompt chips — visible only when chat is fresh */}
                   {showQuickPrompts && (
                     <div className="space-y-2 pt-1">
-                      <p className="text-xs text-slate-500 text-center">Try asking:</p>
+                      <p className="text-xs text-slate-500 text-center">
+                        {mode === "recruiter" ? "Recruiter questions:" : "Try asking:"}
+                      </p>
                       <div className="flex flex-wrap gap-2 justify-center">
-                        {QUICK_PROMPTS.map((prompt) => (
+                        {(USER_MODES[mode]?.quickPrompts ?? QUICK_PROMPTS).map((prompt) => (
                           <button
                             key={prompt}
                             onClick={() => sendMessage(prompt)}
@@ -702,40 +874,57 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
                 </div>
 
                 {/* Input */}
-                <div className="border-t border-slate-700 p-4 bg-slate-900/70">
+                <div className="border-t border-slate-700 p-3 bg-slate-900/70">
+                  {/* Listening indicator */}
+                  {isListening && (
+                    <div className="flex items-center gap-2 mb-2 px-1">
+                      <span className="text-xs text-red-400 font-medium">Listening…</span>
+                      <div className="flex items-end gap-0.5 h-4">
+                        {[0, 1, 2, 3].map((i) => (
+                          <motion.div
+                            key={i}
+                            className="w-0.5 bg-red-400 rounded-full"
+                            animate={{ height: ["4px", "14px", "4px"] }}
+                            transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.12, ease: "easeInOut" }}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  )}
                   <div className="flex gap-2">
                     <button
                       onClick={toggleListening}
-                      className={`p-3 rounded-lg transition flex items-center justify-center shadow-lg ${
+                      className={`p-2.5 rounded-lg transition-all flex items-center justify-center shadow-lg relative ${
                         isListening
-                          ? "bg-red-500 animate-pulse"
+                          ? "bg-red-500 shadow-red-500/30 shadow-[0_0_12px_rgba(239,68,68,0.5)]"
                           : "bg-slate-700 hover:bg-slate-600"
                       }`}
                       title={isListening ? "Stop Listening" : "Voice Input"}
                       aria-label={isListening ? "Stop voice input" : "Start voice input"}
+                      aria-pressed={isListening}
                     >
-                      {isListening ? <MicOff size={20} /> : <Mic size={20} />}
+                      {isListening ? <MicOff size={18} className="text-white" /> : <Mic size={18} />}
                     </button>
                     <textarea
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      placeholder="Ask me anything about Arhan…"
+                      placeholder={isListening ? "Listening… speak now" : "Ask me anything about Arhan…"}
                       rows="2"
                       className="flex-1 bg-slate-800 text-white rounded-lg px-4 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition"
                       disabled={isStreaming}
                       aria-label="Message input"
                     />
                     <button
-                      onClick={sendMessage}
+                      onClick={() => sendMessage()}
                       disabled={isStreaming || !input.trim()}
-                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 text-white p-3 rounded-lg transition flex items-center justify-center shadow-lg"
+                      className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 text-white p-2.5 rounded-lg transition flex items-center justify-center shadow-lg"
                       aria-label="Send message"
                     >
                       {isStreaming ? (
-                        <Loader size={20} className="animate-spin" />
+                        <Loader size={18} className="animate-spin" />
                       ) : (
-                        <Send size={20} />
+                        <Send size={18} />
                       )}
                     </button>
                   </div>
@@ -745,6 +934,9 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* AI Playground Modal */}
+      <AiPlayground isOpen={isPlaygroundOpen} onClose={() => setIsPlaygroundOpen(false)} />
     </>
   );
 };
