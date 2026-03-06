@@ -188,6 +188,20 @@ export const Interface = (props) => {
 
   useEffect(() => {
     const fetchGithubStats = async () => {
+      // Check cache (1-hour TTL)
+      const CACHE_KEY = "gh_stats_cache";
+      const CACHE_TTL = 60 * 60 * 1000;
+      try {
+        const cached = localStorage.getItem(CACHE_KEY);
+        if (cached) {
+          const { data, ts } = JSON.parse(cached);
+          if (Date.now() - ts < CACHE_TTL) {
+            setGithubStats(data);
+            return;
+          }
+        }
+      } catch { /* ignore localStorage errors */ }
+
       try {
         const [userRes, reposRes] = await Promise.all([
           axios.get("https://api.github.com/users/ArhanAnsari"),
@@ -219,15 +233,26 @@ export const Interface = (props) => {
             url: r.html_url,
           }));
 
-        setGithubStats({
+        const data = {
           contributions: 1869,
           repos: userRes.data.public_repos,
           stars,
           topLanguages,
           latestRepos,
-        });
+        };
+
+        setGithubStats(data);
+        // Cache for 1 hour
+        try {
+          localStorage.setItem("gh_stats_cache", JSON.stringify({ data, ts: Date.now() }));
+        } catch { /* ignore */ }
       } catch (error) {
-        console.error("Error fetching GitHub stats:", error);
+        // Handle rate-limit (403) gracefully — keep defaults
+        if (error.response?.status === 403) {
+          console.warn("GitHub API rate limit reached. Using cached/default values.");
+        } else {
+          console.error("Error fetching GitHub stats:", error);
+        }
       }
     };
     fetchGithubStats();
@@ -2579,6 +2604,10 @@ const ArchitectureDiagram = ({ architecture }) => {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: index * 0.1 }}
               viewport={{ once: true }}
+              tabIndex={0}
+              role="button"
+              aria-expanded={hoveredNode === layer.id}
+              aria-label={`${layer.label} layer`}
               onMouseEnter={() => setHoveredNode(layer.id)}
               onMouseLeave={() => setHoveredNode(null)}
               onFocus={() => setHoveredNode(layer.id)}

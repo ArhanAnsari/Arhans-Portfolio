@@ -353,7 +353,15 @@ const TechInfoCard = ({ tech, onClose }) => (
 const TechGalaxy = ({ performanceMode = false }) => {
   const [hoveredTech, setHoveredTech] = useState(null);
   const [selectedTech, setSelectedTech] = useState(null);
-  const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+  // Safe client-side mobile detection (avoids SSR issues)
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 768);
+  }, []);
+  const dpr = useMemo(() => {
+    if (typeof window === "undefined") return 1;
+    return isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5);
+  }, [isMobile]);
 
   if (performanceMode) {
     // Fallback: simple tech grid
@@ -380,7 +388,7 @@ const TechGalaxy = ({ performanceMode = false }) => {
       <Canvas
         camera={{ position: [0, 4, 14], fov: 55 }}
         gl={{ antialias: !isMobile, alpha: true, powerPreference: "default" }}
-        dpr={isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5)}
+        dpr={dpr}
         style={{ background: "transparent" }}
       >
         <Suspense fallback={null}>
