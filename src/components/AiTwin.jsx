@@ -1,16 +1,17 @@
-import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, X, Minimize2, Maximize2, Loader, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+import { Send, X, Minimize2, Maximize2, Loader, Mic, MicOff, Volume2, VolumeX, StopCircle } from "lucide-react";
 
 // ─── Quick suggestion prompts ─────────────────────────────────────────────────
 const QUICK_PROMPTS = [
   "What projects has Arhan built?",
   "What's Arhan's tech stack?",
   "Is Arhan available for freelance?",
-  "Show me AI projects",
+  "Tell me about your AI projects",
+  "What React Native apps have you built?",
 ];
 
-// ─── Extended knowledge base ──────────────────────────────────────────────────
+// ─── Portfolio knowledge base ─────────────────────────────────────────────────
 const KNOWLEDGE_BASE = {
   projects: "Arhan has 250+ projects on GitHub! 🚀 Key highlights:\n• **AutoYT** — AI YouTube automation (Next.js, Gemini)\n• **CanvasCraft** — AI website builder (React, Three.js)\n• **Clipgen AI** — Creator tool (Next.js 15, Convex)\n• **Chat to PDF** — AI document chat (Next.js, LangChain)\n• **InspireGem** — AI inspiration platform (React, Gemini)\n• **3D Car Racing Game** — WebGL physics game (Three.js)\n• **Figma Clone** — Real-time collaborative design (Next.js, Liveblocks)\n\nVisit the Projects section to explore more!",
   skills: "Arhan's tech stack:\n⚛️ **Frontend**: React, Next.js, Three.js, Framer Motion, Tailwind CSS\n🔧 **Backend**: Node.js, Express, Prisma, Convex\n🗄️ **Databases**: MongoDB, PostgreSQL\n📱 **Mobile**: React Native, Expo\n🤖 **AI/ML**: Google Gemini, OpenAI, Together AI, LangChain\n🎮 **3D**: Three.js, React Three Fiber, WebGL\n☁️ **DevOps**: Vercel, Railway, Docker, Git",
@@ -23,7 +24,7 @@ const KNOWLEDGE_BASE = {
   "3d": "🎮 Arhan's 3D projects:\n• **This Portfolio** — Full 3D interactive experience (Three.js + R3F)\n• **3D Car Racing Game** — WebGL physics game\n• **Arhan Guys** — Fall Guys-inspired 3D platformer\n• **Multiplayer Pirate Card Game** — Real-time 3D card game\n• **Tech Stack Galaxy** — Interactive 3D tech explorer\n\nArhan uses Three.js, React Three Fiber, Babylon.js & WebGL.",
 };
 
-// Navigate commands embedded in responses
+// ─── Navigation commands (keyword → section index) ────────────────────────────
 const NAV_COMMANDS = {
   projects: 2,
   "react native": 3,
@@ -40,8 +41,51 @@ const NAV_COMMANDS = {
   github: 15,
 };
 
-// ─── Parse basic markdown (bold, newlines) ─────────────────────────────────
+// ─── Build Gemini system prompt with full portfolio context ───────────────────
+const buildSystemPrompt = () =>
+  `You are Arhan Ansari's AI Twin — a conversational AI assistant and digital representation of Arhan, a full stack developer who builds modern web apps, mobile apps, AI tools, and interactive 3D experiences.
+
+Speak in FIRST PERSON as Arhan. Say "I", "my projects", "I built this", etc. Be knowledgeable, confident, friendly, and enthusiastic about technology. Format responses with **bold** for project names and key terms. Keep answers concise (under 200 words) unless detail is specifically requested.
+
+=== PORTFOLIO KNOWLEDGE ===
+
+PROJECTS:
+${KNOWLEDGE_BASE.projects}
+
+SKILLS & TECH STACK:
+${KNOWLEDGE_BASE.skills}
+
+EXPERIENCE & JOURNEY:
+${KNOWLEDGE_BASE.experience}
+
+ACHIEVEMENTS:
+${KNOWLEDGE_BASE.achievements}
+
+AI PROJECTS:
+${KNOWLEDGE_BASE.ai}
+
+MOBILE DEVELOPMENT:
+${KNOWLEDGE_BASE.mobile}
+
+3D DEVELOPMENT:
+${KNOWLEDGE_BASE["3d"]}
+
+AVAILABILITY:
+${KNOWLEDGE_BASE.availability}
+
+CONTACT:
+${KNOWLEDGE_BASE.contact}
+
+=== BEHAVIOR RULES ===
+1. Answer using the portfolio information above — never invent projects or facts not listed
+2. Speak as Arhan: "I built X to solve Y" rather than "Arhan built X"
+3. If a user asks to navigate (e.g., "show projects", "open skills"), respond naturally and confirm
+4. Keep responses focused and professional but warm
+5. Use bullet points for lists and **bold** for emphasis`;
+
+// ─── Parse basic markdown (bold, newlines) ────────────────────────────────────
 const parseMarkdown = (text) => {
+  if (!text) return null;
   const lines = text.split("\n");
   return lines.map((line, i) => {
     const parts = line.split(/(\*\*[^*]+\*\*)/g);
@@ -49,7 +93,7 @@ const parseMarkdown = (text) => {
       <span key={i}>
         {parts.map((part, j) => {
           if (part.startsWith("**") && part.endsWith("**")) {
-            return <strong key={j} className="text-primary-300 font-semibold">{part.slice(2, -2)}</strong>;
+            return <strong key={j} className="text-purple-300 font-semibold">{part.slice(2, -2)}</strong>;
           }
           return part;
         })}
@@ -58,6 +102,9 @@ const parseMarkdown = (text) => {
     );
   });
 };
+// ─── Gemini generation config constants ───────────────────────────────────────
+const GEMINI_TEMPERATURE = 0.8;
+const GEMINI_MAX_OUTPUT_TOKENS = 800;
 
 
 const AiTwin = () => {
@@ -65,6 +112,7 @@ const AiTwin = () => {
   const [isMinimized, setIsMinimized] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(true);
+  const [isSpeakingActive, setIsSpeakingActive] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -76,35 +124,48 @@ const AiTwin = () => {
   const [input, setInput] = useState("");
   const [isStreaming, setIsStreaming] = useState(false);
   const messagesEndRef = useRef(null);
-
-  // Voice Recognition Setup
   const recognitionRef = useRef(null);
+  // Ref so that speak() always reads the latest isSpeaking value even inside async closures
+  const isSpeakingRef = useRef(true);
+  // Cache loaded TTS voices to avoid race condition with getVoices() returning []
+  const voicesRef = useRef([]);
 
   useEffect(() => {
-    if (typeof window !== "undefined" && (window.SpeechRecognition || window.webkitSpeechRecognition)) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognitionRef.current = new SpeechRecognition();
-      recognitionRef.current.continuous = false;
-      recognitionRef.current.interimResults = false;
+    isSpeakingRef.current = isSpeaking;
+  }, [isSpeaking]);
 
-      recognitionRef.current.onresult = (event) => {
-        const transcript = event.results[0][0].transcript;
-        setInput(transcript);
-        setIsListening(false);
-        // Automatically send if transcript is long enough or just set it
-      };
-
-      recognitionRef.current.onerror = () => {
-        setIsListening(false);
-      };
-
-      recognitionRef.current.onend = () => {
-        setIsListening(false);
-      };
-    }
+  // ─── Pre-load TTS voices (some browsers load them asynchronously) ─────────────
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+    const loadVoices = () => {
+      voicesRef.current = window.speechSynthesis.getVoices();
+    };
+    loadVoices();
+    window.speechSynthesis.onvoiceschanged = loadVoices;
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null;
+    };
   }, []);
 
-  const toggleListening = () => {
+  // ─── Voice Recognition Setup ─────────────────────────────────────────────────
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const SpeechRecognitionAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognitionAPI) return;
+
+    const recognition = new SpeechRecognitionAPI();
+    recognition.continuous = false;
+    recognition.interimResults = false;
+    recognition.onresult = (event) => {
+      setInput(event.results[0][0].transcript);
+      setIsListening(false);
+    };
+    recognition.onerror = () => setIsListening(false);
+    recognition.onend = () => setIsListening(false);
+    recognitionRef.current = recognition;
+  }, []);
+
+  const toggleListening = useCallback(() => {
     if (isListening) {
       recognitionRef.current?.stop();
     } else {
@@ -112,92 +173,96 @@ const AiTwin = () => {
       recognitionRef.current?.start();
       setIsListening(true);
     }
-  };
+  }, [isListening]);
 
-  const speak = (text) => {
-    if (!isSpeaking || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    const utterance = new SpeechSynthesisUtterance(text);
+  // ─── TTS with male voice preference ─────────────────────────────────────────
+  const speak = useCallback((text) => {
+    if (!isSpeakingRef.current || !window.speechSynthesis) return;
+    const synth = window.speechSynthesis;
+    synth.cancel();
+
+    // Strip markdown and limit length for TTS
+    const cleanText = text.replace(/\*\*/g, "").replace(/[#*`]/g, "").slice(0, 500);
+    const utterance = new SpeechSynthesisUtterance(cleanText);
     utterance.rate = 1;
-    utterance.pitch = 1;
-    window.speechSynthesis.speak(utterance);
-  };
+    utterance.pitch = 0.9;
+
+    // Prefer a male voice — use cached voices (populated via onvoiceschanged)
+    const voices = voicesRef.current.length ? voicesRef.current : synth.getVoices();
+    const maleVoice =
+      voices.find((v) => /google uk english male/i.test(v.name)) ||
+      voices.find((v) => /male/i.test(v.name)) ||
+      voices.find((v) => /alex|daniel|fred/i.test(v.name)) ||
+      voices.find((v) => v.lang.startsWith("en") && !/female/i.test(v.name));
+    if (maleVoice) utterance.voice = maleVoice;
+
+    utterance.onstart = () => setIsSpeakingActive(true);
+    utterance.onend = () => setIsSpeakingActive(false);
+    utterance.onerror = () => setIsSpeakingActive(false);
+    synth.speak(utterance);
+  }, []);
+
+  // Stop active speech immediately
+  const stopSpeaking = useCallback(() => {
+    if (window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+      setIsSpeakingActive(false);
+    }
+  }, []);
+
+  // Toggle mute — cancel active speech when muting
+  const toggleMute = useCallback(() => {
+    if (isSpeaking) stopSpeaking();
+    setIsSpeaking((prev) => !prev);
+  }, [isSpeaking, stopSpeaking]);
 
   const scrollToBottom = () =>
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
 
   useEffect(scrollToBottom, [messages]);
 
-  // Demo responses when API key is not available
-  const getDemoResponse = (msg) => {
+  // ─── Demo mode fallback (uses KNOWLEDGE_BASE directly) ───────────────────────
+  const getDemoResponse = useCallback((msg) => {
     const lower = msg.toLowerCase();
-    const responses = {
-      skills:
-        "Arhan is skilled in React, Three.js, Node.js, and full-stack development! He's also great with Tailwind, Prisma, and Framer Motion.",
-      projects:
-        "Arhan has completed 250+ projects, including a 3D interactive portfolio and enterprise web apps for clients like Clystra Networks!",
-      availability:
-        "Yes! Arhan is currently open for freelance and collaborative opportunities. You can reach him via the contact page on his portfolio.",
-      experience:
-        "Arhan has 3+ years of development experience with 1869 GitHub contributions and 10/10 client satisfaction rating!",
-      default:
-        "Hi there! I'm Arhan's AI Twin 👋. I know everything about Arhan's skills, projects, and achievements. What would you like to know?",
-    };
-
-    for (const [key, resp] of Object.entries(responses)) {
-      if (lower.includes(key)) return resp;
+    const keyMap = [
+      [["project", "built", "made"], KNOWLEDGE_BASE.projects],
+      [["skill", "tech", "stack", "language", "framework"], KNOWLEDGE_BASE.skills],
+      [["availab", "freelanc", "hire", "work with", "open for"], KNOWLEDGE_BASE.availability],
+      [["experienc", "journey", "started", "background"], KNOWLEDGE_BASE.experience],
+      [["achiev", "award", "accomplishment"], KNOWLEDGE_BASE.achievements],
+      [["contact", "email", "reach", "linkedin", "twitter"], KNOWLEDGE_BASE.contact],
+      [["ai project", "machine learning", "llm", "gemini", "openai"], KNOWLEDGE_BASE.ai],
+      [["mobile", "react native", "expo", "ios", "android"], KNOWLEDGE_BASE.mobile],
+      [["3d", "three.js", "webgl", "r3f"], KNOWLEDGE_BASE["3d"]],
+    ];
+    for (const [keys, resp] of keyMap) {
+      if (keys.some((k) => lower.includes(k))) return resp;
     }
-    return responses.default;
-  };
+    return "👋 Hey! I'm Arhan's AI Twin. Ask me about his **projects**, **skills**, **experience**, availability, or anything else!\n\n_(Demo mode — set VITE_GEMINI_API_KEY for full AI responses)_";
+  }, []);
 
-  // System prompt for Arhan
-  const SYSTEM_PROMPT = `You are Arhan's AI Twin, a sophisticated AI assistant with deep knowledge of Arhan Ansari. You are available 24/7 to answer questions about Arhan's skills, projects, experience, and availability.
+  // ─── Detect navigation intent and scroll to section ──────────────────────────
+  const handleNavigation = useCallback((text) => {
+    const lower = text.toLowerCase();
+    for (const [keyword, section] of Object.entries(NAV_COMMANDS)) {
+      if (lower.includes(keyword)) {
+        setTimeout(() => {
+          document.getElementById(`section-${section}`)?.scrollIntoView({ behavior: "smooth" });
+        }, 600);
+        return section;
+      }
+    }
+    return null;
+  }, []);
 
-About Arhan:
-- Full Stack Developer with expertise in modern web technologies
-- Passionate about 3D web experiences and interactive design
-- Strong background in React, Node.js, Three.js, and AI integration
+  // ─── Main send handler ────────────────────────────────────────────────────────
+  const sendMessage = useCallback(async () => {
+    if (!input.trim() || isStreaming) return;
 
-Key Skills:
-- Frontend: React, Three.js, Framer Motion, Tailwind CSS, Next.js, Vite
-- Backend: Node.js, Express, Prisma, MongoDB, PostgreSQL
-- 3D/Graphics: Three.js, Babylon.js, WebGL, React Three Fiber
-- AI/ML: LLM integration, Gemini, Claude, prompt engineering
-- DevOps: Docker, Git, Vercel, Railway, serverless functions
-
-Notable Achievements:
-- 250+ projects completed
-- 1869 GitHub contributions
-- 3+ years of development experience
-- 10/10 client satisfaction
-- 20+ technologies mastered
-- Gold medalist in Math & Science Olympiads
-
-Current Status:
-- Open for new opportunities
-- Available for freelance work
-- Interested in 3D web and scalable applications
-- Always learning new technologies
-
-Personality:
-- Friendly and professional
-- Detail-oriented with focus on UX
-- Quick learner and adaptable
-- Passionate about web development
-
-When answering:
-1. Be friendly and professional
-2. Keep answers concise and informative
-3. For inquiries, suggest contacting via portfolio
-4. Be helpful and human-like
-5. Show genuine interest in helping`;
-
-  const sendMessage = async () => {
-    if (!input.trim()) return;
-
+    const userText = input.trim();
     const userMessage = {
       id: Date.now(),
-      text: input,
+      text: userText,
       sender: "user",
       timestamp: new Date(),
     };
@@ -205,6 +270,9 @@ When answering:
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsStreaming(true);
+
+    // Detect navigation commands in the user message
+    handleNavigation(userText);
 
     const aiMessage = {
       id: Date.now() + 1,
@@ -217,15 +285,14 @@ When answering:
     try {
       const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
-      // If no API key, use demo mode
       if (!apiKey) {
-        const demoResponse = getDemoResponse(userMessage.text);
+        // Demo mode
+        const demoResponse = getDemoResponse(userText);
+        await new Promise((r) => setTimeout(r, 400));
         setMessages((prev) => {
           const updated = [...prev];
           const last = updated[updated.length - 1];
-          if (last.sender === "ai") {
-            last.text = demoResponse;
-          }
+          if (last.sender === "ai") last.text = demoResponse;
           return updated;
         });
         setIsStreaming(false);
@@ -233,42 +300,32 @@ When answering:
         return;
       }
 
-      // Call Google Gemini API directly from frontend
+      // Build conversation history — limit to last 10 messages, skip empty texts
+      const historyMessages = messages
+        .filter((m) => m.text && m.text.trim())
+        .slice(-10)
+        .map((m) => ({
+          role: m.sender === "user" ? "user" : "model",
+          parts: [{ text: m.text }],
+        }));
+
       const response = await fetch(
-        "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse&key=" +
-          apiKey,
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:streamGenerateContent?alt=sse&key=${apiKey}`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            system_instruction: {
-              parts: [{ text: SYSTEM_PROMPT }],
-            },
+            system_instruction: { parts: [{ text: buildSystemPrompt() }] },
             contents: [
-              ...messages
-                .filter((m) => m.sender !== undefined)
-                .map((m) => ({
-                  role: m.sender === "user" ? "user" : "model",
-                  parts: [{ text: m.text }],
-                })),
-              {
-                role: "user",
-                parts: [{ text: userMessage.text }],
-              },
+              ...historyMessages,
+              { role: "user", parts: [{ text: userText }] },
             ],
-            generationConfig: {
-              temperature: 0.8,
-              maxOutputTokens: 1000,
-            },
+            generationConfig: { temperature: GEMINI_TEMPERATURE, maxOutputTokens: GEMINI_MAX_OUTPUT_TOKENS },
           }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`API Error: ${response.status}`);
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
@@ -285,28 +342,20 @@ When answering:
           if (line.startsWith("data: ")) {
             try {
               const data = JSON.parse(line.slice(6));
-
-              if (
-                data.candidates &&
-                data.candidates[0] &&
-                data.candidates[0].content
-              ) {
-                const text =
-                  data.candidates[0].content.parts[0]?.text || "";
+              if (data.candidates?.[0]?.content) {
+                const text = data.candidates[0].content.parts[0]?.text || "";
                 if (text) {
                   fullResponse += text;
                   setMessages((prev) => {
                     const updated = [...prev];
                     const last = updated[updated.length - 1];
-                    if (last.sender === "ai") {
-                      last.text += text;
-                    }
+                    if (last.sender === "ai") last.text += text;
                     return [...updated];
                   });
                 }
               }
-            } catch (e) {
-              // Ignore parsing errors
+            } catch {
+              // Ignore JSON parse errors in SSE stream
             }
           }
         }
@@ -316,19 +365,18 @@ When answering:
       speak(fullResponse);
     } catch (error) {
       console.error("AI Twin Error:", error);
-      const errorResponse = "⚠️ Sorry! I couldn't connect to Gemini. Running in demo mode.\n\n" + getDemoResponse(userMessage.text);
+      const errorMsg =
+        "⚠️ AI temporarily unavailable. Please try again in a moment.\n\n" +
+        getDemoResponse(userText);
       setMessages((prev) => {
         const updated = [...prev];
         const last = updated[updated.length - 1];
-        if (last.sender === "ai") {
-          last.text = errorResponse;
-        }
+        if (last.sender === "ai") last.text = errorMsg;
         return updated;
       });
       setIsStreaming(false);
-      speak(errorResponse);
     }
-  };
+  }, [input, isStreaming, messages, getDemoResponse, handleNavigation, speak]);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -336,6 +384,9 @@ When answering:
       sendMessage();
     }
   };
+
+  // Show quick prompts only when only the greeting message is present
+  const showQuickPrompts = messages.length === 1;
 
   return (
     <>
@@ -350,11 +401,12 @@ When answering:
             whileTap={{ scale: 0.95 }}
             onClick={() => setIsOpen(true)}
             className="fixed bottom-6 right-6 z-40 w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 text-white shadow-lg flex items-center justify-center hover:shadow-[0_0_15px_rgba(124,58,237,0.6)] transition-shadow"
+            aria-label="Open AI Twin chat"
           >
             <img
-               src="/AI%20Twin%20PP.jpg"
-               alt="Arhan AI Twin"
-               className="w-10 h-10 rounded-full object-cover border-2 border-white/30 shadow-md"
+              src="/AI%20Twin%20PP.jpg"
+              alt="Arhan AI Twin"
+              className="w-10 h-10 rounded-full object-cover border-2 border-white/30 shadow-md"
             />
           </motion.button>
         )}
@@ -372,39 +424,55 @@ When answering:
                 ? "bottom-6 right-6 w-80"
                 : "bottom-6 right-6 w-96 max-h-[600px]"
             } rounded-2xl shadow-[0_0_30px_rgba(147,51,234,0.2)] bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 overflow-hidden flex flex-col backdrop-blur-xl`}
+            role="dialog"
+            aria-label="Arhan AI Twin chat"
           >
             {/* Header */}
             <div className="bg-gradient-to-r from-purple-600 to-blue-600 px-6 py-4 flex items-center justify-between">
-             <div className="flex items-center gap-3">
-              <img
-               src="/AI%20Twin%20PP.jpg"
-               alt="Arhan AI Twin"
-               className="w-10 h-10 rounded-full object-cover border-2 border-white/30 shadow-md"
-              />
+              <div className="flex items-center gap-3">
+                <img
+                  src="/AI%20Twin%20PP.jpg"
+                  alt="Arhan AI Twin"
+                  className="w-10 h-10 rounded-full object-cover border-2 border-white/30 shadow-md"
+                />
                 <div>
-                  <h3 className="text-white font-bold">Arhan’s AI Twin</h3>
+                  <h3 className="text-white font-bold">Arhan's AI Twin</h3>
                   <p className="text-xs text-purple-200">
-                   {isStreaming ? "Typing..." : "Online • Gemini 2.5"}
+                    {isStreaming ? "Thinking…" : "Online • Gemini 2.5"}
                   </p>
                 </div>
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-1">
+                {/* Stop Speaking — visible only while TTS is active */}
+                {isSpeakingActive && (
+                  <button
+                    onClick={stopSpeaking}
+                    className="text-white hover:bg-white/20 p-2 rounded"
+                    title="Stop Speaking"
+                    aria-label="Stop speaking"
+                  >
+                    <StopCircle size={18} />
+                  </button>
+                )}
                 <button
-                  onClick={() => setIsSpeaking(!isSpeaking)}
+                  onClick={toggleMute}
                   className="text-white hover:bg-white/20 p-2 rounded"
-                  title={isSpeaking ? "Mute AI" : "Unmute AI"}
+                  title={isSpeaking ? "Mute AI voice" : "Unmute AI voice"}
+                  aria-label={isSpeaking ? "Mute AI voice" : "Unmute AI voice"}
                 >
                   {isSpeaking ? <Volume2 size={18} /> : <VolumeX size={18} />}
                 </button>
                 <button
                   onClick={() => setIsMinimized(!isMinimized)}
                   className="text-white hover:bg-white/20 p-2 rounded"
+                  aria-label={isMinimized ? "Expand chat" : "Minimise chat"}
                 >
                   {isMinimized ? <Maximize2 size={18} /> : <Minimize2 size={18} />}
                 </button>
                 <button
                   onClick={() => setIsOpen(false)}
                   className="text-white hover:bg-white/20 p-2 rounded"
+                  aria-label="Close chat"
                 >
                   <X size={18} />
                 </button>
@@ -415,30 +483,41 @@ When answering:
               <>
                 {/* Messages */}
                 <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-slate-900/40">
-                  {messages.map((m) => (
+                  {messages.map((m, index) => (
                     <motion.div
                       key={m.id}
                       initial={{ opacity: 0, y: 8 }}
                       animate={{ opacity: 1, y: 0 }}
                       className={`flex ${
-                        m.sender === "user" ? "justify-end" : "justify-start"
+                        m.sender === "user" ? "justify-end" : "justify-start gap-2"
                       }`}
                     >
                       {m.sender === "ai" && (
-                      <img
-                        src="/AI%20Twin%20PP.jpg"
-                        alt="AI Twin PP"
-                        className="w-8 h-8 rounded-full object-cover border border-slate-600"
-                      />
+                        <img
+                          src="/AI%20Twin%20PP.jpg"
+                          alt="AI Twin"
+                          className="w-8 h-8 rounded-full object-cover border border-slate-600 flex-shrink-0 self-end"
+                        />
                       )}
                       <div
-                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-xl whitespace-pre-line ${
+                        className={`max-w-xs lg:max-w-md px-4 py-2 rounded-xl ${
                           m.sender === "user"
                             ? "bg-blue-600 text-white rounded-br-none shadow-lg"
                             : "bg-slate-700 text-slate-100 rounded-bl-none shadow-md"
                         }`}
                       >
-                        <p className="text-sm leading-relaxed">{m.text}</p>
+                        <p className="text-sm leading-relaxed">
+                          {parseMarkdown(m.text)}
+                          {/* Blinking cursor on the last AI message while streaming */}
+                          {isStreaming &&
+                            m.sender === "ai" &&
+                            index === messages.length - 1 && (
+                              <span
+                                className="inline-block w-0.5 h-4 bg-blue-400 ml-0.5 animate-pulse align-middle"
+                                aria-hidden="true"
+                              />
+                            )}
+                        </p>
                         <span className="text-xs mt-1 block opacity-60 text-right">
                           {m.timestamp.toLocaleTimeString([], {
                             hour: "2-digit",
@@ -449,14 +528,46 @@ When answering:
                     </motion.div>
                   ))}
 
-                  {isStreaming && (
-                    <div className="flex justify-start">
-                      <div className="bg-slate-700 text-slate-100 px-4 py-2 rounded-lg rounded-bl-none flex items-center gap-2 animate-pulse">
-                        <Loader size={16} className="animate-spin" />
-                        <span className="text-sm">Arhan is thinking...</span>
+                  {/* Thinking dots — shown before the first streaming text arrives */}
+                  {isStreaming &&
+                    messages[messages.length - 1]?.sender === "ai" &&
+                    !messages[messages.length - 1]?.text && (
+                      <div className="flex justify-start gap-2">
+                        <div className="bg-slate-700 text-slate-100 px-4 py-3 rounded-lg rounded-bl-none flex items-center gap-1.5">
+                          <span
+                            className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"
+                            style={{ animationDelay: "0ms" }}
+                          />
+                          <span
+                            className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"
+                            style={{ animationDelay: "150ms" }}
+                          />
+                          <span
+                            className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"
+                            style={{ animationDelay: "300ms" }}
+                          />
+                        </div>
+                      </div>
+                    )}
+
+                  {/* Quick prompt chips — visible only when chat is fresh */}
+                  {showQuickPrompts && (
+                    <div className="space-y-2 pt-1">
+                      <p className="text-xs text-slate-500 text-center">Try asking:</p>
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {QUICK_PROMPTS.map((prompt) => (
+                          <button
+                            key={prompt}
+                            onClick={() => setInput(prompt)}
+                            className="text-xs px-3 py-1.5 rounded-full bg-slate-700/60 text-slate-300 border border-slate-600/50 hover:bg-purple-500/20 hover:border-purple-500/50 hover:text-purple-200 transition-all duration-200"
+                          >
+                            {prompt}
+                          </button>
+                        ))}
                       </div>
                     </div>
                   )}
+
                   <div ref={messagesEndRef} />
                 </div>
 
@@ -466,9 +577,12 @@ When answering:
                     <button
                       onClick={toggleListening}
                       className={`p-3 rounded-lg transition flex items-center justify-center shadow-lg ${
-                        isListening ? "bg-red-500 animate-pulse" : "bg-slate-700 hover:bg-slate-600"
+                        isListening
+                          ? "bg-red-500 animate-pulse"
+                          : "bg-slate-700 hover:bg-slate-600"
                       }`}
-                      title={isListening ? "Stop Listening" : "Start Voice Input"}
+                      title={isListening ? "Stop Listening" : "Voice Input"}
+                      aria-label={isListening ? "Stop voice input" : "Start voice input"}
                     >
                       {isListening ? <MicOff size={20} /> : <Mic size={20} />}
                     </button>
@@ -476,15 +590,17 @@ When answering:
                       value={input}
                       onChange={(e) => setInput(e.target.value)}
                       onKeyDown={handleKeyPress}
-                      placeholder="Ask something about Arhan..."
+                      placeholder="Ask me anything about Arhan…"
                       rows="2"
                       className="flex-1 bg-slate-800 text-white rounded-lg px-4 py-2 text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 resize-none transition"
                       disabled={isStreaming}
+                      aria-label="Message input"
                     />
                     <button
                       onClick={sendMessage}
                       disabled={isStreaming || !input.trim()}
                       className="bg-blue-600 hover:bg-blue-700 disabled:bg-slate-700 text-white p-3 rounded-lg transition flex items-center justify-center shadow-lg"
+                      aria-label="Send message"
                     >
                       {isStreaming ? (
                         <Loader size={20} className="animate-spin" />
