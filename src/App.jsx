@@ -228,7 +228,7 @@ function App() {
         </motion.div>
       )}
 
-      {!isResumePage && <AiTwin />}
+      {!isResumePage && <AiTwin section={section} />}
       {!isResumePage && <CommandPalette onSectionChange={setSection} />}
       
       <Leva hidden />

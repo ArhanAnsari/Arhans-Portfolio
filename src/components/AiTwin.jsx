@@ -41,9 +41,51 @@ const NAV_COMMANDS = {
   github: 15,
 };
 
+// Section index → human-readable name (mirrors NAV_COMMANDS values)
+const SECTION_NAMES = [
+  "Hero", "Skills", "Projects", "ReactNative", "Education",
+  "Achievements", "CurrentlyBuilding", "Services", "Testimonials",
+  "Blog", "Journey", "Recognitions", "HireMe", "Contact",
+  "TechGalaxy", "GitHubActivity",
+];
+
+// ─── Thinking phase cycling messages ──────────────────────────────────────────
+const THINKING_PHASES = [
+  "⚡ Arhan AI is thinking…",
+  "⚡ Analyzing portfolio data…",
+  "⚡ Generating response…",
+];
+
+// ─── Follow-up suggestion chips per topic ─────────────────────────────────────
+const FOLLOW_UP_MAP = {
+  projects:     ["Tell me about Clipgen AI", "What's your most complex project?", "Show me your GitHub"],
+  skills:       ["Which skill do you use most?", "Tell me about your AI experience", "What are you currently learning?"],
+  availability: ["How do I contact you?", "What services do you offer?", "Show me the Hire Me section"],
+  experience:   ["What was your first project?", "What's your biggest achievement?", "Are you open to work?"],
+  achievements: ["Tell me about your GitHub contributions", "What competitions have you won?", "Are you available for hire?"],
+  ai:           ["Tell me more about AutoYT", "How does Clipgen AI work?", "What AI models do you use?"],
+  mobile:       ["Tell me about your React Native setup", "Do you publish to app stores?", "What's your mobile tech stack?"],
+  "3d":         ["How did you build this portfolio?", "Tell me about the car racing game", "What 3D libraries do you use?"],
+  default:      ["What projects have you built?", "Tell me about your tech stack", "Are you available for freelance?"],
+};
+
 // ─── Build Gemini system prompt with full portfolio context ───────────────────
-const buildSystemPrompt = () =>
-  `You are Arhan Ansari's AI Twin — a conversational AI assistant and digital representation of Arhan, a full stack developer who builds modern web apps, mobile apps, AI tools, and interactive 3D experiences.
+const buildSystemPrompt = ({ sessionCtx = null, activeProject = null } = {}) => {
+  const sessionLines = [];
+  if (activeProject) {
+    sessionLines.push(`CURRENT VIEW: The user is currently viewing the "${activeProject}" project. If asked about it, provide detail.`);
+  }
+  if (sessionCtx?.lastMentionedProject) {
+    sessionLines.push(`LAST DISCUSSED PROJECT: "${sessionCtx.lastMentionedProject}". If the user says "the first one", "that project", or "tell me more", refer to this.`);
+  }
+  if (sessionCtx?.lastTopic) {
+    sessionLines.push(`LAST TOPIC: ${sessionCtx.lastTopic}`);
+  }
+  if (sessionCtx?.lastSectionVisited) {
+    sessionLines.push(`USER'S CURRENT PORTFOLIO SECTION: ${sessionCtx.lastSectionVisited}`);
+  }
+
+  return `You are Arhan Ansari's AI Twin — a conversational AI assistant and digital representation of Arhan, a full stack developer who builds modern web apps, mobile apps, AI tools, and interactive 3D experiences.
 
 Speak in FIRST PERSON as Arhan. Say "I", "my projects", "I built this", etc. Be knowledgeable, confident, friendly, and enthusiastic about technology. Format responses with **bold** for project names and key terms. Keep answers concise (under 200 words) unless detail is specifically requested.
 
@@ -81,7 +123,8 @@ ${KNOWLEDGE_BASE.contact}
 2. Speak as Arhan: "I built X to solve Y" rather than "Arhan built X"
 3. If a user asks to navigate (e.g., "show projects", "open skills"), respond naturally and confirm
 4. Keep responses focused and professional but warm
-5. Use bullet points for lists and **bold** for emphasis`;
+5. Use bullet points for lists and **bold** for emphasis${sessionLines.length ? "\n\n=== SESSION CONTEXT ===\n" + sessionLines.join("\n") : ""}`;
+};
 
 // ─── Parse basic markdown (bold, newlines) ────────────────────────────────────
 const parseMarkdown = (text) => {
@@ -107,12 +150,14 @@ const GEMINI_TEMPERATURE = 0.8;
 const GEMINI_MAX_OUTPUT_TOKENS = 800;
 
 
-const AiTwin = () => {
+const AiTwin = ({ section = 0, activeProject = null }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(true);
   const [isSpeakingActive, setIsSpeakingActive] = useState(false);
+  const [thinkingPhase, setThinkingPhase] = useState(0);
+  const [followUpSuggestions, setFollowUpSuggestions] = useState([]);
   const [messages, setMessages] = useState([
     {
       id: 1,
@@ -129,10 +174,33 @@ const AiTwin = () => {
   const isSpeakingRef = useRef(true);
   // Cache loaded TTS voices to avoid race condition with getVoices() returning []
   const voicesRef = useRef([]);
+  // Session context memory — persists across messages; section synced via useEffect
+  const sessionContextRef = useRef({
+    lastMentionedProject: null,
+    lastTopic: null,
+    lastSectionVisited: SECTION_NAMES[section] ?? SECTION_NAMES[0],
+  });
 
   useEffect(() => {
     isSpeakingRef.current = isSpeaking;
   }, [isSpeaking]);
+
+  // ─── Track current portfolio section in session context ──────────────────────
+  useEffect(() => {
+    sessionContextRef.current.lastSectionVisited = SECTION_NAMES[section] ?? "Hero";
+  }, [section]);
+
+  // ─── Cycling thinking-phase indicator ─────────────────────────────────────────
+  useEffect(() => {
+    if (!isStreaming) {
+      setThinkingPhase(0);
+      return;
+    }
+    const interval = setInterval(() => {
+      setThinkingPhase((p) => (p + 1) % THINKING_PHASES.length);
+    }, 700);
+    return () => clearInterval(interval);
+  }, [isStreaming]);
 
   // ─── Pre-load TTS voices (some browsers load them asynchronously) ─────────────
   useEffect(() => {
@@ -221,6 +289,49 @@ const AiTwin = () => {
 
   useEffect(scrollToBottom, [messages]);
 
+  // ─── Update session context after each exchange ───────────────────────────────
+  const updateSessionContext = useCallback((userText, aiResponse) => {
+    const ctx = sessionContextRef.current;
+    const lower = userText.toLowerCase();
+
+    // Detect topic from user message
+    const topicMap = [
+      [["ai project", "llm", "gemini", "openai", "autoyt", "clipgen", "synthara"], "ai"],
+      [["react native", "mobile", "expo", "ios", "android"], "mobile"],
+      [["3d", "three.js", "webgl", "r3f", "racing", "galaxy"], "3d"],
+      [["project", "built", "made", "github"], "projects"],
+      [["skill", "tech", "stack", "language", "framework", "tailwind"], "skills"],
+      [["availab", "freelanc", "hire", "open for"], "availability"],
+      [["experienc", "journey", "background", "started"], "experience"],
+      [["achiev", "award", "accomplishment", "olympiad"], "achievements"],
+      [["contact", "email", "reach", "linkedin"], "contact"],
+    ];
+    for (const [keys, topic] of topicMap) {
+      if (keys.some((k) => lower.includes(k))) {
+        ctx.lastTopic = topic;
+        break;
+      }
+    }
+
+    // Extract the first mentioned project name from the AI response
+    const knownProjects = [
+      "AutoYT", "CanvasCraft", "Clipgen AI", "Chat to PDF", "InspireGem",
+      "Synthara", "Figma Clone", "Arhan Guys",
+    ];
+    for (const proj of knownProjects) {
+      if (aiResponse.includes(proj)) {
+        ctx.lastMentionedProject = proj;
+        break;
+      }
+    }
+  }, []);
+
+  // ─── Derive follow-up suggestions from last topic ─────────────────────────────
+  const computeFollowUpSuggestions = useCallback(() => {
+    const topic = sessionContextRef.current.lastTopic;
+    return (FOLLOW_UP_MAP[topic] ?? FOLLOW_UP_MAP.default).slice(0, 3);
+  }, []);
+
   // ─── Demo mode fallback (uses KNOWLEDGE_BASE directly) ───────────────────────
   const getDemoResponse = useCallback((msg) => {
     const lower = msg.toLowerCase();
@@ -255,11 +366,11 @@ const AiTwin = () => {
     return null;
   }, []);
 
-  // ─── Main send handler ────────────────────────────────────────────────────────
-  const sendMessage = useCallback(async () => {
-    if (!input.trim() || isStreaming) return;
+  // ─── Main send handler — accepts optional override text for chip auto-submit ──
+  const sendMessage = useCallback(async (overrideText = null) => {
+    const userText = (overrideText ?? input).trim();
+    if (!userText || isStreaming) return;
 
-    const userText = input.trim();
     const userMessage = {
       id: Date.now(),
       text: userText,
@@ -268,7 +379,7 @@ const AiTwin = () => {
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    setInput("");
+    setInput(""); // always clear input after sending
     setIsStreaming(true);
 
     // Detect navigation commands in the user message
@@ -295,6 +406,8 @@ const AiTwin = () => {
           if (last.sender === "ai") last.text = demoResponse;
           return updated;
         });
+        updateSessionContext(userText, demoResponse);
+        setFollowUpSuggestions(computeFollowUpSuggestions());
         setIsStreaming(false);
         speak(demoResponse);
         return;
@@ -315,7 +428,9 @@ const AiTwin = () => {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            system_instruction: { parts: [{ text: buildSystemPrompt() }] },
+            system_instruction: {
+              parts: [{ text: buildSystemPrompt({ sessionCtx: sessionContextRef.current, activeProject }) }],
+            },
             contents: [
               ...historyMessages,
               { role: "user", parts: [{ text: userText }] },
@@ -361,6 +476,8 @@ const AiTwin = () => {
         }
       }
 
+      updateSessionContext(userText, fullResponse);
+      setFollowUpSuggestions(computeFollowUpSuggestions());
       setIsStreaming(false);
       speak(fullResponse);
     } catch (error) {
@@ -376,7 +493,7 @@ const AiTwin = () => {
       });
       setIsStreaming(false);
     }
-  }, [input, isStreaming, messages, getDemoResponse, handleNavigation, speak]);
+  }, [input, isStreaming, messages, activeProject, getDemoResponse, handleNavigation, speak, updateSessionContext, computeFollowUpSuggestions]);
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -528,27 +645,40 @@ const AiTwin = () => {
                     </motion.div>
                   ))}
 
-                  {/* Thinking dots — shown before the first streaming text arrives */}
+                  {/* Thinking indicator — cycling phases before first token arrives */}
                   {isStreaming &&
                     messages[messages.length - 1]?.sender === "ai" &&
                     !messages[messages.length - 1]?.text && (
-                      <div className="flex justify-start gap-2">
-                        <div className="bg-slate-700 text-slate-100 px-4 py-3 rounded-lg rounded-bl-none flex items-center gap-1.5">
-                          <span
-                            className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"
-                            style={{ animationDelay: "0ms" }}
-                          />
-                          <span
-                            className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"
-                            style={{ animationDelay: "150ms" }}
-                          />
-                          <span
-                            className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-bounce"
-                            style={{ animationDelay: "300ms" }}
-                          />
+                      <motion.div
+                        key={thinkingPhase}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        className="flex justify-start gap-2"
+                      >
+                        <div className="bg-slate-700/80 border border-purple-500/20 text-slate-200 px-4 py-2.5 rounded-lg rounded-bl-none flex items-center gap-2 text-sm">
+                          <span className="text-purple-400 text-base">⚡</span>
+                          <span>{THINKING_PHASES[thinkingPhase]}</span>
                         </div>
-                      </div>
+                      </motion.div>
                     )}
+
+                  {/* Follow-up suggestion chips — shown after last AI response */}
+                  {!isStreaming && followUpSuggestions.length > 0 && messages.length > 1 && (
+                    <div className="space-y-1 ml-10">
+                      <p className="text-xs text-slate-500">You might also ask:</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {followUpSuggestions.map((suggestion) => (
+                          <button
+                            key={suggestion}
+                            onClick={() => sendMessage(suggestion)}
+                            className="text-xs px-3 py-1.5 rounded-full bg-slate-700/60 text-slate-300 border border-slate-600/50 hover:bg-purple-500/20 hover:border-purple-500/50 hover:text-purple-200 transition-all duration-200"
+                          >
+                            {suggestion}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {/* Quick prompt chips — visible only when chat is fresh */}
                   {showQuickPrompts && (
@@ -558,7 +688,7 @@ const AiTwin = () => {
                         {QUICK_PROMPTS.map((prompt) => (
                           <button
                             key={prompt}
-                            onClick={() => setInput(prompt)}
+                            onClick={() => sendMessage(prompt)}
                             className="text-xs px-3 py-1.5 rounded-full bg-slate-700/60 text-slate-300 border border-slate-600/50 hover:bg-purple-500/20 hover:border-purple-500/50 hover:text-purple-200 transition-all duration-200"
                           >
                             {prompt}
