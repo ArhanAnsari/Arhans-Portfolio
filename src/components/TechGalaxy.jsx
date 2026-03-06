@@ -13,6 +13,7 @@ const techData = [
     ring: 1,
     speed: 0.35,
     phaseOffset: 0,
+    level: "Core Skill",
     description: "UI library for building interactive interfaces with a component-based architecture.",
     projects: ["This Portfolio", "Task Manager Pro", "Clipgen AI"],
   },
@@ -23,6 +24,7 @@ const techData = [
     ring: 1,
     speed: 0.28,
     phaseOffset: Math.PI / 2,
+    level: "Core Skill",
     description: "3D graphics library powering WebGL scenes, animations, and immersive experiences.",
     projects: ["This Portfolio", "3D Car Racing Game"],
   },
@@ -33,6 +35,7 @@ const techData = [
     ring: 2,
     speed: 0.22,
     phaseOffset: 0.8,
+    level: "Advanced",
     description: "Server-side JavaScript runtime for building scalable, high-performance backends.",
     projects: ["Chat to PDF", "InspireGem", "SaaS Platforms"],
   },
@@ -43,6 +46,7 @@ const techData = [
     ring: 2,
     speed: 0.2,
     phaseOffset: 2.1,
+    level: "Advanced",
     description: "NoSQL document database for flexible, scalable data storage in modern apps.",
     projects: ["Chat to PDF", "InspireGem"],
   },
@@ -53,6 +57,7 @@ const techData = [
     ring: 2,
     speed: 0.25,
     phaseOffset: 3.8,
+    level: "Advanced",
     description: "Cross-platform mobile framework for building iOS & Android apps with React.",
     projects: ["Mobile Apps", "Expo Projects"],
   },
@@ -63,6 +68,7 @@ const techData = [
     ring: 2,
     speed: 0.18,
     phaseOffset: 5.2,
+    level: "Core Skill",
     description: "Full-stack React framework with SSR, SSG, and API routes built-in.",
     projects: ["AutoYT", "CanvasCraft", "Clipgen AI"],
   },
@@ -73,6 +79,7 @@ const techData = [
     ring: 3,
     speed: 0.15,
     phaseOffset: 1.2,
+    level: "Intermediate",
     description: "Versatile language for AI/ML scripting, automation, and backend services.",
     projects: ["AI Tools", "Data Scripts"],
   },
@@ -83,6 +90,7 @@ const techData = [
     ring: 3,
     speed: 0.17,
     phaseOffset: 2.8,
+    level: "Advanced",
     description: "Machine learning integrations using Gemini, OpenAI, and Together AI APIs.",
     projects: ["AutoYT", "InspireGem", "Synthara"],
   },
@@ -93,6 +101,7 @@ const techData = [
     ring: 3,
     speed: 0.14,
     phaseOffset: 4.4,
+    level: "Core Skill",
     description: "Utility-first CSS framework for building modern, responsive UIs at speed.",
     projects: ["This Portfolio", "All Web Projects"],
   },
@@ -103,6 +112,7 @@ const techData = [
     ring: 3,
     speed: 0.16,
     phaseOffset: 0.4,
+    level: "Advanced",
     description: "Typed superset of JavaScript that catches bugs early and improves code quality.",
     projects: ["Modern Projects", "SaaS Platforms"],
   },
@@ -113,6 +123,7 @@ const techData = [
     ring: 3,
     speed: 0.13,
     phaseOffset: 3.5,
+    level: "Intermediate",
     description: "Minimalist Node.js web framework for building REST APIs and web servers.",
     projects: ["Backend APIs", "Full-Stack Projects"],
   },
@@ -123,9 +134,22 @@ const techData = [
     ring: 1,
     speed: 0.4,
     phaseOffset: Math.PI,
+    level: "Advanced",
     description: "Production-ready animation library for React with physics-based motion.",
     projects: ["This Portfolio", "Interactive UIs"],
   },
+];
+
+// Connection pairs — IDs of techs that are commonly used together
+const CONNECTIONS = [
+  ["react", "nextjs"],
+  ["react", "tailwind"],
+  ["nodejs", "mongodb"],
+  ["nodejs", "express"],
+  ["nextjs", "typescript"],
+  ["ai", "python"],
+  ["react", "threejs"],
+  ["reactnative", "react"],
 ];
 
 // Ring radii
@@ -268,9 +292,58 @@ const OrbitRing = ({ radius }) => {
   );
 };
 
+// ─── Connection line between two tech nodes ───────────────────────────────────
+// Uses a simple line that updates its endpoints each frame using the nodes' live positions
+const ConnectionLine = ({ nodeA, nodeB, nodes }) => {
+  const lineRef = useRef();
+  const posA = useRef(new THREE.Vector3());
+  const posB = useRef(new THREE.Vector3());
+
+  const geometry = useMemo(() => {
+    const geo = new THREE.BufferGeometry();
+    const positions = new Float32Array(6); // 2 points × 3 coords
+    geo.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+    return geo;
+  }, []);
+
+  useFrame(() => {
+    // Compute expected positions based on current time (same formula as TechNode)
+    [nodeA, nodeB].forEach((tech, i) => {
+      const t = (Date.now() * 0.001 * tech.speed) + tech.phaseOffset;
+      const radius = RING_RADII[tech.ring];
+      const x = Math.cos(t) * radius;
+      const z = Math.sin(t) * radius;
+      const y = Math.sin(t * 0.7 + tech.phaseOffset) * 0.6;
+      if (i === 0) posA.current.set(x, y, z);
+      else posB.current.set(x, y, z);
+    });
+
+    if (lineRef.current) {
+      const pos = lineRef.current.geometry.attributes.position;
+      pos.setXYZ(0, posA.current.x, posA.current.y, posA.current.z);
+      pos.setXYZ(1, posB.current.x, posB.current.y, posB.current.z);
+      pos.needsUpdate = true;
+    }
+  });
+
+  return (
+    <line ref={lineRef} geometry={geometry}>
+      <lineBasicMaterial color="#38bdf8" opacity={0.18} transparent />
+    </line>
+  );
+};
+
 // ─── Scene ────────────────────────────────────────────────────────────────────
 const GalaxyScene = ({ onHover, onNodeClick, hovered, isMobile }) => {
   const nodes = isMobile ? techData.filter((t) => t.ring < 3) : techData;
+  const nodeMap = useMemo(() => Object.fromEntries(techData.map((t) => [t.id, t])), []);
+  const activeConnections = useMemo(
+    () =>
+      CONNECTIONS.filter(
+        ([a, b]) => nodes.find((n) => n.id === a) && nodes.find((n) => n.id === b)
+      ),
+    [nodes]
+  );
 
   return (
     <>
@@ -288,6 +361,11 @@ const GalaxyScene = ({ onHover, onNodeClick, hovered, isMobile }) => {
         <OrbitRing key={r} radius={r} />
       ))}
 
+      {/* Connection lines between related techs */}
+      {activeConnections.map(([a, b]) => (
+        <ConnectionLine key={`${a}-${b}`} nodeA={nodeMap[a]} nodeB={nodeMap[b]} />
+      ))}
+
       {/* Tech nodes */}
       {nodes.map((tech) => (
         <TechNode
@@ -300,6 +378,13 @@ const GalaxyScene = ({ onHover, onNodeClick, hovered, isMobile }) => {
       ))}
     </>
   );
+};
+
+// ─── Skill level badge colors ─────────────────────────────────────────────────
+const LEVEL_STYLES = {
+  "Core Skill": "bg-primary-500/20 text-primary-300 border-primary-500/30",
+  "Advanced":   "bg-green-500/20 text-green-300 border-green-500/30",
+  "Intermediate": "bg-amber-500/20 text-amber-300 border-amber-500/30",
 };
 
 // ─── Tech Info Card (HTML overlay) ───────────────────────────────────────────
@@ -324,13 +409,19 @@ const TechInfoCard = ({ tech, onClose }) => (
           </svg>
         </button>
         {/* Color dot + name */}
-        <div className="flex items-center gap-2 mb-3">
+        <div className="flex items-center gap-2 mb-2">
           <span
             className="w-3 h-3 rounded-full flex-shrink-0"
             style={{ backgroundColor: tech.color, boxShadow: `0 0 8px ${tech.color}` }}
           />
           <h3 className="font-bold text-neutral-100 text-base">{tech.label}</h3>
         </div>
+        {/* Skill level badge */}
+        {tech.level && (
+          <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border mb-3 ${LEVEL_STYLES[tech.level] || LEVEL_STYLES["Intermediate"]}`}>
+            {tech.level}
+          </span>
+        )}
         <p className="text-neutral-400 text-xs leading-relaxed mb-3">{tech.description}</p>
         {tech.projects?.length > 0 && (
           <div>
@@ -364,7 +455,7 @@ const TechGalaxy = ({ performanceMode = false }) => {
   }, [isMobile]);
 
   if (performanceMode) {
-    // Fallback: simple tech grid
+    // Fallback: simple tech chip grid with skill level badges
     return (
       <div className="w-full grid grid-cols-3 sm:grid-cols-4 gap-3 py-8">
         {techData.map((tech) => (
@@ -377,6 +468,11 @@ const TechGalaxy = ({ performanceMode = false }) => {
               style={{ backgroundColor: tech.color }}
             />
             <span className="text-xs text-neutral-300 font-medium text-center">{tech.label}</span>
+            {tech.level && (
+              <span className={`text-[9px] px-1.5 py-0.5 rounded-full border ${LEVEL_STYLES[tech.level] || LEVEL_STYLES["Intermediate"]}`}>
+                {tech.level}
+              </span>
+            )}
           </div>
         ))}
       </div>

@@ -7,9 +7,13 @@ import { Link } from "react-router-dom";
 import { currentProjectAtom, projects } from "./Projects";
 import { Blog } from "./Blog";
 import axios from "axios";
+import { GitHubCalendar } from "react-github-calendar";
 
 // Lazy-load the heavy 3D TechGalaxy component
 const TechGalaxy = lazy(() => import("./TechGalaxy"));
+
+// GitHub profile used across API calls and the calendar widget
+const GITHUB_USERNAME = "ArhanAnsari";
 
 // Animated counter hook
 const useAnimatedCounter = (end, duration = 2000, startOnView = true) => {
@@ -204,8 +208,8 @@ export const Interface = (props) => {
 
       try {
         const [userRes, reposRes] = await Promise.all([
-          axios.get("https://api.github.com/users/ArhanAnsari"),
-          axios.get("https://api.github.com/users/ArhanAnsari/repos?sort=updated&per_page=30"),
+          axios.get(`https://api.github.com/users/${GITHUB_USERNAME}`),
+          axios.get(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=30`),
         ]);
 
         const repos = reposRes.data;
@@ -2787,6 +2791,32 @@ const GitHubActivitySection = ({ stats }) => {
           <GitHubStatCard icon="⭐" label="GitHub Stars" value={stars} color="text-yellow-400" delay={0.2} />
           <GitHubStatCard icon="💻" label="Hours Coded" value={1000} color="text-green-400" delay={0.3} />
         </div>
+
+        {/* GitHub Contribution Heatmap */}
+        <motion.div
+          className="glass-morphism rounded-2xl p-6 space-y-4 overflow-x-auto"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.35 }}
+          viewport={{ once: true }}
+        >
+          <h3 className="font-bold text-neutral-200 flex items-center gap-2">
+            <span>📅</span> Contribution Activity
+          </h3>
+          <div className="min-w-0">
+            <GitHubCalendar
+              username={GITHUB_USERNAME}
+              colorScheme="dark"
+              fontSize={12}
+              blockSize={13}
+              blockMargin={4}
+              theme={{
+                dark: ["#1e293b", "#0c4a6e", "#0369a1", "#0284c7", "#38bdf8"],
+              }}
+              style={{ width: "100%" }}
+            />
+          </div>
+        </motion.div>
 
         {/* Two-column: Languages + Latest Repos */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
