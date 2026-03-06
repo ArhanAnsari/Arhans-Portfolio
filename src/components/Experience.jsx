@@ -41,10 +41,11 @@ const FloatingShape = ({ position, geometry, color, speed = 1, scale = 1 }) => {
 };
 
 export const Experience = (props) => {
-  const { menuOpened, section: parentSection, setSection } = props;
+  const { menuOpened, section: parentSection, setSection, performanceMode = false } = props;
   const { viewport } = useThree();
 
   const isMobile = window.innerWidth < 768;
+  const isLowPower = performanceMode || isMobile;
   const responsiveRatio = viewport.width / 12;
   const officeScaleRatio = Math.max(0.5, Math.min(0.9 * responsiveRatio, 0.9));
 
@@ -229,6 +230,39 @@ export const Experience = (props) => {
             scaleY: isMobile ? 0.9 : 1,
             scaleZ: isMobile ? 0.9 : 1,
           },
+          11: {
+            y: 1,
+            x: isMobile ? 0 : -1.5,
+            z: isMobile ? 6 : 7,
+            rotateX: 0,
+            rotateY: Math.PI / 6,
+            rotateZ: 0,
+            scaleX: isMobile ? 0.9 : 1,
+            scaleY: isMobile ? 0.9 : 1,
+            scaleZ: isMobile ? 0.9 : 1,
+          },
+          12: {
+            y: 0.5,
+            x: isMobile ? 0 : 2,
+            z: isMobile ? 5 : 6,
+            rotateX: 0,
+            rotateY: -Math.PI / 4,
+            rotateZ: 0,
+            scaleX: 1,
+            scaleY: 1,
+            scaleZ: 1,
+          },
+          13: {
+            y: 1,
+            x: isMobile ? 0 : -2,
+            z: isMobile ? 5 : 6,
+            rotateX: 0,
+            rotateY: Math.PI / 4,
+            rotateZ: 0,
+            scaleX: 1,
+            scaleY: 1,
+            scaleZ: 1,
+          },
         }}
       >
         <Avatar animation={characterAnimation} wireframe={localSection === 1} />
@@ -237,12 +271,12 @@ export const Experience = (props) => {
       <directionalLight position={[5, 5, 5]} intensity={0.8} castShadow />
       <directionalLight position={[-5, 3, -5]} intensity={0.4} />
 
-      {/* Hero background floating shapes - only visible at section 0 */}
+      {/* Hero background floating shapes - only visible at section 0, desktop only */}
       <motion.group
         animate={{ opacity: localSection === 0 ? 1 : 0 }}
         transition={{ duration: 0.8 }}
       >
-        {!isMobile && (
+        {!isLowPower && (
           <>
             <FloatingShape
               position={[-6, 2, -5]}

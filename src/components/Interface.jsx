@@ -1241,7 +1241,7 @@ const ProjectCard = ({ project, index, onClick }) => {
           {project.title}
         </h3>
         
-        <p className="text-neutral-400 text-sm line-clamp-3 leading-relaxed">
+        <p className="text-neutral-400 text-sm line-clamp-3 leading-relaxed" title={project.description}>
           {project.description}
         </p>
 
@@ -1442,7 +1442,7 @@ const CurrentlyBuildingSection = () => {
                   <h3 className="text-xl font-bold text-neutral-100 mb-2 group-hover:text-primary-300 transition-colors">
                     {project.title}
                   </h3>
-                  <p className="text-neutral-400 text-sm leading-relaxed line-clamp-3">
+                  <p className="text-neutral-400 text-sm leading-relaxed line-clamp-3" title={project.description}>
                     {project.description}
                   </p>
                 </div>
@@ -2343,7 +2343,7 @@ const RecognitionsSection = () => (
               <h3 className="font-bold text-neutral-100 text-sm leading-snug group-hover:text-primary-300 transition-colors">
                 {item.title}
               </h3>
-              <p className="text-neutral-500 text-xs leading-relaxed line-clamp-3">{item.description}</p>
+              <p className="text-neutral-500 text-xs leading-relaxed line-clamp-3" title={item.description}>{item.description}</p>
             </div>
           </motion.div>
         ))}

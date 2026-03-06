@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const commands = [
@@ -123,15 +123,27 @@ export const CommandPalette = ({ onSectionChange }) => {
     },
   };
 
-  const filtered = commands.filter(
-    (cmd) =>
-      query === "" ||
-      cmd.label.toLowerCase().includes(query.toLowerCase()) ||
-      cmd.description.toLowerCase().includes(query.toLowerCase()) ||
-      cmd.category.toLowerCase().includes(query.toLowerCase())
+  const filtered = useMemo(() => {
+    const q = query.toLowerCase();
+    if (!q) return commands;
+    return commands.filter(
+      (cmd) =>
+        cmd.label.toLowerCase().includes(q) ||
+        cmd.description.toLowerCase().includes(q) ||
+        cmd.category.toLowerCase().includes(q)
+    );
+  }, [query]);
+
+  const categories = useMemo(
+    () => [...new Set(filtered.map((c) => c.category))],
+    [filtered]
   );
 
-  const categories = [...new Set(filtered.map((c) => c.category))];
+  // Flat ordered list for keyboard nav
+  const allFiltered = useMemo(
+    () => categories.flatMap((cat) => filtered.filter((c) => c.category === cat)),
+    [categories, filtered]
+  );
 
   // Keyboard shortcut to open
   useEffect(() => {
@@ -161,28 +173,23 @@ export const CommandPalette = ({ onSectionChange }) => {
     const handler = (e) => {
       if (e.key === "ArrowDown") {
         e.preventDefault();
-        setSelectedIndex((i) => Math.min(i + 1, filtered.length - 1));
+        setSelectedIndex((i) => Math.min(i + 1, allFiltered.length - 1));
       } else if (e.key === "ArrowUp") {
         e.preventDefault();
         setSelectedIndex((i) => Math.max(i - 1, 0));
-      } else if (e.key === "Enter" && filtered[selectedIndex]) {
-        filtered[selectedIndex].action(ctx);
+      } else if (e.key === "Enter" && allFiltered[selectedIndex]) {
+        allFiltered[selectedIndex].action(ctx);
         setOpen(false);
       }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [open, selectedIndex, filtered]);
+  }, [open, selectedIndex, allFiltered]);
 
   // Reset selection on query change
   useEffect(() => {
     setSelectedIndex(0);
   }, [query]);
-
-  // Flat index for keyboard nav across categories
-  const allFiltered = categories.flatMap((cat) =>
-    filtered.filter((c) => c.category === cat)
-  );
 
   return (
     <AnimatePresence>

@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
 import { MotionConfig, motion, useScroll, useSpring } from "framer-motion";
 import { Leva } from "leva";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import { Cursor } from "./components/Cursor";
 import { Experience } from "./components/Experience";
 import { Interface } from "./components/Interface";
@@ -27,6 +27,17 @@ function App() {
   const [theme, setTheme] = useAtom(themeAtom);
   const location = useLocation();
   const isResumePage = location.pathname === "/resume";
+
+  // Detect low-power / mobile for performance mode (static — computed once)
+  const isPerformanceMode = useMemo(
+    () =>
+      typeof navigator !== "undefined"
+        ? (navigator.hardwareConcurrency != null && navigator.hardwareConcurrency <= 4) ||
+          window.innerWidth < 768 ||
+          /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+        : false,
+    []
+  );
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -94,7 +105,7 @@ function App() {
         {!isResumePage && (
           <div className="fixed top-0 left-0 w-screen h-screen z-0 pointer-events-none">
             <Canvas 
-              shadows 
+              shadows={!isPerformanceMode}
               camera={{ 
                 position: [0, 3, 10], 
                 fov: window.innerWidth < 768 ? 50 : 42,
@@ -102,13 +113,13 @@ function App() {
                 far: 1000
               }}
               gl={{ 
-                antialias: true,
+                antialias: !isPerformanceMode,
                 alpha: true,
-                powerPreference: "high-performance",
-                logarithmicDepthBuffer: true,
-                precision: "mediump"
+                powerPreference: isPerformanceMode ? "default" : "high-performance",
+                logarithmicDepthBuffer: !isPerformanceMode,
+                precision: isPerformanceMode ? "lowp" : "mediump"
               }}
-              dpr={window.innerWidth < 768 ? 1 : window.devicePixelRatio}
+              dpr={isPerformanceMode ? 1 : Math.min(window.devicePixelRatio, 2)}
               style={{ display: 'block', width: '100%', height: '100%' }}
             >
               <color attach="background" args={[theme === "light" ? "#f8fafc" : "#0f172a"]} />
@@ -116,7 +127,7 @@ function App() {
             
               <Suspense fallback={null}>
                 {started && (
-                  <Experience section={section} menuOpened={menuOpened} setSection={setSection} />
+                  <Experience section={section} menuOpened={menuOpened} setSection={setSection} performanceMode={isPerformanceMode} />
                 )}
               </Suspense>
             </Canvas>
@@ -201,6 +212,19 @@ function App() {
           <kbd className="bg-neutral-800 border border-neutral-700 rounded px-1.5 py-0.5 text-[10px]">⌘</kbd>
           <kbd className="bg-neutral-800 border border-neutral-700 rounded px-1.5 py-0.5 text-[10px]">K</kbd>
           <span>command palette</span>
+        </motion.div>
+      )}
+
+      {/* Performance mode indicator */}
+      {!isResumePage && started && isPerformanceMode && (
+        <motion.div
+          className="fixed bottom-6 right-6 z-40 flex items-center gap-1.5 px-3 py-1.5 glass-morphism-dark rounded-full text-green-400 text-[10px] font-medium border border-green-500/20 select-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 2 }}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-green-400" />
+          Performance Mode
         </motion.div>
       )}
 
