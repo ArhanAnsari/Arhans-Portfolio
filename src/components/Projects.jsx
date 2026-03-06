@@ -66,7 +66,15 @@ export const projects = [
 		description: "AI-powered chat interface with conversation history and modern UI design.",
 		category: "ai",
 		type: "learning",
-		technologies: ["React", "OpenAI API", "Node.js", "Express"]
+		technologies: ["React", "OpenAI API", "Node.js", "Express"],
+		architecture: {
+			layers: [
+				{ id: "user", label: "User", icon: "👤", description: "Browser-based client interacting with the chat UI.", tech: ["React", "Tailwind CSS"] },
+				{ id: "frontend", label: "React Frontend", icon: "⚛️", description: "Renders the chat UI, manages message state, and streams tokens to the display.", tech: ["React", "Framer Motion"] },
+				{ id: "api", label: "Express API", icon: "🔌", description: "REST endpoint that receives user messages, sanitises input, and forwards to OpenAI.", tech: ["Node.js", "Express"] },
+				{ id: "ai", label: "OpenAI API", icon: "🤖", description: "GPT model processes the conversation history and returns a streamed response.", tech: ["OpenAI GPT-4o"] },
+			],
+		},
 	},
 	{
 		title: "Smart ChatBot",
@@ -86,7 +94,15 @@ export const projects = [
 		description: "Full-stack coding platform with problem sets, code editor, and test cases.",
 		category: "education",
 		type: "inspired",
-		technologies: ["React", "Node.js", "MongoDB", "Monaco Editor"]
+		technologies: ["React", "Node.js", "MongoDB", "Monaco Editor"],
+		architecture: {
+			layers: [
+				{ id: "user", label: "User", icon: "👤", description: "Developer solves coding challenges in the browser.", tech: [] },
+				{ id: "editor", label: "Monaco Editor", icon: "📝", description: "VS Code-powered in-browser code editor with syntax highlighting and auto-complete.", tech: ["Monaco Editor", "React"] },
+				{ id: "runner", label: "Code Runner API", icon: "⚙️", description: "Sandboxed Node.js service that executes submitted code against test cases safely.", tech: ["Node.js", "Express"] },
+				{ id: "db", label: "MongoDB", icon: "🗄️", description: "Stores problems, user progress, submissions, and test case results.", tech: ["MongoDB", "Mongoose"] },
+			],
+		},
 	},
 	{
 		title: "Game Hub",
@@ -176,7 +192,15 @@ export const projects = [
 		description: "Collaborative design tool with live cursor, comments, and drawing on canvas.",
 		category: "productivity",
 		type: "inspired",
-		technologies: ["Next.js", "Fabric.js", "Liveblocks", "Tailwind CSS"]
+		technologies: ["Next.js", "Fabric.js", "Liveblocks", "Tailwind CSS"],
+		architecture: {
+			layers: [
+				{ id: "user", label: "User A / User B", icon: "👥", description: "Multiple users collaborate simultaneously on the same canvas in real time.", tech: [] },
+				{ id: "canvas", label: "Fabric.js Canvas", icon: "🎨", description: "High-performance canvas rendering library that handles shapes, images, and transformations.", tech: ["Fabric.js", "Next.js"] },
+				{ id: "liveblocks", label: "Liveblocks Sync Layer", icon: "⚡", description: "Real-time CRDT synchronisation layer that broadcasts cursor positions and canvas mutations.", tech: ["Liveblocks"] },
+				{ id: "storage", label: "Cloud Storage", icon: "☁️", description: "Persists canvas state, shared comments, and design assets so sessions are recoverable.", tech: ["Vercel", "Liveblocks Storage"] },
+			],
+		},
 	},
 	{
 		title: "Rediscord",

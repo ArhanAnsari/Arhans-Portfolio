@@ -26,6 +26,8 @@ export const Menu = (props) => {
     { label: "Recognitions", section: 11, icon: "🎖️" },
     { label: "Hire Me", section: 12, icon: "💼" },
     { label: "Contact", section: 13, icon: "📬" },
+    { label: "Tech Galaxy", section: 14, icon: "🌌" },
+    { label: "GitHub Activity", section: 15, icon: "📊" },
   ];
 
   // 🔥 Smooth scroll handler

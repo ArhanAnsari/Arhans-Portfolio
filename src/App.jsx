@@ -73,7 +73,7 @@ function App() {
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
-      const newSection = Math.min(Math.floor(scrollY / windowHeight), 13);
+      const newSection = Math.min(Math.floor(scrollY / windowHeight), 15);
       
       if (newSection !== section) {
         setSection(newSection);
@@ -139,7 +139,7 @@ function App() {
             <>
               {started && (
                 <div className="relative z-10 w-full pointer-events-auto">
-                  <Interface setSection={setSection} />
+                  <Interface setSection={setSection} performanceMode={isPerformanceMode} />
                 </div>
               )}
               

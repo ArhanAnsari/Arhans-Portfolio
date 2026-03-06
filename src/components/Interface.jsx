@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useRef, useState, useCallback, useMemo, lazy, Suspense as ReactSuspense } from "react";
 import emailjs from "@emailjs/browser";
 import { ValidationError, useForm } from "@formspree/react";
 import { motion, AnimatePresence, useInView, useMotionValue, useSpring } from "framer-motion";
@@ -7,6 +7,9 @@ import { Link } from "react-router-dom";
 import { currentProjectAtom, projects } from "./Projects";
 import { Blog } from "./Blog";
 import axios from "axios";
+
+// Lazy-load the heavy 3D TechGalaxy component
+const TechGalaxy = lazy(() => import("./TechGalaxy"));
 
 // Animated counter hook
 const useAnimatedCounter = (end, duration = 2000, startOnView = true) => {
@@ -174,24 +177,54 @@ const services = [
 ];
 
 export const Interface = (props) => {
-  const { setSection } = props;
+  const { setSection, performanceMode = false } = props;
   const [githubStats, setGithubStats] = useState({
     contributions: 1869,
     repos: 250,
-    stars: 0
+    stars: 0,
+    topLanguages: [],
+    latestRepos: [],
   });
 
   useEffect(() => {
     const fetchGithubStats = async () => {
       try {
-        const response = await axios.get("https://api.github.com/users/ArhanAnsari");
-        const reposResponse = await axios.get("https://api.github.com/users/ArhanAnsari/repos");
-        const stars = reposResponse.data.reduce((acc, repo) => acc + repo.stargazers_count, 0);
-        
+        const [userRes, reposRes] = await Promise.all([
+          axios.get("https://api.github.com/users/ArhanAnsari"),
+          axios.get("https://api.github.com/users/ArhanAnsari/repos?sort=updated&per_page=30"),
+        ]);
+
+        const repos = reposRes.data;
+        const stars = repos.reduce((acc, repo) => acc + repo.stargazers_count, 0);
+
+        // Top languages
+        const langMap = {};
+        repos.forEach((repo) => {
+          if (repo.language) langMap[repo.language] = (langMap[repo.language] || 0) + 1;
+        });
+        const topLanguages = Object.entries(langMap)
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 6)
+          .map(([name, count]) => ({ name, count }));
+
+        // Latest repos (non-fork, with description)
+        const latestRepos = repos
+          .filter((r) => !r.fork)
+          .slice(0, 5)
+          .map((r) => ({
+            name: r.name,
+            description: r.description || "No description",
+            stars: r.stargazers_count,
+            language: r.language,
+            url: r.html_url,
+          }));
+
         setGithubStats({
-          contributions: 1869, // Note: Contributions require GraphQL API or scraping, keeping hardcoded for now
-          repos: response.data.public_repos,
-          stars: stars
+          contributions: 1869,
+          repos: userRes.data.public_repos,
+          stars,
+          topLanguages,
+          latestRepos,
         });
       } catch (error) {
         console.error("Error fetching GitHub stats:", error);
@@ -228,6 +261,8 @@ export const Interface = (props) => {
         <div id="section-11"><RecognitionsSection /></div>
         <div id="section-12"><HireMeSection setSection={setSection} /></div>
         <div id="section-13"><ContactSection /></div>
+        <div id="section-14"><TechGalaxySection performanceMode={performanceMode} /></div>
+        <div id="section-15"><GitHubActivitySection stats={githubStats} /></div>
       </div>
     </div>
   );
@@ -1033,12 +1068,20 @@ const FeaturedProjectCard = ({ project, index, onClick, compact = false }) => {
 };
 
 const ProjectCaseStudyModal = ({ project, onClose }) => {
+  const [activeTab, setActiveTab] = useState("overview");
+
   // Press Escape to close
   useEffect(() => {
     const handler = (e) => { if (e.key === "Escape") onClose(); };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
+
+  const tabs = useMemo(() => {
+    const t = [{ id: "overview", label: "Overview" }];
+    if (project.architecture) t.push({ id: "architecture", label: "Architecture" });
+    return t;
+  }, [project]);
 
   return (
     <motion.div
@@ -1094,63 +1137,90 @@ const ProjectCaseStudyModal = ({ project, onClose }) => {
           </div>
         </div>
 
-        {/* Body */}
-        <div className="p-6 space-y-6">
-          {/* Overview */}
-          <div>
-            <h3 className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-2">Overview</h3>
-            <p className="text-neutral-300 text-sm leading-relaxed">{project.description}</p>
+        {/* Tabs */}
+        {tabs.length > 1 && (
+          <div className="flex border-b border-neutral-800 px-6 pt-4">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-4 py-2 text-sm font-medium transition-all duration-200 border-b-2 -mb-px ${
+                  activeTab === tab.id
+                    ? "border-primary-400 text-primary-300"
+                    : "border-transparent text-neutral-500 hover:text-neutral-300"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
+        )}
 
-          {/* Tech Stack */}
-          {project.technologies && (
-            <div>
-              <h3 className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-3">Tech Stack</h3>
-              <div className="flex flex-wrap gap-2">
-                {project.technologies.map((tech) => (
-                  <span key={tech} className="px-3 py-1 bg-primary-500/10 border border-primary-500/30 text-primary-300 text-xs rounded-full font-medium">
-                    {tech}
-                  </span>
-                ))}
+        {/* Body */}
+        <div className="p-6">
+          {activeTab === "overview" && (
+            <div className="space-y-6">
+              {/* Overview */}
+              <div>
+                <h3 className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-2">Overview</h3>
+                <p className="text-neutral-300 text-sm leading-relaxed">{project.description}</p>
+              </div>
+
+              {/* Tech Stack */}
+              {project.technologies && (
+                <div>
+                  <h3 className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-3">Tech Stack</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {project.technologies.map((tech) => (
+                      <span key={tech} className="px-3 py-1 bg-primary-500/10 border border-primary-500/30 text-primary-300 text-xs rounded-full font-medium">
+                        {tech}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Category */}
+              <div>
+                <h3 className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-2">Category</h3>
+                <span className="px-3 py-1 bg-neutral-800 text-neutral-300 text-xs rounded-full capitalize">
+                  {project.category || "Web"}
+                </span>
+              </div>
+
+              {/* Actions */}
+              <div className="flex flex-wrap gap-3 pt-2 border-t border-neutral-700/50">
+                <a
+                  href={project.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 px-5 py-2.5 btn-gradient-primary text-white rounded-xl text-sm font-semibold"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                  </svg>
+                  Live Demo
+                </a>
+                {project.github && (
+                  <a
+                    href={project.github}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-2 px-5 py-2.5 bg-neutral-800 border border-neutral-700 text-neutral-200 rounded-xl text-sm font-semibold hover:bg-neutral-700 transition-colors"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    GitHub
+                  </a>
+                )}
               </div>
             </div>
           )}
 
-          {/* Category */}
-          <div>
-            <h3 className="text-sm font-semibold text-primary-400 uppercase tracking-wider mb-2">Category</h3>
-            <span className="px-3 py-1 bg-neutral-800 text-neutral-300 text-xs rounded-full capitalize">
-              {project.category || "Web"}
-            </span>
-          </div>
-
-          {/* Actions */}
-          <div className="flex flex-wrap gap-3 pt-2 border-t border-neutral-700/50">
-            <a
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 px-5 py-2.5 btn-gradient-primary text-white rounded-xl text-sm font-semibold"
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-              Live Demo
-            </a>
-            {project.github && (
-              <a
-                href={project.github}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-5 py-2.5 bg-neutral-800 border border-neutral-700 text-neutral-200 rounded-xl text-sm font-semibold hover:bg-neutral-700 transition-colors"
-              >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
-                </svg>
-                GitHub
-              </a>
-            )}
-          </div>
+          {activeTab === "architecture" && project.architecture && (
+            <ArchitectureDiagram architecture={project.architecture} />
+          )}
         </div>
       </motion.div>
     </motion.div>
@@ -2457,6 +2527,376 @@ const HireMeSection = ({ setSection }) => {
           <p className="text-neutral-600 text-sm">
             💬 Usually responds within 24 hours &nbsp;·&nbsp; 🌏 Available for remote work worldwide
           </p>
+        </motion.div>
+      </motion.div>
+    </Section>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ARCHITECTURE DIAGRAM (used inside ProjectCaseStudyModal)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const ArchitectureDiagram = ({ architecture }) => {
+  const [hoveredNode, setHoveredNode] = useState(null);
+
+  return (
+    <div className="space-y-4">
+      <p className="text-neutral-500 text-xs">
+        Hover over any layer to learn more. Arrows show system flow.
+      </p>
+      <div className="relative flex flex-col items-center gap-0 py-4">
+        {architecture.layers.map((layer, index) => (
+          <div key={layer.id} className="relative flex flex-col items-center w-full">
+            {/* Arrow from previous */}
+            {index > 0 && (
+              <motion.div
+                className="w-px h-8 bg-gradient-to-b from-primary-500/60 to-primary-500/20 relative"
+                initial={{ height: 0 }}
+                whileInView={{ height: 32 }}
+                transition={{ duration: 0.4, delay: index * 0.08 }}
+                viewport={{ once: true }}
+              >
+                {/* Arrow head */}
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0"
+                  style={{
+                    borderLeft: "5px solid transparent",
+                    borderRight: "5px solid transparent",
+                    borderTop: "6px solid rgba(14,165,233,0.6)",
+                  }}
+                />
+              </motion.div>
+            )}
+
+            {/* Layer node */}
+            <motion.div
+              className={`relative w-full max-w-sm px-5 py-3 rounded-xl border cursor-pointer transition-all duration-200 ${
+                hoveredNode === layer.id
+                  ? "border-primary-400 bg-primary-500/10 shadow-[0_0_16px_rgba(14,165,233,0.2)]"
+                  : "border-neutral-700/50 bg-neutral-800/40"
+              }`}
+              initial={{ opacity: 0, y: 10 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: index * 0.1 }}
+              viewport={{ once: true }}
+              onMouseEnter={() => setHoveredNode(layer.id)}
+              onMouseLeave={() => setHoveredNode(null)}
+              onFocus={() => setHoveredNode(layer.id)}
+              onBlur={() => setHoveredNode(null)}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="text-lg">{layer.icon}</span>
+                  <div>
+                    <p className="font-semibold text-neutral-100 text-sm">{layer.label}</p>
+                    {layer.tech && (
+                      <p className="text-[10px] text-primary-400 mt-0.5">{layer.tech.join(" · ")}</p>
+                    )}
+                  </div>
+                </div>
+                <svg className={`w-4 h-4 transition-transform ${hoveredNode === layer.id ? "rotate-90" : ""} text-neutral-500`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
+
+              {/* Expanded description */}
+              <AnimatePresence>
+                {hoveredNode === layer.id && layer.description && (
+                  <motion.p
+                    className="text-xs text-neutral-400 mt-2 leading-relaxed"
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    {layer.description}
+                  </motion.p>
+                )}
+              </AnimatePresence>
+            </motion.div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TECH STACK GALAXY (section 14)
+// ─────────────────────────────────────────────────────────────────────────────
+const TechGalaxySection = ({ performanceMode }) => (
+  <Section className="bg-gradient-to-b from-transparent via-neutral-950/20 to-transparent">
+    <motion.div
+      className="w-full max-w-6xl pl-8 md:pl-16 lg:pl-24 space-y-8"
+      whileInView="visible"
+      viewport={{ once: true }}
+    >
+      <div className="text-center space-y-4">
+        <motion.h2
+          className="text-responsive-lg font-display font-bold text-gradient"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          viewport={{ once: true }}
+        >
+          Tech Stack Galaxy
+        </motion.h2>
+        <motion.p
+          className="text-neutral-400 max-w-2xl mx-auto text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          viewport={{ once: true }}
+        >
+          Explore the technologies I work with — orbiting in 3D space. Click any node to learn more.
+        </motion.p>
+      </div>
+
+      <ReactSuspense
+        fallback={
+          <div className="flex items-center justify-center h-64 text-neutral-500 text-sm">
+            Loading galaxy…
+          </div>
+        }
+      >
+        <TechGalaxy performanceMode={performanceMode} />
+      </ReactSuspense>
+    </motion.div>
+  </Section>
+);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// GITHUB ACTIVITY (section 15)
+// ─────────────────────────────────────────────────────────────────────────────
+
+const LANG_COLORS = {
+  JavaScript: "#f7df1e",
+  TypeScript: "#3178c6",
+  Python: "#3776ab",
+  HTML: "#e34c26",
+  CSS: "#563d7c",
+  "Jupyter Notebook": "#da5b0b",
+  PHP: "#777bb4",
+  Shell: "#89e051",
+  Rust: "#dea584",
+  Go: "#00add8",
+};
+
+const GitHubStatCard = ({ icon, label, value, color, delay = 0 }) => {
+  const { count, ref } = useAnimatedCounter(typeof value === "number" ? value : 0, 1500);
+  return (
+    <motion.div
+      ref={ref}
+      className="glass-morphism rounded-2xl p-5 flex flex-col items-center gap-2 text-center"
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay }}
+      viewport={{ once: true }}
+      whileHover={{ y: -3, scale: 1.02 }}
+    >
+      <span className="text-3xl">{icon}</span>
+      <div className={`text-3xl font-bold ${color}`}>
+        {typeof value === "number" ? count.toLocaleString() : value}
+      </div>
+      <p className="text-neutral-400 text-xs font-medium">{label}</p>
+    </motion.div>
+  );
+};
+
+const GitHubActivitySection = ({ stats }) => {
+  const { repos, stars, contributions, topLanguages, latestRepos } = stats;
+  const maxCount = useMemo(
+    () => (topLanguages.length ? Math.max(...topLanguages.map((l) => l.count)) : 1),
+    [topLanguages]
+  );
+
+  // Fallback languages if API hasn't loaded yet
+  const languages = topLanguages.length
+    ? topLanguages
+    : [
+        { name: "JavaScript", count: 80 },
+        { name: "TypeScript", count: 45 },
+        { name: "Python", count: 25 },
+        { name: "HTML", count: 60 },
+        { name: "CSS", count: 40 },
+        { name: "PHP", count: 15 },
+      ];
+
+  return (
+    <Section alignRight className="bg-gradient-to-b from-transparent via-neutral-950/30 to-transparent">
+      <motion.div
+        className="w-full max-w-6xl pr-8 md:pr-16 lg:pr-24 space-y-12"
+        whileInView="visible"
+        viewport={{ once: true }}
+      >
+        {/* Header */}
+        <div className="text-center space-y-4">
+          <motion.h2
+            className="text-responsive-lg font-display font-bold text-gradient"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+          >
+            Developer Activity
+          </motion.h2>
+          <motion.p
+            className="text-neutral-400 max-w-2xl mx-auto text-center"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            viewport={{ once: true }}
+          >
+            Live GitHub metrics — contributions, repositories, and top languages
+          </motion.p>
+        </div>
+
+        {/* Stats grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <GitHubStatCard icon="🔥" label="Contributions" value={contributions} color="text-orange-400" delay={0} />
+          <GitHubStatCard icon="📦" label="Public Repos" value={repos} color="text-primary-400" delay={0.1} />
+          <GitHubStatCard icon="⭐" label="GitHub Stars" value={stars} color="text-yellow-400" delay={0.2} />
+          <GitHubStatCard icon="💻" label="Hours Coded" value={1000} color="text-green-400" delay={0.3} />
+        </div>
+
+        {/* Two-column: Languages + Latest Repos */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Top Languages */}
+          <motion.div
+            className="glass-morphism rounded-2xl p-6 space-y-4"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.3 }}
+            viewport={{ once: true }}
+          >
+            <h3 className="font-bold text-neutral-200 flex items-center gap-2">
+              <span>🧠</span> Top Languages
+            </h3>
+            <div className="space-y-3">
+              {languages.map((lang, i) => {
+                const color = LANG_COLORS[lang.name] || "#888";
+                const pct = Math.round((lang.count / maxCount) * 100);
+                return (
+                  <motion.div
+                    key={lang.name}
+                    initial={{ opacity: 0, x: -10 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: 0.4 + i * 0.07 }}
+                    viewport={{ once: true }}
+                  >
+                    <div className="flex justify-between text-xs text-neutral-400 mb-1">
+                      <span className="flex items-center gap-1.5">
+                        <span
+                          className="w-2.5 h-2.5 rounded-full inline-block flex-shrink-0"
+                          style={{ backgroundColor: color }}
+                        />
+                        {lang.name}
+                      </span>
+                      <span>{pct}%</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-neutral-800 rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full rounded-full"
+                        style={{ backgroundColor: color }}
+                        initial={{ width: 0 }}
+                        whileInView={{ width: `${pct}%` }}
+                        transition={{ duration: 0.8, delay: 0.5 + i * 0.07 }}
+                        viewport={{ once: true }}
+                      />
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+
+          {/* Latest repos */}
+          <motion.div
+            className="glass-morphism rounded-2xl p-6 space-y-4"
+            initial={{ opacity: 0, x: 20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            viewport={{ once: true }}
+          >
+            <h3 className="font-bold text-neutral-200 flex items-center gap-2">
+              <span>🗂️</span> Latest Repositories
+            </h3>
+            <div className="space-y-3">
+              {(latestRepos.length
+                ? latestRepos
+                : [
+                    { name: "Arhans-Portfolio", description: "Interactive 3D developer portfolio", stars: 0, language: "TypeScript", url: "https://github.com/ArhanAnsari/Arhans-Portfolio" },
+                    { name: "clipgen-ai", description: "AI-powered clip generator for creators", stars: 0, language: "JavaScript", url: "https://github.com/ArhanAnsari" },
+                    { name: "AutoYT", description: "Automated YouTube content pipeline", stars: 0, language: "TypeScript", url: "https://github.com/ArhanAnsari" },
+                  ]
+              ).map((repo, i) => (
+                <motion.a
+                  key={repo.name}
+                  href={repo.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start justify-between gap-3 p-3 rounded-xl bg-neutral-800/40 hover:bg-neutral-700/40 border border-neutral-700/30 hover:border-primary-500/40 transition-all duration-200 group"
+                  initial={{ opacity: 0, y: 8 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.5 + i * 0.08 }}
+                  viewport={{ once: true }}
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-neutral-200 group-hover:text-primary-300 transition-colors truncate">
+                      {repo.name}
+                    </p>
+                    <p className="text-xs text-neutral-500 mt-0.5 line-clamp-1" title={repo.description}>
+                      {repo.description}
+                    </p>
+                    {repo.language && (
+                      <span className="inline-flex items-center gap-1 mt-1 text-[10px] text-neutral-500">
+                        <span
+                          className="w-2 h-2 rounded-full"
+                          style={{ backgroundColor: LANG_COLORS[repo.language] || "#888" }}
+                        />
+                        {repo.language}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1 text-xs text-yellow-400 flex-shrink-0">
+                    <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    {repo.stars}
+                  </div>
+                </motion.a>
+              ))}
+              <a
+                href="https://github.com/ArhanAnsari"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-center text-xs text-primary-400 hover:text-primary-300 transition-colors mt-2"
+              >
+                View all repositories →
+              </a>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* GitHub link CTA */}
+        <motion.div
+          className="text-center"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          viewport={{ once: true }}
+        >
+          <a
+            href="https://github.com/ArhanAnsari"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 glass-morphism border border-neutral-700/50 hover:border-primary-500/50 text-neutral-200 rounded-xl font-semibold text-sm transition-all duration-300 hover:bg-primary-500/10"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 0C5.374 0 0 5.373 0 12 0 17.302 3.438 21.8 8.207 23.387c.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23A11.509 11.509 0 0112 5.803c1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576C20.566 21.797 24 17.3 24 12c0-6.627-5.373-12-12-12z"/>
+            </svg>
+            View Full GitHub Profile
+          </a>
         </motion.div>
       </motion.div>
     </Section>

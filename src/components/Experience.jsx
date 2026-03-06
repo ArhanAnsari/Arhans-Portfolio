@@ -263,6 +263,28 @@ export const Experience = (props) => {
             scaleY: 1,
             scaleZ: 1,
           },
+          14: {
+            y: 0.5,
+            x: isMobile ? 0 : 2.5,
+            z: isMobile ? 5 : 7,
+            rotateX: 0,
+            rotateY: -Math.PI / 3,
+            rotateZ: 0,
+            scaleX: isMobile ? 0.9 : 1,
+            scaleY: isMobile ? 0.9 : 1,
+            scaleZ: isMobile ? 0.9 : 1,
+          },
+          15: {
+            y: 1,
+            x: isMobile ? 0 : -2,
+            z: isMobile ? 5 : 6,
+            rotateX: 0,
+            rotateY: Math.PI / 5,
+            rotateZ: 0,
+            scaleX: 1,
+            scaleY: 1,
+            scaleZ: 1,
+          },
         }}
       >
         <Avatar animation={characterAnimation} wireframe={localSection === 1} />

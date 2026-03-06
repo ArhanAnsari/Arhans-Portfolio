@@ -106,6 +106,22 @@ const commands = [
     action: (ctx) => ctx.scrollTo(9),
     category: "Navigate",
   },
+  {
+    id: "galaxy",
+    label: "Tech Stack Galaxy",
+    description: "Interactive 3D tech exploration",
+    icon: "🌌",
+    action: (ctx) => ctx.scrollTo(14),
+    category: "Navigate",
+  },
+  {
+    id: "github-activity",
+    label: "GitHub Activity",
+    description: "Live developer stats & repos",
+    icon: "📊",
+    action: (ctx) => ctx.scrollTo(15),
+    category: "Navigate",
+  },
 ];
 
 export const CommandPalette = ({ onSectionChange }) => {

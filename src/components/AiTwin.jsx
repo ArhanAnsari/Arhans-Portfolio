@@ -1,6 +1,64 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, X, Minimize2, Maximize2, Loader, Mic, MicOff, Volume2, VolumeX } from "lucide-react";
+
+// ─── Quick suggestion prompts ─────────────────────────────────────────────────
+const QUICK_PROMPTS = [
+  "What projects has Arhan built?",
+  "What's Arhan's tech stack?",
+  "Is Arhan available for freelance?",
+  "Show me AI projects",
+];
+
+// ─── Extended knowledge base ──────────────────────────────────────────────────
+const KNOWLEDGE_BASE = {
+  projects: "Arhan has 250+ projects on GitHub! 🚀 Key highlights:\n• **AutoYT** — AI YouTube automation (Next.js, Gemini)\n• **CanvasCraft** — AI website builder (React, Three.js)\n• **Clipgen AI** — Creator tool (Next.js 15, Convex)\n• **Chat to PDF** — AI document chat (Next.js, LangChain)\n• **InspireGem** — AI inspiration platform (React, Gemini)\n• **3D Car Racing Game** — WebGL physics game (Three.js)\n• **Figma Clone** — Real-time collaborative design (Next.js, Liveblocks)\n\nVisit the Projects section to explore more!",
+  skills: "Arhan's tech stack:\n⚛️ **Frontend**: React, Next.js, Three.js, Framer Motion, Tailwind CSS\n🔧 **Backend**: Node.js, Express, Prisma, Convex\n🗄️ **Databases**: MongoDB, PostgreSQL\n📱 **Mobile**: React Native, Expo\n🤖 **AI/ML**: Google Gemini, OpenAI, Together AI, LangChain\n🎮 **3D**: Three.js, React Three Fiber, WebGL\n☁️ **DevOps**: Vercel, Railway, Docker, Git",
+  availability: "Yes! Arhan is currently **open for freelance and collaborative work**. 🟢\n\nAvailable for:\n✅ Full-Stack Web Development\n✅ Mobile App Development (React Native)\n✅ AI Integrations & SaaS\n✅ 3D Web Experiences\n✅ Freelance Projects\n\nHit the **Hire Me** section or email arhanansari2009@gmail.com!",
+  experience: "Arhan's journey:\n📅 **2021** — Started with HTML/CSS\n⚡ **2022** — Mastered JavaScript + MERN Stack\n🎮 **2023** — Discovered Three.js & 3D web\n🤖 **2024** — Built AI-powered SaaS tools\n📱 **2024** — Expanded to React Native mobile\n🏆 **2025** — 250+ projects, 1869 GitHub contributions, 3+ years experience",
+  achievements: "🏆 Arhan's achievements:\n• 1869+ GitHub contributions\n• 250+ projects completed\n• 🥇 Urjaa Brain Arithmetic Winner\n• 🏅 Math & Science Olympiad Gold Medalist\n• 🎓 Programming Club President\n• 20+ technologies mastered\n• 10/10 client satisfaction rating",
+  contact: "📬 Reach Arhan here:\n• Email: arhanansari2009@gmail.com\n• GitHub: github.com/ArhanAnsari\n• LinkedIn: linkedin.com/in/arhan-ansari-687597353\n• Twitter/X: @codewitharhan\n• Discord Community: discord.com/invite/bwjCXVwS8k\n\nOr scroll to the **Contact** section!",
+  ai: "Arhan's AI & ML projects:\n• **AutoYT** — AI YouTube content automation\n• **InspireGem** — AI creative inspiration tool\n• **Synthara** — AI music/media generation\n• **Chat to PDF** — Chat with any PDF document\n• **AI Chat Assistant** — OpenAI GPT-powered chat\n• **Clipgen AI** — AI-powered clip generation\n\nArhan integrates Gemini, OpenAI, Together AI & LangChain.",
+  mobile: "📱 Arhan's React Native projects:\n• Cross-platform iOS & Android apps\n• Built with **Expo** for rapid development\n• Real-time features with **Convex**\n• Auth with **Clerk**\n• Push notifications & native APIs\n\nScroll to the React Native section to see them!",
+  "3d": "🎮 Arhan's 3D projects:\n• **This Portfolio** — Full 3D interactive experience (Three.js + R3F)\n• **3D Car Racing Game** — WebGL physics game\n• **Arhan Guys** — Fall Guys-inspired 3D platformer\n• **Multiplayer Pirate Card Game** — Real-time 3D card game\n• **Tech Stack Galaxy** — Interactive 3D tech explorer\n\nArhan uses Three.js, React Three Fiber, Babylon.js & WebGL.",
+};
+
+// Navigate commands embedded in responses
+const NAV_COMMANDS = {
+  projects: 2,
+  "react native": 3,
+  skills: 1,
+  contact: 13,
+  "hire me": 12,
+  services: 7,
+  achievements: 5,
+  "currently building": 6,
+  journey: 10,
+  recognitions: 11,
+  blog: 9,
+  galaxy: 14,
+  github: 15,
+};
+
+// ─── Parse basic markdown (bold, newlines) ─────────────────────────────────
+const parseMarkdown = (text) => {
+  const lines = text.split("\n");
+  return lines.map((line, i) => {
+    const parts = line.split(/(\*\*[^*]+\*\*)/g);
+    return (
+      <span key={i}>
+        {parts.map((part, j) => {
+          if (part.startsWith("**") && part.endsWith("**")) {
+            return <strong key={j} className="text-primary-300 font-semibold">{part.slice(2, -2)}</strong>;
+          }
+          return part;
+        })}
+        {i < lines.length - 1 && <br />}
+      </span>
+    );
+  });
+};
+
 
 const AiTwin = () => {
   const [isOpen, setIsOpen] = useState(false);
