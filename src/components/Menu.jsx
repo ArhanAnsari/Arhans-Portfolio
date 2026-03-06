@@ -18,11 +18,16 @@ export const Menu = (props) => {
     { label: "React Native", section: 3, icon: "📱" },
     { label: "Education", section: 4, icon: "🎓" },
     { label: "Achievements", section: 5, icon: "🏆" },
-    { label: "Current Work", section: 6, icon: "💼" },
+    { label: "Building", section: 6, icon: "🔨" },
     { label: "Services", section: 7, icon: "🛠️" },
     { label: "Testimonials", section: 8, icon: "💬" },
     { label: "Blog", section: 9, icon: "✍️" },
-    { label: "Contact", section: 10, icon: "📬" },
+    { label: "Journey", section: 10, icon: "🗺️" },
+    { label: "Recognitions", section: 11, icon: "🎖️" },
+    { label: "Hire Me", section: 12, icon: "💼" },
+    { label: "Contact", section: 13, icon: "📬" },
+    { label: "Tech Galaxy", section: 14, icon: "🌌" },
+    { label: "GitHub Activity", section: 15, icon: "📊" },
   ];
 
   // 🔥 Smooth scroll handler
