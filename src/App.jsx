@@ -250,14 +250,16 @@ function App() {
       {!isResumePage && <KonamiEasterEgg />}
       {!isResumePage && started && <FloatingParticles />}
 
-      {/* Easter Egg 2: Secret Lab */}
-      <AnimatePresence>
-        {secretLabOpen && (
-          <Suspense fallback={null}>
+      {/* Easter Egg 2: Secret Lab — Suspense must be outside AnimatePresence so that
+          SecretLab's motion.div root is the direct child AnimatePresence tracks for
+          exit animations. Having Suspense as the direct child prevents exit from firing. */}
+      <Suspense fallback={null}>
+        <AnimatePresence>
+          {secretLabOpen && (
             <SecretLab onClose={() => setSecretLabOpen(false)} />
-          </Suspense>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>
+      </Suspense>
       
       <Leva hidden />
       <Analytics />
