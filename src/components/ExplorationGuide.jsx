@@ -158,7 +158,7 @@ function TooltipBox({ step, stepIndex, total, rect, onNext, onPrev, onSkip }) {
 
   return (
     <motion.div
-      className={`${boxClass} z-[9999] w-80 rounded-2xl border border-violet-500/40 bg-neutral-900/95 backdrop-blur-lg shadow-2xl shadow-violet-900/30 p-5 select-none`}
+      className={`${boxClass} z-[9999] w-80 rounded-2xl border border-violet-500/40 bg-neutral-900/95 backdrop-blur-lg shadow-2xl shadow-violet-900/30 p-5 select-none pointer-events-auto`}
       style={isCenter ? {} : style}
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
@@ -298,7 +298,16 @@ export function ExplorationGuide({ onSectionChange }) {
 
       <AnimatePresence>
         {active && (
-          <>
+          // AnimatePresence requires a motion component as its direct child (not a
+          // Fragment) to track the element's lifecycle and trigger exit animations.
+          <motion.div
+            key="guide-overlay"
+            className="pointer-events-none fixed inset-0 z-[9997]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.25 }}
+          >
             <Spotlight rect={rect} />
             <TooltipBox
               key={stepIndex}
@@ -310,7 +319,7 @@ export function ExplorationGuide({ onSectionChange }) {
               onPrev={handlePrev}
               onSkip={handleSkip}
             />
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
     </>
