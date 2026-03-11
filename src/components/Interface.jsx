@@ -23,19 +23,31 @@ const useAnimatedCounter = (end, duration = 2000, startOnView = true) => {
   const hasStarted = useRef(false);
 
   useEffect(() => {
+    let animationFrameId;
+    let isCancelled = false;
     if ((startOnView ? inView : true) && !hasStarted.current) {
       hasStarted.current = true;
       let startTime = null;
       const animate = (timestamp) => {
+        if (isCancelled) return;
         if (!startTime) startTime = timestamp;
         const progress = Math.min((timestamp - startTime) / duration, 1);
         const eased = 1 - Math.pow(1 - progress, 3);
         setCount(Math.floor(eased * end));
-        if (progress < 1) requestAnimationFrame(animate);
-        else setCount(end);
+        if (progress < 1) {
+          animationFrameId = requestAnimationFrame(animate);
+        } else {
+          setCount(end);
+        }
       };
-      requestAnimationFrame(animate);
+      animationFrameId = requestAnimationFrame(animate);
     }
+    return () => {
+      isCancelled = true;
+      if (animationFrameId !== undefined) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, [inView, end, duration, startOnView]);
 
   return { count, ref };
@@ -206,14 +218,34 @@ export const Interface = (props) => {
         }
       } catch { /* ignore localStorage errors */ }
 
+      // Fetch all repository pages so star count is not limited to the first page
+      const fetchAllRepos = async (username) => {
+        const perPage = 100;
+        let page = 1;
+        let allRepos = [];
+        while (true) {
+          const res = await axios.get(`https://api.github.com/users/${username}/repos`, {
+            params: { sort: "updated", per_page: perPage, page },
+          });
+          const reposPage = res.data || [];
+          allRepos = allRepos.concat(reposPage);
+          if (reposPage.length < perPage) {
+            break;
+          }
+          page += 1;
+          // Safety cap to avoid unbounded requests
+          if (page > 10) {
+            break;
+          }
+        }
+        return allRepos;
+      };
       try {
-        const [userRes, reposRes] = await Promise.all([
+        const [userRes, repos] = await Promise.all([
           axios.get(`https://api.github.com/users/${GITHUB_USERNAME}`),
-          axios.get(`https://api.github.com/users/${GITHUB_USERNAME}/repos?sort=updated&per_page=30`),
+          fetchAllRepos(GITHUB_USERNAME),
         ]);
-
-        const repos = reposRes.data;
-        const stars = repos.reduce((acc, repo) => acc + repo.stargazers_count, 0);
+      const stars = repos.reduce((acc, repo) => acc + (repo.stargazers_count || 0), 0);
 
         // Top languages
         const langMap = {};
@@ -248,7 +280,7 @@ export const Interface = (props) => {
         setGithubStats(data);
         // Cache for 1 hour
         try {
-          localStorage.setItem("gh_stats_cache", JSON.stringify({ data, ts: Date.now() }));
+         localStorage.setItem(CACHE_KEY, JSON.stringify({ data, ts: Date.now() }));
         } catch { /* ignore */ }
       } catch (error) {
         // Handle rate-limit (403) gracefully — keep defaults

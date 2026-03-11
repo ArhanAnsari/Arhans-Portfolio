@@ -4,6 +4,7 @@ import { Billboard, Text, Stars } from "@react-three/drei";
 import { motion, AnimatePresence } from "framer-motion";
 import * as THREE from "three";
 
+
 // ─── Tech node data ──────────────────────────────────────────────────────────
 const techData = [
   {
@@ -64,11 +65,11 @@ const techData = [
   {
     id: "nextjs",
     label: "Next.js",
-    color: "#a0a0a0",
+    color: "#61dafb",
     ring: 2,
     speed: 0.18,
     phaseOffset: 5.2,
-    level: "Core Skill",
+    level: "Advanced",
     description: "Full-stack React framework with SSR, SSG, and API routes built-in.",
     projects: ["AutoYT", "CanvasCraft", "Clipgen AI"],
   },
@@ -79,7 +80,7 @@ const techData = [
     ring: 3,
     speed: 0.15,
     phaseOffset: 1.2,
-    level: "Intermediate",
+    level: "Core Skill",
     description: "Versatile language for AI/ML scripting, automation, and backend services.",
     projects: ["AI Tools", "Data Scripts"],
   },
@@ -112,7 +113,7 @@ const techData = [
     ring: 3,
     speed: 0.16,
     phaseOffset: 0.4,
-    level: "Advanced",
+    level: "Core Skill",
     description: "Typed superset of JavaScript that catches bugs early and improves code quality.",
     projects: ["Modern Projects", "SaaS Platforms"],
   },
@@ -123,7 +124,7 @@ const techData = [
     ring: 3,
     speed: 0.13,
     phaseOffset: 3.5,
-    level: "Intermediate",
+    level: "Core Skill",
     description: "Minimalist Node.js web framework for building REST APIs and web servers.",
     projects: ["Backend APIs", "Full-Stack Projects"],
   },
@@ -155,87 +156,163 @@ const CONNECTIONS = [
 // Ring radii
 const RING_RADII = { 1: 3.5, 2: 6, 3: 8.5 };
 
+// ─── Skill level badge colours ────────────────────────────────────────────────
+const LEVEL_STYLES = {
+  "Core Skill":   "bg-primary-500/20 text-primary-300 border-primary-500/30",
+  "Advanced":     "bg-green-500/20 text-green-300 border-green-500/30",
+  "Intermediate": "bg-amber-500/20 text-amber-300 border-amber-500/30",
+};
+
+// ─── Skill level progress percentages ─────────────────────────────────────────
+const LEVEL_PROGRESS = {
+  "Core Skill":   92,
+  "Advanced":     75,
+  "Intermediate": 52,
+};
+
+// ─── Camera: gentle auto-orbit + pointer-driven vertical parallax ─────────────
+const CameraController = () => {
+  const angleRef = useRef(0);
+  useFrame((state, delta) => {
+    angleRef.current += delta * 0.055; // full orbit ≈ 114 s
+    const dist = 14;
+    const tx = Math.sin(angleRef.current) * dist;
+    const tz = Math.cos(angleRef.current) * dist;
+    const ty = 4 + state.pointer.y * 1.8; // subtle vertical parallax from cursor
+    state.camera.position.x += (tx - state.camera.position.x) * 0.007;
+    state.camera.position.z += (tz - state.camera.position.z) * 0.007;
+    state.camera.position.y += (ty - state.camera.position.y) * 0.05;
+    state.camera.lookAt(0, 0, 0);
+  });
+  return null;
+};
+
 // ─── Central core ────────────────────────────────────────────────────────────
-const CoreSphere = () => {
-  const meshRef = useRef();
-  const glowRef = useRef();
+const CoreSphere = ({ glowing = false }) => {
+  const meshRef  = useRef();
+  const glowRef  = useRef();
+  const lightRef = useRef();
 
   useFrame((state) => {
     if (!meshRef.current) return;
     meshRef.current.rotation.y += 0.008;
     meshRef.current.rotation.x += 0.003;
-    // Pulse
     const pulse = 1 + Math.sin(state.clock.elapsedTime * 1.5) * 0.06;
     if (glowRef.current) {
-      glowRef.current.scale.setScalar(pulse * 1.6);
+      const cur = glowRef.current.scale.x;
+      const tgt = pulse * (glowing ? 2.05 : 1.6);
+      glowRef.current.scale.setScalar(cur + (tgt - cur) * 0.06);
+      const curOp = glowRef.current.material.opacity;
+      glowRef.current.material.opacity = curOp + ((glowing ? 0.28 : 0.15) - curOp) * 0.06;
+    }
+    if (lightRef.current) {
+      const tgt = glowing ? 4.0 : 2;
+      lightRef.current.intensity += (tgt - lightRef.current.intensity) * 0.06;
     }
   });
 
   return (
     <group>
-      {/* Outer glow */}
       <mesh ref={glowRef}>
         <sphereGeometry args={[0.8, 16, 16]} />
-        <meshStandardMaterial
-          color="#38bdf8"
-          emissive="#38bdf8"
-          emissiveIntensity={0.3}
-          transparent
-          opacity={0.15}
-          depthWrite={false}
-        />
+        <meshStandardMaterial color="#38bdf8" emissive="#38bdf8" emissiveIntensity={0.3} transparent opacity={0.15} depthWrite={false} />
       </mesh>
-      {/* Core */}
       <mesh ref={meshRef}>
         <icosahedronGeometry args={[0.55, 1]} />
-        <meshStandardMaterial
-          color="#0ea5e9"
-          emissive="#38bdf8"
-          emissiveIntensity={0.8}
-          roughness={0.1}
-          metalness={0.9}
-          wireframe
-        />
+        <meshStandardMaterial color="#0ea5e9" emissive="#38bdf8" emissiveIntensity={0.8} roughness={0.1} metalness={0.9} wireframe />
       </mesh>
-      <pointLight color="#38bdf8" intensity={2} distance={8} />
+      <pointLight ref={lightRef} color="#38bdf8" intensity={2} distance={8} />
     </group>
   );
 };
 
 // ─── Individual tech node ─────────────────────────────────────────────────────
-const TechNode = ({ tech, hovered, onClick, onHover }) => {
-  const groupRef = useRef();
-  const meshRef = useRef();
-  const isHovered = hovered?.id === tech.id;
-  const radius = RING_RADII[tech.ring];
-  const timeRef = useRef(tech.phaseOffset);
+const TechNode = ({ tech, hovered, selected, onClick, onHover }) => {
+  const groupRef   = useRef();
+  const meshRef    = useRef();
+  const ringRef    = useRef(); // spinning torus on hover
+  const burstRef   = useRef(); // expand-and-fade ring on click
+  const lightRef   = useRef(); // per-node point light
+  const timeRef    = useRef(tech.phaseOffset);
+  const popRef     = useRef(1);     // scale burst value (decays to 1)
+  const burstTRef  = useRef(0);     // 0=idle, 0→1 during animation
+  const prevSelRef = useRef(false); // detects leading edge of selection
 
-  useFrame((state) => {
+  const isHovered  = hovered?.id  === tech.id;
+  const isSelected = selected?.id === tech.id;
+  const radius     = RING_RADII[tech.ring];
+  const col        = useMemo(() => new THREE.Color(tech.color), [tech.color]);
+
+  useFrame((state, delta) => {
     timeRef.current += tech.speed * 0.008;
     const t = timeRef.current;
-
-    // Orbit in XZ plane with slight Y oscillation
     const x = Math.cos(t) * radius;
     const z = Math.sin(t) * radius;
     const y = Math.sin(t * 0.7 + tech.phaseOffset) * 0.6;
+    if (groupRef.current) groupRef.current.position.set(x, y, z);
 
-    if (groupRef.current) {
-      groupRef.current.position.set(x, y, z);
+    // ── Click pop + burst ring (trigger on leading edge) ──────────────────
+    if (isSelected && !prevSelRef.current) {
+      popRef.current  = 2.1;
+      burstTRef.current = 0.001;
+    }
+    prevSelRef.current = isSelected;
+
+    // Pop scale decay
+    if (popRef.current > 1) popRef.current = Math.max(1, popRef.current - delta * 5.5);
+
+    // Burst ring expand + fade
+    if (burstTRef.current > 0) {
+      burstTRef.current = Math.min(1, burstTRef.current + delta * 2.2);
+      if (burstRef.current) {
+        burstRef.current.scale.setScalar(1 + burstTRef.current * 4.5);
+        burstRef.current.material.opacity = (1 - burstTRef.current) * 0.55;
+      }
+      if (burstTRef.current >= 1) burstTRef.current = 0;
     }
 
-    // Pulse emissive when hovered
+    // ── Main sphere ──────────────────────────────────────────────────────
     if (meshRef.current) {
-      meshRef.current.material.emissiveIntensity = isHovered
+      const tgtEmissive = isHovered
         ? 1.5 + Math.sin(state.clock.elapsedTime * 4) * 0.4
-        : 0.5;
-      meshRef.current.scale.setScalar(isHovered ? 1.4 : 1);
+        : isSelected ? 1.2 : 0.5;
+      meshRef.current.material.emissiveIntensity +=
+        (tgtEmissive - meshRef.current.material.emissiveIntensity) * 0.15;
+      meshRef.current.scale.setScalar((isHovered ? 1.4 : 1) * popRef.current);
+    }
+
+    // ── Hover orbit ring (spins + fades in) ───────────────────────────────
+    if (ringRef.current) {
+      const tgt = isHovered ? 0.75 : 0;
+      ringRef.current.material.opacity += (tgt - ringRef.current.material.opacity) * 0.1;
+      if (isHovered) ringRef.current.rotation.z += delta * 1.4;
+    }
+
+    // ── Per-node point light ─────────────────────────────────────────────
+    if (lightRef.current) {
+      const tgt = (isHovered || isSelected) ? 2.8 : 0;
+      lightRef.current.intensity += (tgt - lightRef.current.intensity) * 0.1;
     }
   });
 
-  const color = new THREE.Color(tech.color);
-
   return (
     <group ref={groupRef}>
+      {/* Hover orbit ring */}
+      <mesh ref={ringRef}>
+        <torusGeometry args={[0.46, 0.016, 8, 48]} />
+        <meshBasicMaterial color={tech.color} transparent opacity={0} depthWrite={false} />
+      </mesh>
+
+      {/* Click burst ring */}
+      <mesh ref={burstRef}>
+        <torusGeometry args={[0.4, 0.012, 6, 40]} />
+        <meshBasicMaterial color={tech.color} transparent opacity={0} depthWrite={false} />
+      </mesh>
+
+      {/* Per-node glow light */}
+      <pointLight ref={lightRef} color={tech.color} intensity={0} distance={3.5} />
+
+      {/* Main sphere */}
       <mesh
         ref={meshRef}
         onPointerOver={(e) => { e.stopPropagation(); onHover(tech); }}
@@ -243,20 +320,15 @@ const TechNode = ({ tech, hovered, onClick, onHover }) => {
         onClick={(e) => { e.stopPropagation(); onClick(tech); }}
       >
         <sphereGeometry args={[0.28, 14, 14]} />
-        <meshStandardMaterial
-          color={color}
-          emissive={color}
-          emissiveIntensity={0.5}
-          roughness={0.2}
-          metalness={0.7}
-        />
+        <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.5} roughness={0.2} metalness={0.7} />
       </mesh>
-      {/* Label */}
+
+      {/* Billboard label */}
       <Billboard>
         <Text
           position={[0, 0.55, 0]}
           fontSize={0.22}
-          color={isHovered ? "#ffffff" : "#cccccc"}
+          color={isHovered ? "#ffffff" : isSelected ? "#e0dcff" : "#cccccc"}
           anchorX="center"
           anchorY="bottom"
           outlineWidth={0.02}
@@ -293,11 +365,16 @@ const OrbitRing = ({ radius }) => {
 };
 
 // ─── Connection line between two tech nodes ───────────────────────────────────
-// Uses a simple line that updates its endpoints each frame using the nodes' live positions
-const ConnectionLine = ({ nodeA, nodeB, nodes }) => {
-  const lineRef = useRef();
-  const posA = useRef(new THREE.Vector3());
-  const posB = useRef(new THREE.Vector3());
+// Uses the same per-frame accumulation as TechNode to stay in sync.
+// Adds: flow particle traveling A→B, smooth glow when either end is hovered.
+const ConnectionLine = ({ nodeA, nodeB, isGlowing }) => {
+  const lineRef    = useRef();
+  const matRef     = useRef(); // lineBasicMaterial ref for opacity/colour
+  const flowRef    = useRef(); // traveling dot mesh
+  const flowMatRef = useRef(); // traveling dot material
+  const timeA  = useRef(nodeA.phaseOffset);
+  const timeB  = useRef(nodeB.phaseOffset);
+  const flowT  = useRef(Math.random()); // stagger starting position per line
 
   const geometry = useMemo(() => {
     const geo = new THREE.BufferGeometry();
@@ -306,35 +383,73 @@ const ConnectionLine = ({ nodeA, nodeB, nodes }) => {
     return geo;
   }, []);
 
-  useFrame(() => {
-    // Compute expected positions based on current time (same formula as TechNode)
-    [nodeA, nodeB].forEach((tech, i) => {
-      const t = (Date.now() * 0.001 * tech.speed) + tech.phaseOffset;
-      const radius = RING_RADII[tech.ring];
-      const x = Math.cos(t) * radius;
-      const z = Math.sin(t) * radius;
-      const y = Math.sin(t * 0.7 + tech.phaseOffset) * 0.6;
-      if (i === 0) posA.current.set(x, y, z);
-      else posB.current.set(x, y, z);
-    });
+  useFrame((_, delta) => {
+    // Mirror TechNode exactly: accumulate per-frame, starting from phaseOffset
+    timeA.current += nodeA.speed * 0.008;
+    timeB.current += nodeB.speed * 0.008;
+    flowT.current  = (flowT.current + delta * 0.38) % 1;
+
+    const tA = timeA.current;
+    const rA = RING_RADII[nodeA.ring];
+    const xA = Math.cos(tA) * rA;
+    const zA = Math.sin(tA) * rA;
+    const yA = Math.sin(tA * 0.7 + nodeA.phaseOffset) * 0.6;
+
+    const tB = timeB.current;
+    const rB = RING_RADII[nodeB.ring];
+    const xB = Math.cos(tB) * rB;
+    const zB = Math.sin(tB) * rB;
+    const yB = Math.sin(tB * 0.7 + nodeB.phaseOffset) * 0.6;
 
     if (lineRef.current) {
       const pos = lineRef.current.geometry.attributes.position;
-      pos.setXYZ(0, posA.current.x, posA.current.y, posA.current.z);
-      pos.setXYZ(1, posB.current.x, posB.current.y, posB.current.z);
+      pos.setXYZ(0, xA, yA, zA);
+      pos.setXYZ(1, xB, yB, zB);
       pos.needsUpdate = true;
+    }
+
+    // Traveling flow dot (interpolate A → B)
+    if (flowRef.current) {
+      const t = flowT.current;
+      flowRef.current.position.set(
+        xA + (xB - xA) * t,
+        yA + (yB - yA) * t,
+        zA + (zB - zA) * t
+      );
+      // Sinusoidal size pulse — biggest at midpoint
+      flowRef.current.scale.setScalar(0.6 + Math.sin(t * Math.PI) * 0.7);
+    }
+
+    // Smooth opacity + colour transition for line
+    if (matRef.current) {
+      const tgt = isGlowing ? 0.65 : 0.18;
+      matRef.current.opacity += (tgt - matRef.current.opacity) * 0.09;
+      matRef.current.color.set(isGlowing ? "#a78bfa" : "#38bdf8");
+    }
+    // Smooth opacity + colour for flow dot
+    if (flowMatRef.current) {
+      const tgt = isGlowing ? 1.0 : 0.65;
+      flowMatRef.current.opacity += (tgt - flowMatRef.current.opacity) * 0.09;
+      flowMatRef.current.color.set(isGlowing ? "#a78bfa" : "#38bdf8");
     }
   });
 
   return (
-    <line ref={lineRef} geometry={geometry}>
-      <lineBasicMaterial color="#38bdf8" opacity={0.18} transparent />
-    </line>
+    <group>
+      <line ref={lineRef} geometry={geometry}>
+        <lineBasicMaterial ref={matRef} color="#38bdf8" opacity={0.18} transparent />
+      </line>
+      {/* Traveling dot */}
+      <mesh ref={flowRef}>
+        <sphereGeometry args={[0.05, 6, 6]} />
+        <meshBasicMaterial ref={flowMatRef} color="#38bdf8" transparent opacity={0.65} depthWrite={false} />
+      </mesh>
+    </group>
   );
 };
 
 // ─── Scene ────────────────────────────────────────────────────────────────────
-const GalaxyScene = ({ onHover, onNodeClick, hovered, isMobile }) => {
+const GalaxyScene = ({ onHover, onNodeClick, hovered, selected, isMobile }) => {
   const nodes = isMobile ? techData.filter((t) => t.ring < 3) : techData;
   const nodeMap = useMemo(() => Object.fromEntries(techData.map((t) => [t.id, t])), []);
   const activeConnections = useMemo(
@@ -353,17 +468,28 @@ const GalaxyScene = ({ onHover, onNodeClick, hovered, isMobile }) => {
       {/* Starfield background */}
       <Stars radius={40} depth={20} count={isMobile ? 300 : 600} factor={2} saturation={0} fade />
 
-      {/* Core */}
-      <CoreSphere />
+      {/* Auto-orbit + pointer parallax camera controller */}
+      <CameraController />
+
+      {/* Core — brightens when any node is hovered/selected */}
+      <CoreSphere glowing={!!hovered || !!selected} />
 
       {/* Orbit ring guides */}
       {[3.5, 6, ...(isMobile ? [] : [8.5])].map((r) => (
         <OrbitRing key={r} radius={r} />
       ))}
 
-      {/* Connection lines between related techs */}
+      {/* Connection lines — glow when either endpoint is active */}
       {activeConnections.map(([a, b]) => (
-        <ConnectionLine key={`${a}-${b}`} nodeA={nodeMap[a]} nodeB={nodeMap[b]} />
+        <ConnectionLine
+          key={`${a}-${b}`}
+          nodeA={nodeMap[a]}
+          nodeB={nodeMap[b]}
+          isGlowing={
+            hovered?.id === a || hovered?.id === b ||
+            selected?.id === a || selected?.id === b
+          }
+        />
       ))}
 
       {/* Tech nodes */}
@@ -372,19 +498,13 @@ const GalaxyScene = ({ onHover, onNodeClick, hovered, isMobile }) => {
           key={tech.id}
           tech={tech}
           hovered={hovered}
+          selected={selected}
           onHover={onHover}
           onClick={onNodeClick}
         />
       ))}
     </>
   );
-};
-
-// ─── Skill level badge colors ─────────────────────────────────────────────────
-const LEVEL_STYLES = {
-  "Core Skill": "bg-primary-500/20 text-primary-300 border-primary-500/30",
-  "Advanced":   "bg-green-500/20 text-green-300 border-green-500/30",
-  "Intermediate": "bg-amber-500/20 text-amber-300 border-amber-500/30",
 };
 
 // ─── Tech Info Card (HTML overlay) ───────────────────────────────────────────
@@ -394,43 +514,74 @@ const TechInfoCard = ({ tech, onClose }) => (
       <motion.div
         key={tech.id}
         className="absolute top-4 left-4 z-10 w-64 rounded-2xl glass-morphism-dark border border-primary-500/30 p-5 pointer-events-auto"
-        initial={{ opacity: 0, scale: 0.9, x: -10 }}
+        initial={{ opacity: 0, scale: 0.88, x: -14 }}
         animate={{ opacity: 1, scale: 1, x: 0 }}
-        exit={{ opacity: 0, scale: 0.9, x: -10 }}
-        transition={{ duration: 0.2 }}
+        exit={{ opacity: 0, scale: 0.88, x: -14 }}
+        transition={{ type: "spring", stiffness: 340, damping: 26 }}
       >
-        <button
+        {/* Close button — spins 90° on hover */}
+        <motion.button
           onClick={onClose}
-          className="absolute top-3 right-3 text-neutral-500 hover:text-neutral-200 transition-colors"
+          className="absolute top-3 right-3 text-neutral-500 hover:text-neutral-200 p-1 rounded-lg hover:bg-white/10 transition-colors"
+          whileHover={{ scale: 1.15, rotate: 90 }}
+          whileTap={{ scale: 0.82 }}
           aria-label="Close"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
-        </button>
-        {/* Color dot + name */}
+        </motion.button>
+
+        {/* Pulsing colour dot + name */}
         <div className="flex items-center gap-2 mb-2">
-          <span
+          <motion.span
             className="w-3 h-3 rounded-full flex-shrink-0"
-            style={{ backgroundColor: tech.color, boxShadow: `0 0 8px ${tech.color}` }}
+            style={{ backgroundColor: tech.color }}
+            animate={{ boxShadow: [`0 0 4px ${tech.color}55`, `0 0 14px ${tech.color}cc`, `0 0 4px ${tech.color}55`] }}
+            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
           />
           <h3 className="font-bold text-neutral-100 text-base">{tech.label}</h3>
         </div>
-        {/* Skill level badge */}
+
+        {/* Skill level badge + animated progress bar */}
         {tech.level && (
-          <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border mb-3 ${LEVEL_STYLES[tech.level] || LEVEL_STYLES["Intermediate"]}`}>
-            {tech.level}
-          </span>
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-1.5">
+              <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border ${LEVEL_STYLES[tech.level] ?? LEVEL_STYLES["Intermediate"]}`}>
+                {tech.level}
+              </span>
+              <span className="text-[10px] text-neutral-500 tabular-nums">{LEVEL_PROGRESS[tech.level] ?? 52}%</span>
+            </div>
+            <div className="h-1 rounded-full bg-neutral-800 overflow-hidden">
+              <motion.div
+                className="h-full rounded-full"
+                style={{ background: `linear-gradient(90deg, ${tech.color}55, ${tech.color})` }}
+                initial={{ width: 0 }}
+                animate={{ width: `${LEVEL_PROGRESS[tech.level] ?? 52}%` }}
+                transition={{ duration: 0.75, delay: 0.12, ease: [0.33, 1, 0.68, 1] }}
+              />
+            </div>
+          </div>
         )}
+
         <p className="text-neutral-400 text-xs leading-relaxed mb-3">{tech.description}</p>
+
+        {/* Project chips — staggered spring entrance + hover lift */}
         {tech.projects?.length > 0 && (
           <div>
             <p className="text-[10px] font-semibold text-primary-400 uppercase tracking-wider mb-1.5">Used in</p>
             <div className="flex flex-wrap gap-1">
-              {tech.projects.map((p) => (
-                <span key={p} className="text-[10px] px-2 py-0.5 bg-primary-500/10 border border-primary-500/20 text-primary-300 rounded-full">
+              {tech.projects.map((p, i) => (
+                <motion.span
+                  key={p}
+                  initial={{ opacity: 0, scale: 0.6, y: 4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  transition={{ delay: 0.08 + i * 0.07, type: "spring", stiffness: 380, damping: 22 }}
+                  whileHover={{ scale: 1.1, y: -1 }}
+                  className="text-[10px] px-2 py-0.5 bg-primary-500/10 border border-primary-500/20 text-primary-300 rounded-full cursor-default"
+                >
                   {p}
-                </span>
+                </motion.span>
               ))}
             </div>
           </div>
@@ -455,59 +606,77 @@ const TechGalaxy = ({ performanceMode = false }) => {
   }, [isMobile]);
 
   if (performanceMode) {
-    // Fallback: simple tech chip grid with skill level badges
     return (
       <div className="w-full grid grid-cols-3 sm:grid-cols-4 gap-3 py-8">
-        {techData.map((tech) => (
-          <div
+        {techData.map((tech, i) => (
+          <motion.div
             key={tech.id}
-            className="flex flex-col items-center gap-2 p-3 rounded-xl glass-morphism border border-neutral-700/30"
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: i * 0.04, type: "spring", stiffness: 300 }}
+            whileHover={{ y: -4, scale: 1.06 }}
+            whileTap={{ scale: 0.93 }}
+            className="flex flex-col items-center gap-2 p-3 rounded-xl glass-morphism border border-neutral-700/30 hover:border-primary-500/30 transition-colors cursor-default"
           >
-            <span
+            <motion.span
               className="w-3 h-3 rounded-full"
               style={{ backgroundColor: tech.color }}
+              animate={{ boxShadow: [`0 0 3px ${tech.color}50`, `0 0 10px ${tech.color}`, `0 0 3px ${tech.color}50`] }}
+              transition={{ duration: 2 + i * 0.15, repeat: Infinity, ease: "easeInOut" }}
             />
             <span className="text-xs text-neutral-300 font-medium text-center">{tech.label}</span>
             {tech.level && (
-              <span className={`text-[9px] px-1.5 py-0.5 rounded-full border ${LEVEL_STYLES[tech.level] || LEVEL_STYLES["Intermediate"]}`}>
+              <span className={`text-[9px] px-1.5 py-0.5 rounded-full border ${LEVEL_STYLES[tech.level] ?? LEVEL_STYLES["Intermediate"]}`}>
                 {tech.level}
               </span>
             )}
-          </div>
+          </motion.div>
         ))}
       </div>
     );
   }
 
   return (
-    <div className="relative w-full" style={{ height: isMobile ? "360px" : "520px" }}>
+    <motion.div
+      className="relative w-full"
+      style={{ height: isMobile ? "360px" : "520px" }}
+      initial={{ opacity: 0 }}
+      whileInView={{ opacity: 1 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.8 }}
+      data-cursor="canvas"
+    >
       <Canvas
         camera={{ position: [0, 4, 14], fov: 55 }}
         gl={{ antialias: !isMobile, alpha: true, powerPreference: "default" }}
         dpr={dpr}
         style={{ background: "transparent" }}
+        onPointerMissed={() => setSelectedTech(null)}
       >
         <Suspense fallback={null}>
           <GalaxyScene
             onHover={setHoveredTech}
             onNodeClick={setSelectedTech}
             hovered={hoveredTech}
+            selected={selectedTech}
             isMobile={isMobile}
           />
         </Suspense>
       </Canvas>
 
-      {/* Info card overlay */}
-      <TechInfoCard
-        tech={selectedTech}
-        onClose={() => setSelectedTech(null)}
-      />
+      <TechInfoCard tech={selectedTech} onClose={() => setSelectedTech(null)} />
 
       {/* Hint */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 text-center pointer-events-none">
-        <p className="text-[10px] text-neutral-600">Click any node to explore</p>
-      </div>
-    </div>
+      <motion.div
+        className="absolute bottom-3 left-1/2 -translate-x-1/2 text-center pointer-events-none"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.4 }}
+      >
+        <p className="text-[10px] text-neutral-600">Click any node to explore · Auto-rotating</p>
+      </motion.div>
+    </motion.div>
   );
 };
 

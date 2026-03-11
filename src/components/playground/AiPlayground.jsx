@@ -45,13 +45,15 @@ const AiPlayground = ({ isOpen, onClose }) => {
             className="fixed inset-0 z-[60] bg-black/70 backdrop-blur-sm"
           />
 
-          {/* Modal */}
+          {/* Modal — wrapper div owns all positioning so Framer Motion's inline
+               transform doesn't overwrite Tailwind's translate classes */}
+          <div className="fixed z-[70] inset-0 flex items-center justify-center p-4 pointer-events-none">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: "spring", damping: 20, stiffness: 300 }}
-            className="fixed z-[70] inset-4 md:inset-auto md:top-1/2 md:left-1/2 md:-translate-x-1/2 md:-translate-y-1/2 md:w-[640px] md:max-h-[90vh] rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 shadow-[0_0_60px_rgba(147,51,234,0.2)] flex flex-col overflow-hidden"
+            className="pointer-events-auto w-full md:max-w-[640px] md:max-h-[90vh] rounded-2xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 shadow-[0_0_60px_rgba(147,51,234,0.2)] flex flex-col overflow-hidden"
             role="dialog"
             aria-modal="true"
             aria-label="AI Playground"
@@ -117,7 +119,7 @@ const AiPlayground = ({ isOpen, onClose }) => {
             })()}
 
             {/* Demo Content */}
-            <div className="flex-1 overflow-y-auto p-6 pt-4">
+            <div className="flex-1 overflow-y-auto min-h-0 p-6 pt-4">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={activeTab}
@@ -142,6 +144,7 @@ const AiPlayground = ({ isOpen, onClose }) => {
               </p>
             </div>
           </motion.div>
+          </div>
         </>
       )}
     </AnimatePresence>

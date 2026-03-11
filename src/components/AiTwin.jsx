@@ -100,15 +100,17 @@ const USER_MODES = {
 
 // ─── AI Action map (action name → behavior) ───────────────────────────────────
 const AI_ACTIONS = {
-  open_projects:    { section: 2 },
-  open_skills:      { section: 1 },
-  scroll_skills:    { section: 1 },
-  open_contact:     { section: 13 },
-  open_experience:  { section: 4 },
-  open_resume:      { url: "/resume" },
-  open_github:      { url: "https://github.com/ArhanAnsari" },
-  open_playground:  { modal: "playground" },
-  highlight_project: { section: 2 }, // scrolls to projects section
+  open_projects:     { section: 2 },
+  open_skills:       { section: 1 },
+  scroll_skills:     { section: 1 },
+  open_contact:      { section: 13 },
+  open_experience:   { section: 4 },
+  open_resume:       { url: "/resume" },
+  open_github:       { url: "https://github.com/ArhanAnsari" },
+  open_playground:   { modal: "playground" },
+  // Scrolls to Projects and dispatches a custom event so the Projects
+  // component can select/highlight the specific project via payload.
+  highlight_project: { section: 2, event: "aitwin:highlight-project" },
 };
 
 // ─── Action timing constants ───────────────────────────────────────────────────
@@ -180,7 +182,7 @@ Available actions (use ONLY when the user explicitly asks to navigate or open so
 - open_resume: Open resume/CV
 - open_github: Open GitHub profile
 - open_playground: Open the AI Playground
-- highlight_project: Highlight a specific project (add payload: "ProjectName")
+- highlight_project: Scroll to Projects section and highlight a specific project (add payload: "ProjectName")
 
 For regular conversation, respond ONLY in plain text (NOT JSON).
 ONLY use JSON format when the user explicitly requests navigation or opening a section/link.
@@ -378,6 +380,9 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
     if (actionDef.section !== undefined) {
       setTimeout(() => {
         document.getElementById(`section-${actionDef.section}`)?.scrollIntoView({ behavior: "smooth" });
+        if (actionDef.event && payload) {
+          window.dispatchEvent(new CustomEvent(actionDef.event, { detail: { project: payload } }));
+        }
       }, ACTION_SCROLL_DELAY);
     } else if (actionDef.url) {
       // Open all URLs in new tab (internal pages open in new tab too for overlay-free UX)
@@ -704,17 +709,16 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
                       <button
                         key={m}
                         onClick={() => setMode(m)}
-                        className={`flex items-center gap-1 px-2 py-1 text-[10px] font-medium transition-colors ${
+                        className={`flex items-center justify-center p-1.5 text-[10px] font-medium transition-colors ${
                           mode === m
                             ? "bg-white/25 text-white"
                             : "text-white/60 hover:text-white hover:bg-white/10"
                         }`}
-                        title={`${cfg.label} mode`}
+                        title={cfg.label}
                         aria-label={`Switch to ${cfg.label} mode`}
                         aria-pressed={mode === m}
                       >
-                        <Icon size={10} />
-                        <span className="hidden sm:inline">{cfg.label}</span>
+                        <Icon size={12} />
                       </button>
                     );
                   })}

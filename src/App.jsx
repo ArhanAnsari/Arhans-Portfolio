@@ -204,21 +204,21 @@ function App() {
       {/* Command palette hint */}
       {!isResumePage && started && (
         <motion.div
-          className="fixed bottom-6 left-6 z-40 hidden md:flex items-center gap-2 px-3 py-2 glass-morphism-dark rounded-lg text-neutral-500 text-xs border border-neutral-700/30 select-none"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-40 hidden md:flex items-center gap-2 px-3 py-2 glass-morphism-dark rounded-lg text-neutral-500 text-xs border border-neutral-700/30 select-none"
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 3, duration: 0.5 }}
         >
           <kbd className="bg-neutral-800 border border-neutral-700 rounded px-1.5 py-0.5 text-[10px]">⌘</kbd>
           <kbd className="bg-neutral-800 border border-neutral-700 rounded px-1.5 py-0.5 text-[10px]">K</kbd>
-          <span>command palette</span>
+          <span>Command Palette</span>
         </motion.div>
       )}
 
       {/* Performance mode indicator */}
       {!isResumePage && started && isPerformanceMode && (
         <motion.div
-          className="fixed bottom-6 right-6 z-40 flex items-center gap-1.5 px-3 py-1.5 glass-morphism-dark rounded-full text-green-400 text-[10px] font-medium border border-green-500/20 select-none"
+          className="fixed bottom-24 right-6 z-40 flex items-center gap-1.5 px-3 py-1.5 glass-morphism-dark rounded-full text-green-400 text-[10px] font-medium border border-green-500/20 select-none"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2 }}

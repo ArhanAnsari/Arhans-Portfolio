@@ -580,6 +580,7 @@ export const projects = [
 		description: "A sleek and modern online IDE built with Next.js 15, Convex, Sentry, Lemon Squeezy, Clerk and EmailJS, offering multi-language support, customization, and community-driven collaboration. Perfect for developers seeking a powerful and seamless coding environment. ",
 		category: "productivity",
 		type: "original",
+		featured: true,
 		technologies: ["Next.js 15", "Convex", "Clerk", "TypeScript", "EmailJS"]
 	},
 	{
@@ -638,6 +639,7 @@ export const projects = [
 		description: "Reddish is a Reddit Clone made with Next.js 15, TailwindCSS, ShadCN, Radix UI, TypeScript, Sanity CMS, Sentry, Clerk, Lucide Icons, Gemini API, Vercel.",
 		category: "web",
 		type: "original",
+		featured: true,
 		technologies: ["NextJS", "TailwindCSS", "Sentry", "ShadCN", "TypeScript", "Sanity"]
 	},
 	{
@@ -670,6 +672,7 @@ export const projects = [
 		description: "TruthMatrix is an AI-powered fact-checking platform that helps users verify the authenticity of information. It uses advanced AI algorithms to analyze text, images, and videos, providing users with accurate and reliable fact-checking results. Built with Next.js 15, React 19, TailwindCSS, Shadcn/ui, TypeScript, Gemini and Together AI.",
 		category: "ai",
 		type: "original",
+		featured: true,
 		technologies: ["NextJS", "React", "TailwindCSS", "TypeScript", "Gemini", "Framer Motion"]
 	},
 	{
@@ -690,6 +693,7 @@ export const projects = [
 		description: "A professional resume builder mobile application built with React Native. It features real-time preview, multiple templates, and easy export options.",
 		category: "mobile",
 		type: "original",
+		featured: true,
 		technologies: ["React Native", "Expo", "Appwrite", "TypeScript", "Gemini"]
 	},
 ];
