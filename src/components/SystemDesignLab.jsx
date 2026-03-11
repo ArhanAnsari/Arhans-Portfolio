@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useRef } from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 // ─── Simulation data ──────────────────────────────────────────────────────────
@@ -87,11 +87,26 @@ function getNodeCenter(node) {
 function SimGraph({ sim, activeStep, selectedNode, onNodeClick, traffic }) {
   const extraNodes = [];
   if (traffic >= 2) {
-    extraNodes.push({ id: "lb",    label: "Load Balancer", icon: "⚖️", x: 300, y: 470, type: "api" });
+    extraNodes.push({
+      id: "lb", label: "Load Balancer", icon: "⚖️", x: 300, y: 470, type: "api",
+      tech: "Application Load Balancer",
+      purpose: "Distributes incoming requests across multiple servers to improve reliability and throughput",
+      scaling: "Auto-scales with traffic via additional backend instances",
+    });
   }
   if (traffic >= 3) {
-    extraNodes.push({ id: "queue", label: "Job Queue",     icon: "📋", x: 500, y: 470, type: "queue" });
-    extraNodes.push({ id: "srv2",  label: "Server 2",      icon: "🖥️", x: 640, y: 470, type: "worker" });
+    extraNodes.push({
+      id: "queue", label: "Job Queue", icon: "📋", x: 500, y: 470, type: "queue",
+      tech: "Distributed message queue (e.g. BullMQ / Redis)",
+      purpose: "Buffers and schedules background jobs for asynchronous processing",
+      scaling: "Horizontally scalable via additional queue partitions and workers",
+    });
+    extraNodes.push({
+      id: "srv2", label: "Server 2", icon: "🖥️", x: 640, y: 470, type: "worker",
+      tech: "Additional application server instance",
+      purpose: "Processes workload in parallel with the primary server to handle higher traffic",
+      scaling: "Scale out by adding more worker servers behind the load balancer",
+    });
   }
 
   const allNodes = [...sim.nodes, ...extraNodes];
@@ -161,7 +176,7 @@ function SimGraph({ sim, activeStep, selectedNode, onNodeClick, traffic }) {
       </svg>
 
       {/* Nodes */}
-      {allNodes.map((node) => {
+      {allNodes.map((node, i) => {
         const colors   = NODE_COLORS[node.type] || NODE_COLORS.worker;
         const isActive = activeStep !== null && sim.edges.some(e => (e.from === node.id || e.to === node.id) && e.step <= activeStep);
         const isSel    = selectedNode?.id === node.id;
@@ -182,7 +197,7 @@ function SimGraph({ sim, activeStep, selectedNode, onNodeClick, traffic }) {
             }}
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.05 * sim.nodes.indexOf(node) }}
+            transition={{ type: "spring", stiffness: 300, damping: 20, delay: 0.05 * i }}
             whileHover={{ scale: 1.08 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => onNodeClick(node)}

@@ -22,8 +22,17 @@ export function FloatingParticles() {
   const [particles, setParticles] = useState([]);
   const clickCountRef   = useRef(0);
   const resetTimerRef   = useRef(null);
+  const removeTimerRef  = useRef(null);
+  const cooldownTimerRef = useRef(null);
   const cooldownRef     = useRef(false);
   const nextId          = useRef(0);
+
+  // Cleanup all timers on unmount
+  useEffect(() => () => {
+    clearTimeout(resetTimerRef.current);
+    clearTimeout(removeTimerRef.current);
+    clearTimeout(cooldownTimerRef.current);
+  }, []);
 
   const spawnParticles = useCallback(() => {
     const spawned = CODE_SNIPPETS.map((text, i) => ({
@@ -37,8 +46,9 @@ export function FloatingParticles() {
     nextId.current += CODE_SNIPPETS.length;
     setParticles(prev => [...prev, ...spawned]);
 
-    // Auto-remove after longest possible duration
-    setTimeout(() => {
+    // Auto-remove after longest possible duration — track so we can cancel on unmount
+    clearTimeout(removeTimerRef.current);
+    removeTimerRef.current = setTimeout(() => {
       setParticles(prev =>
         prev.filter(p => !spawned.find(s => s.id === p.id))
       );
@@ -60,7 +70,8 @@ export function FloatingParticles() {
       clickCountRef.current = 0;
       clearTimeout(resetTimerRef.current);
       cooldownRef.current = true;
-      setTimeout(() => { cooldownRef.current = false; }, SPAWN_COOLDOWN);
+      clearTimeout(cooldownTimerRef.current);
+      cooldownTimerRef.current = setTimeout(() => { cooldownRef.current = false; }, SPAWN_COOLDOWN);
       spawnParticles();
     }
   }, [spawnParticles]);

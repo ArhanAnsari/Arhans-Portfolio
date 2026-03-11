@@ -64,10 +64,11 @@ function getTargetRect(selector) {
   if (!selector) return null;
   const el = document.querySelector(selector);
   if (!el) return null;
+  // Return viewport-relative coords (position: fixed uses viewport coords)
   const rect = el.getBoundingClientRect();
   return {
-    top:    rect.top    + window.scrollY,
-    left:   rect.left   + window.scrollX,
+    top:    rect.top,
+    left:   rect.left,
     width:  rect.width,
     height: rect.height,
   };
@@ -250,7 +251,8 @@ export function ExplorationGuide({ onSectionChange }) {
       const el = document.getElementById(`section-${step.fallbackScroll}`);
       if (el) el.scrollIntoView({ behavior: "smooth", block: "center" });
     } else if (r) {
-      window.scrollTo({ top: r.top - 120, behavior: "smooth" });
+      // r.top is viewport-relative; add scrollY to get document position for scrollTo
+      window.scrollTo({ top: r.top + window.scrollY - 120, behavior: "smooth" });
     }
   }, []);
 
