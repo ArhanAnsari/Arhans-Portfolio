@@ -40,6 +40,9 @@ const NAV_COMMANDS = {
   blog: 9,
   galaxy: 14,
   github: 15,
+  "system design": 16,
+  "architecture": 16,
+  "design lab": 16,
 };
 
 // Section index → human-readable name (mirrors NAV_COMMANDS values)
@@ -47,7 +50,7 @@ const SECTION_NAMES = [
   "Hero", "Skills", "Projects", "ReactNative", "Education",
   "Achievements", "CurrentlyBuilding", "Services", "Testimonials",
   "Blog", "Journey", "Recognitions", "HireMe", "Contact",
-  "TechGalaxy", "GitHubActivity",
+  "TechGalaxy", "GitHubActivity", "SystemDesignLab",
 ];
 
 // ─── Thinking phase cycling messages ──────────────────────────────────────────
@@ -96,21 +99,40 @@ const USER_MODES = {
     ],
     followUpDefault: ["What's your experience with React?", "Tell me about your freelance work", "How do I contact you for a project?"],
   },
+  copilot: {
+    label: "Copilot",
+    icon: Beaker,
+    promptAddition: `CURRENT_MODE: AI Copilot — You are acting as Arhan's AI pair programmer. Help the user design systems, suggest tech stacks, generate architecture explanations, explain scaling strategies, and produce example code snippets. When asked to design a system or explain architecture, provide:
+1. A clear component breakdown
+2. Technology recommendations with justification
+3. Scaling strategy
+4. A brief code example if relevant
+Be technical, detailed, and think out loud like an experienced senior engineer.`,
+    quickPrompts: [
+      "Design a real-time chat system",
+      "What tech stack for a SaaS app?",
+      "Explain microservices vs monolith",
+      "How would you scale AutoYT to 1M users?",
+    ],
+    followUpDefault: ["Show me the System Design Lab", "Explain the AutoYT architecture", "What database would you choose for this?"],
+  },
 };
 
 // ─── AI Action map (action name → behavior) ───────────────────────────────────
 const AI_ACTIONS = {
-  open_projects:     { section: 2 },
-  open_skills:       { section: 1 },
-  scroll_skills:     { section: 1 },
-  open_contact:      { section: 13 },
-  open_experience:   { section: 4 },
-  open_resume:       { url: "/resume" },
-  open_github:       { url: "https://github.com/ArhanAnsari" },
-  open_playground:   { modal: "playground" },
+  open_projects:        { section: 2 },
+  open_skills:          { section: 1 },
+  scroll_skills:        { section: 1 },
+  open_contact:         { section: 13 },
+  open_experience:      { section: 4 },
+  open_resume:          { url: "/resume" },
+  open_github:          { url: "https://github.com/ArhanAnsari" },
+  open_playground:      { modal: "playground" },
+  open_system_design:   { section: 16 },
+  open_secret_lab:      { event: "easter:secret-lab" },
   // Scrolls to Projects and dispatches a custom event so the Projects
   // component can select/highlight the specific project via payload.
-  highlight_project: { section: 2, event: "aitwin:highlight-project" },
+  highlight_project:    { section: 2, event: "aitwin:highlight-project" },
 };
 
 // ─── Action timing constants ───────────────────────────────────────────────────
@@ -182,6 +204,8 @@ Available actions (use ONLY when the user explicitly asks to navigate or open so
 - open_resume: Open resume/CV
 - open_github: Open GitHub profile
 - open_playground: Open the AI Playground
+- open_system_design: Scroll to the System Design Lab (use when user asks about "how AutoYT works", "system design", "architecture", or "explain how [project] works")
+- open_secret_lab: Open the secret AI Experiments Lab (use ONLY when user says "show me the secret project", "open developer lab", or "open secret lab")
 - highlight_project: Scroll to Projects section and highlight a specific project (add payload: "ProjectName")
 
 For regular conversation, respond ONLY in plain text (NOT JSON).
@@ -383,6 +407,11 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
         if (actionDef.event && payload) {
           window.dispatchEvent(new CustomEvent(actionDef.event, { detail: { project: payload } }));
         }
+      }, ACTION_SCROLL_DELAY);
+    } else if (actionDef.event && !actionDef.section) {
+      // Standalone event (e.g. open_secret_lab)
+      setTimeout(() => {
+        window.dispatchEvent(new CustomEvent(actionDef.event, payload ? { detail: { project: payload } } : undefined));
       }, ACTION_SCROLL_DELAY);
     } else if (actionDef.url) {
       // Open all URLs in new tab (internal pages open in new tab too for overlay-free UX)
@@ -635,6 +664,13 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
     sendMessageRef.current = sendMessage;
   }, [sendMessage]);
 
+  // ─── Open chat when ExplorationGuide reaches the playground step ─────────────
+  useEffect(() => {
+    const handler = () => setIsOpen(true);
+    window.addEventListener("guide:open-chat", handler);
+    return () => window.removeEventListener("guide:open-chat", handler);
+  }, [setIsOpen]);
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
@@ -659,6 +695,7 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
             onClick={() => setIsOpen(true)}
             className="fixed bottom-6 right-6 z-40 w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-blue-600 text-white shadow-lg flex items-center justify-center hover:shadow-[0_0_15px_rgba(124,58,237,0.6)] transition-shadow"
             aria-label="Open AI Twin chat"
+            data-guide="ai-twin"
           >
             <img
               src="/AI%20Twin%20PP.jpg"
@@ -730,6 +767,7 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
                   className="text-white hover:bg-white/20 p-1.5 rounded"
                   title="Open AI Playground"
                   aria-label="Open AI Playground"
+                  data-guide="playground"
                 >
                   <Beaker size={16} />
                 </button>

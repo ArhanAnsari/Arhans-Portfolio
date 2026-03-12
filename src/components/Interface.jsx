@@ -12,6 +12,9 @@ import { GitHubCalendar } from "react-github-calendar";
 // Lazy-load the heavy 3D TechGalaxy component
 const TechGalaxy = lazy(() => import("./TechGalaxy"));
 
+// Lazy-load System Design Lab
+const SystemDesignLab = lazy(() => import("./SystemDesignLab"));
+
 // GitHub profile used across API calls and the calendar widget
 const GITHUB_USERNAME = "ArhanAnsari";
 
@@ -324,6 +327,7 @@ export const Interface = (props) => {
         <div id="section-13"><ContactSection /></div>
         <div id="section-14"><TechGalaxySection performanceMode={performanceMode} /></div>
         <div id="section-15"><GitHubActivitySection stats={githubStats} /></div>
+        <div id="section-16"><SystemDesignLabSection /></div>
       </div>
     </div>
   );
@@ -2993,3 +2997,14 @@ const GitHubActivitySection = ({ stats }) => {
     </Section>
   );
 };
+
+// SYSTEM DESIGN LAB (section 16)
+const SystemDesignLabSection = () => (
+  <ReactSuspense fallback={
+    <div className="min-h-screen flex items-center justify-center text-neutral-500 text-sm">
+      Loading System Design Lab…
+    </div>
+  }>
+    <SystemDesignLab />
+  </ReactSuspense>
+);

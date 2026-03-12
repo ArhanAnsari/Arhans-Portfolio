@@ -1,7 +1,7 @@
 import { Canvas } from "@react-three/fiber";
-import { MotionConfig, motion, useScroll, useSpring } from "framer-motion";
+import { MotionConfig, motion, AnimatePresence, useScroll, useSpring } from "framer-motion";
 import { Leva } from "leva";
-import { Suspense, useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { Cursor } from "./components/Cursor";
 import { Experience } from "./components/Experience";
 import { Interface } from "./components/Interface";
@@ -16,15 +16,20 @@ import { useAtom } from "jotai";
 import { themeAtom } from "./config";
 import { Sun, Moon } from "lucide-react";
 import { NotFound } from "./components/NotFound";
-import { Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { BlogDetail } from "./components/BlogDetail";
 import Resume from "./components/Resume";
+import { ExplorationGuide } from "./components/ExplorationGuide";
+import { KonamiEasterEgg } from "./components/EasterEggs";
+import { FloatingParticles } from "./components/FloatingParticles";
+const SecretLab = lazy(() => import("./components/SecretLab"));
 
 function App() {
   const [section, setSection] = useState(0);
   const [started, setStarted] = useState(false);
   const [menuOpened, setMenuOpened] = useState(false);
   const [theme, setTheme] = useAtom(themeAtom);
+  const [secretLabOpen, setSecretLabOpen] = useState(false);
   const location = useLocation();
   const isResumePage = location.pathname === "/resume";
 
@@ -67,13 +72,20 @@ function App() {
     setMenuOpened(false);
   }, [section]);
 
+  // Secret Lab easter egg trigger (via AI Twin command)
+  useEffect(() => {
+    const handler = () => setSecretLabOpen(true);
+    window.addEventListener("easter:secret-lab", handler);
+    return () => window.removeEventListener("easter:secret-lab", handler);
+  }, []);
+
   // Native scroll listener for section tracking
   useEffect(() => {
     if (location.pathname !== "/") return;
     const handleScroll = () => {
       const scrollY = window.scrollY;
       const windowHeight = window.innerHeight;
-      const newSection = Math.min(Math.floor(scrollY / windowHeight), 15);
+      const newSection = Math.min(Math.floor(scrollY / windowHeight), 16);
       
       if (newSection !== section) {
         setSection(newSection);
@@ -230,6 +242,24 @@ function App() {
 
       {!isResumePage && <AiTwin section={section} />}
       {!isResumePage && <CommandPalette onSectionChange={setSection} />}
+      
+      {/* New interactive features */}
+      {!isResumePage && started && (
+        <ExplorationGuide onSectionChange={setSection} />
+      )}
+      {!isResumePage && <KonamiEasterEgg />}
+      {!isResumePage && started && <FloatingParticles />}
+
+      {/* Easter Egg 2: Secret Lab — Suspense must be outside AnimatePresence so that
+          SecretLab's motion.div root is the direct child AnimatePresence tracks for
+          exit animations. Having Suspense as the direct child prevents exit from firing. */}
+      <Suspense fallback={null}>
+        <AnimatePresence>
+          {secretLabOpen && (
+            <SecretLab onClose={() => setSecretLabOpen(false)} />
+          )}
+        </AnimatePresence>
+      </Suspense>
       
       <Leva hidden />
       <Analytics />
