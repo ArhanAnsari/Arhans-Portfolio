@@ -50,8 +50,8 @@ Edit `App.jsx` (or use `.tsx` for TypeScript projects) and enjoy live hot reload
 
 - **InspireGem** — AI-powered content generation
 - **EduSync** — An AI Powered Offline based Learning Platform (LMS)
-- Clipgen AI** — AI Powered App for the content creators (YouTube)
-- Clystra Networks** — This is the app of the client
+- **Clipgen AI** — AI Powered App for the content creators (YouTube)
+- **Clystra Networks** — This is the app of the client
 - **CanvasCraft** — CanvasCraft is an AI powered drop n drag website creation app.
 ## 📘 Community & Learning
 
