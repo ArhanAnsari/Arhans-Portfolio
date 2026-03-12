@@ -664,6 +664,13 @@ const AiTwin = ({ section = 0, activeProject = null }) => {
     sendMessageRef.current = sendMessage;
   }, [sendMessage]);
 
+  // ─── Open chat when ExplorationGuide reaches the playground step ─────────────
+  useEffect(() => {
+    const handler = () => setIsOpen(true);
+    window.addEventListener("guide:open-chat", handler);
+    return () => window.removeEventListener("guide:open-chat", handler);
+  }, [setIsOpen]);
+
   const handleKeyPress = (e) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();

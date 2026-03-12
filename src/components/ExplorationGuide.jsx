@@ -39,6 +39,9 @@ const STEPS = [
       "This is the AI Playground. You can try simplified versions of my projects here.",
     position: "top",
     fallbackScroll: null,
+    // The playground button lives inside the AI Twin chat header, which is only
+    // rendered when the chat is open. Open it before we try to locate the element.
+    beforeStep: () => window.dispatchEvent(new CustomEvent("guide:open-chat")),
   },
   {
     id: "system-design",
@@ -259,7 +262,10 @@ export function ExplorationGuide({ onSectionChange }) {
   useEffect(() => {
     if (!active) return;
     const step = STEPS[stepIndex];
-    // Small delay to let scroll settle
+    // Run any per-step setup immediately (e.g. open a UI element so its DOM
+    // node exists by the time we try to locate it with getTargetRect).
+    if (step.beforeStep) step.beforeStep();
+    // Small delay to let scroll/animations settle before measuring
     const t = setTimeout(() => resolveRect(step), 350);
     return () => clearTimeout(t);
   }, [active, stepIndex, resolveRect]);
