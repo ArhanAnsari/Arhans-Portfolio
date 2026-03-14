@@ -112,9 +112,10 @@ function SimGraph({ sim, activeStep, selectedNode, onNodeClick, traffic }) {
   const allNodes = [...sim.nodes, ...extraNodes];
 
   return (
-    <div className="relative w-full overflow-auto" style={{ minHeight: 520 }}>
+    <div className="overflow-x-auto">
+    <div className="relative" style={{ minHeight: 520, minWidth: 760 }}>
       {/* SVG edges */}
-      <svg className="absolute inset-0 w-full h-full pointer-events-none" style={{ zIndex: 0 }}>
+      <svg className="absolute inset-0 pointer-events-none" width="760" height="560" style={{ zIndex: 0 }}>
         <defs>
           <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
             <path d="M0,0 L0,6 L8,3 z" fill="#6366f1" />
@@ -210,6 +211,7 @@ function SimGraph({ sim, activeStep, selectedNode, onNodeClick, traffic }) {
         );
       })}
     </div>
+    </div>
   );
 }
 
@@ -219,7 +221,7 @@ function NodeDetail({ node, onClose }) {
   const colors = NODE_COLORS[node.type] || NODE_COLORS.worker;
   return (
     <motion.div
-      className={`absolute right-4 top-4 w-64 rounded-2xl border ${colors.border} ${colors.bg} backdrop-blur-md p-4 shadow-2xl z-20`}
+      className={`absolute right-2 top-2 sm:right-4 sm:top-4 w-52 sm:w-64 rounded-xl sm:rounded-2xl border ${colors.border} ${colors.bg} backdrop-blur-md p-3 sm:p-4 shadow-2xl z-20 max-h-48 overflow-y-auto`}
       initial={{ opacity: 0, x: 30 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: 30 }}
@@ -276,6 +278,7 @@ const SystemDesignLab = React.forwardRef(function SystemDesignLab(_props, ref) {
     intervalRef.current = setInterval(() => {
       if (step > totalSteps) {
         clearInterval(intervalRef.current);
+        setActiveStep(totalSteps + 1); // sentinel → triggers "complete" callout
         setRunning(false);
         return;
       }

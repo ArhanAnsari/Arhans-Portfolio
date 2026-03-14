@@ -137,21 +137,43 @@ function TooltipBox({ step, stepIndex, total, rect, onNext, onPrev, onSkip }) {
 
   if (!isCenter && rect) {
     const pad = 14;
+    const vw = typeof window !== "undefined" ? window.innerWidth : 1024;
+    const vh = typeof window !== "undefined" ? window.innerHeight : 768;
+    const BOX_W = Math.min(320, vw - 24);
+    const BOX_H = 240;
+    const EDGE = 12;
+
+    const clampLeft = (l) => Math.max(EDGE, Math.min(vw - BOX_W - EDGE, l));
+    const clampTop  = (t) => Math.max(EDGE, Math.min(vh - BOX_H - EDGE, t));
+
     if (step.position === "bottom") {
       style = {
-        top:  rect.top + rect.height + pad + 14,
-        left: Math.max(12, rect.left + rect.width / 2 - 160),
+        top:   clampTop(rect.top + rect.height + pad + 14),
+        left:  clampLeft(rect.left + rect.width / 2 - BOX_W / 2),
+        width: BOX_W,
       };
     } else if (step.position === "top") {
       style = {
-        top:  rect.top - pad - 14 - 180,
-        left: Math.max(12, rect.left + rect.width / 2 - 160),
+        top:   clampTop(rect.top - pad - 14 - BOX_H),
+        left:  clampLeft(rect.left + rect.width / 2 - BOX_W / 2),
+        width: BOX_W,
       };
     } else {
-      style = {
-        top:  Math.max(12, rect.top + rect.height / 2 - 90),
-        left: rect.left - 340,
-      };
+      // "left" – preferred; falls back to bottom when near the left edge
+      const leftX = rect.left - BOX_W - 20;
+      if (leftX >= EDGE) {
+        style = {
+          top:   clampTop(rect.top + rect.height / 2 - BOX_H / 2),
+          left:  leftX,
+          width: BOX_W,
+        };
+      } else {
+        style = {
+          top:   clampTop(rect.top + rect.height + pad + 14),
+          left:  clampLeft(rect.left + rect.width / 2 - BOX_W / 2),
+          width: BOX_W,
+        };
+      }
     }
   }
 
@@ -161,8 +183,8 @@ function TooltipBox({ step, stepIndex, total, rect, onNext, onPrev, onSkip }) {
 
   return (
     <motion.div
-      className={`${boxClass} z-[9999] w-80 rounded-2xl border border-violet-500/40 bg-neutral-900/95 backdrop-blur-lg shadow-2xl shadow-violet-900/30 p-5 select-none pointer-events-auto`}
-      style={isCenter ? {} : style}
+      className={`${boxClass} z-[9999] rounded-2xl border border-violet-500/40 bg-neutral-900/95 backdrop-blur-lg shadow-2xl shadow-violet-900/30 p-4 sm:p-5 select-none pointer-events-auto`}
+      style={isCenter ? { width: "min(320px, calc(100vw - 24px))" } : style}
       initial={{ opacity: 0, scale: 0.92 }}
       animate={{ opacity: 1, scale: 1 }}
       exit={{ opacity: 0, scale: 0.92 }}
@@ -291,7 +313,7 @@ export function ExplorationGuide({ onSectionChange }) {
       {/* "How to Explore" button — always visible */}
       <motion.button
         onClick={() => { setStepIndex(0); setActive(true); }}
-        className="fixed bottom-6 right-20 z-50 flex items-center gap-2 px-3 py-2 rounded-xl glass-morphism-dark border border-violet-500/30 text-violet-300 text-xs font-semibold hover:bg-violet-500/20 transition-all duration-300 shadow-lg"
+        className="fixed bottom-6 right-4 sm:right-20 z-50 flex items-center gap-2 px-3 py-2 rounded-xl glass-morphism-dark border border-violet-500/30 text-violet-300 text-xs font-semibold hover:bg-violet-500/20 transition-all duration-300 shadow-lg"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 4 }}
