@@ -696,6 +696,28 @@ export const projects = [
 		featured: true,
 		technologies: ["React Native", "Expo", "Appwrite", "TypeScript", "Gemini"]
 	},
+	{
+		title: "InvoiceFlow",
+		url: "https://invoiceflow.appwrite.network/",
+		github: "https://github.com/ArhanAnsari/InvoiceFlow",
+		image: "projects/invoiceflow.jpg",
+		description: "A modern invoice management application built with React Native and Appwrite.",
+		category: "mobile",
+		type: "original",
+		featured: true,
+		technologies: ["React Native", "Expo", "Appwrite", "TypeScript", "Gemini"]
+	},
+	{
+		title: "HRMate",
+		url: "https://github.com/ArhanAnsari/HRMate",
+		github: "https://github.com/ArhanAnsari/HRMate",
+		image: "projects/hrmate.jpg",
+		description: "A comprehensive HR management system built with React Native and Appwrite.",
+		category: "mobile",
+		type: "original",
+		featured: true,
+		technologies: ["React Native", "Expo", "Appwrite", "TypeScript", "Gemini"]
+	}
 ];
 
 const Project = (props) => {
