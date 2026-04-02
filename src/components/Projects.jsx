@@ -686,6 +686,17 @@ export const projects = [
 		technologies: ["HTML", "CSS", "JavaScript"]
 	},
 	{
+		title: "MyFlix",
+		url: "https://myflix-beta-five.vercel.app/",
+		github: "",
+		image: "projects/myflix.png",
+		description: "A movie streaming platform built with Next.js, TailwindCSS and Appwrite where you can upload and watch your favorite movies.",
+		category: "web",
+		type: "original",
+		featured: true,
+		technologies: ["NextJS", "TailwindCSS", "Appwrite", "TypeScript"]
+	},
+	{
 		title: "ResuMate",
 		url: "https://github.com/ArhanAnsari/ResuMate",
 		github: "https://github.com/ArhanAnsari/ResuMate",
