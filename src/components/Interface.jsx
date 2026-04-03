@@ -419,7 +419,10 @@ const AboutSection = (props) => {
           className="flex flex-col sm:flex-row gap-4 pt-4"
         >
           <motion.button
-            onClick={() => setSection(13)}
+            onClick={() => {
+              setSection(13);
+              document.getElementById("section-13")?.scrollIntoView({ behavior: "smooth" });
+            }}
             className="relative overflow-hidden flex items-center justify-center px-6 py-3 rounded-xl font-semibold text-white group btn-gradient-primary"
             whileHover={{ scale: 1.05, boxShadow: '0 0 30px rgba(14,165,233,0.5)' }}
             whileTap={{ scale: 0.97 }}
@@ -432,7 +435,10 @@ const AboutSection = (props) => {
           </motion.button>
           
           <motion.button
-            onClick={() => setSection(2)}
+            onClick={() => {
+              setSection(2);
+              document.getElementById("section-2")?.scrollIntoView({ behavior: "smooth" });
+            }}
             className="relative overflow-hidden flex items-center justify-center px-6 py-3 rounded-xl font-semibold group border border-primary-500/40 text-neutral-200 glass-morphism"
             whileHover={{ scale: 1.05, borderColor: 'rgba(14,165,233,0.8)', boxShadow: '0 0 20px rgba(14,165,233,0.2)' }}
             whileTap={{ scale: 0.97 }}

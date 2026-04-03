@@ -688,7 +688,7 @@ export const projects = [
 	{
 		title: "MyFlix",
 		url: "https://myflix-beta-five.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/MyFlix",
 		image: "projects/myflix.png",
 		description: "A movie streaming platform built with Next.js, TailwindCSS and Appwrite where you can upload and watch your favorite movies.",
 		category: "web",
