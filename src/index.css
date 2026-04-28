@@ -242,6 +242,71 @@ textarea:focus {
   outline-offset: 2px;
 }
 
+/* INTENTIONAL SPACING SYSTEM - Non-uniform for human feel */
+.spacing-generous {
+  gap: 3rem;
+}
+
+.spacing-medium {
+  gap: 2rem;
+}
+
+.spacing-tight {
+  gap: 1rem;
+}
+
+/* Section variations - different rhythms */
+.section-featured {
+  padding: 120px 16px;
+}
+
+@media (min-width: 768px) {
+  .section-featured {
+    padding: 160px 32px;
+  }
+}
+
+.section-compact {
+  padding: 60px 16px;
+}
+
+@media (min-width: 768px) {
+  .section-compact {
+    padding: 80px 32px;
+  }
+}
+
+/* Typography refinements - better hierarchy */
+.headline-xl {
+  font-size: 3.5rem;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+@media (max-width: 768px) {
+  .headline-xl {
+    font-size: 2rem;
+  }
+}
+
+.headline-lg {
+  font-size: 2.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+@media (max-width: 768px) {
+  .headline-lg {
+    font-size: 1.75rem;
+  }
+}
+
+.body-balanced {
+  max-width: 65ch;
+  line-height: 1.75;
+}
+
 /* Loading animation */
 @keyframes shimmer {
   0% {

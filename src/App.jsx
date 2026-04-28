@@ -6,6 +6,7 @@ import { Cursor } from "./components/Cursor";
 import { Experience } from "./components/Experience";
 import { Interface } from "./components/Interface";
 import { LoadingScreen } from "./components/LoadingScreen";
+import { AssetsPreloader } from "./components/AssetsPreloader";
 import { Menu } from "./components/Menu";
 import { CommandPalette } from "./components/CommandPalette";
 import { ParticleBackground } from "./components/ParticleBackground";
@@ -113,9 +114,12 @@ function App() {
           ...framerMotionConfig,
         }}
       >
-        {/* Fixed Canvas for 3D Scene - Behind Everything */}
+        {/* Fixed Canvas for 3D Scene - Behind Everything, Hidden During Loading */}
         {!isResumePage && (
-          <div className="fixed top-0 left-0 w-screen h-screen z-0 pointer-events-none">
+          <div 
+            className="fixed top-0 left-0 w-screen h-screen z-0 pointer-events-none"
+            style={{ display: started ? 'block' : 'none' }}
+          >
             <Canvas 
               shadows={!isPerformanceMode}
               camera={{ 
@@ -131,13 +135,19 @@ function App() {
                 logarithmicDepthBuffer: !isPerformanceMode,
                 precision: isPerformanceMode ? "lowp" : "mediump"
               }}
-              dpr={isPerformanceMode ? 1 : Math.min(window.devicePixelRatio, 2)}
+              dpr={[1, isPerformanceMode ? 1 : 1.5]}
               style={{ display: 'block', width: '100%', height: '100%' }}
             >
               <color attach="background" args={[theme === "light" ? "#f8fafc" : "#0f172a"]} />
               <fog attach="fog" args={[theme === "light" ? "#f8fafc" : "#0f172a", 20, 50]} />
             
               <Suspense fallback={null}>
+                {/* ALWAYS preload assets - useProgress needs this mounted to track loading */}
+                <AssetsPreloader />
+              </Suspense>
+              
+              <Suspense fallback={null}>
+                {/* Experience only renders when started (after all assets loaded) */}
                 {started && (
                   <Experience section={section} menuOpened={menuOpened} setSection={setSection} performanceMode={isPerformanceMode} />
                 )}
