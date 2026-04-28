@@ -13,26 +13,30 @@ export const LoadingScreen = (props) => {
       setDisplayProgress(progress);
     }, 100);
 
-    // Finish loader ONLY when all assets are completely loaded
-    // useProgress tracks AssetsPreloader hooks (useGLTF, useFBX, useTexture, useVideoTexture)
-    if (progress === 100 && total > 0 && loaded === total && !started) {
-      // Assets are ready - no artificial delays
-      setStarted(true);
+    // Finish loader when progress reaches a reasonable level
+    // Allow some time for async 3D asset loading to complete
+    if (progress >= 90 && !started) {
+      const delayedStart = setTimeout(() => {
+        setStarted(true);
+      }, 500); // 500ms smooth exit
       
-      return () => clearTimeout(timer);
+      return () => {
+        clearTimeout(timer);
+        clearTimeout(delayedStart);
+      };
     }
 
     return () => clearTimeout(timer);
   }, [progress, total, loaded, item, setStarted, started]);
 
-  // Fallback safety net (in case progress never reaches 100%)
+  // Fallback safety net
   useEffect(() => {
     const fallbackTimer = setTimeout(() => {
       if (!started) {
-        console.warn("LoadingScreen fallback triggered after 8 seconds - forcing app start");
+        console.warn("LoadingScreen fallback triggered - forcing app start");
         setStarted(true);
       }
-    }, 8000); // 8 second safety net for edge cases
+    }, 5000); // 5 second safety net
 
     return () => clearTimeout(fallbackTimer);
   }, [started, setStarted]);

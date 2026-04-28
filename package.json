@@ -19,6 +19,7 @@
     "framer-motion": "^10.12.16",
     "framer-motion-3d": "^10.12.16",
     "jotai": "^2.1.1",
+    "leva": "^0.10.1",
     "lucide-react": "^0.544.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

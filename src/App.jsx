@@ -6,7 +6,6 @@ import { Cursor } from "./components/Cursor";
 import { Experience } from "./components/Experience";
 import { Interface } from "./components/Interface";
 import { LoadingScreen } from "./components/LoadingScreen";
-import { AssetsPreloader } from "./components/AssetsPreloader";
 import { Menu } from "./components/Menu";
 import { CommandPalette } from "./components/CommandPalette";
 import { ParticleBackground } from "./components/ParticleBackground";
@@ -142,12 +141,6 @@ function App() {
               <fog attach="fog" args={[theme === "light" ? "#f8fafc" : "#0f172a", 20, 50]} />
             
               <Suspense fallback={null}>
-                {/* ALWAYS preload assets - useProgress needs this mounted to track loading */}
-                <AssetsPreloader />
-              </Suspense>
-              
-              <Suspense fallback={null}>
-                {/* Experience only renders when started (after all assets loaded) */}
                 {started && (
                   <Experience section={section} menuOpened={menuOpened} setSection={setSection} performanceMode={isPerformanceMode} />
                 )}
