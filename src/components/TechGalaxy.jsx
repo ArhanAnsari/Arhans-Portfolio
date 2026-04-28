@@ -195,19 +195,19 @@ const CoreSphere = ({ glowing = false }) => {
 
   useFrame((state) => {
     if (!meshRef.current) return;
-    meshRef.current.rotation.y += 0.008;
-    meshRef.current.rotation.x += 0.003;
-    const pulse = 1 + Math.sin(state.clock.elapsedTime * 1.5) * 0.06;
+    meshRef.current.rotation.y += 0.01;
+    meshRef.current.rotation.x += 0.004;
+    const pulse = 1 + Math.sin(state.clock.elapsedTime * 1.8) * 0.08;
     if (glowRef.current) {
       const cur = glowRef.current.scale.x;
-      const tgt = pulse * (glowing ? 2.05 : 1.6);
-      glowRef.current.scale.setScalar(cur + (tgt - cur) * 0.06);
+      const tgt = pulse * (glowing ? 2.2 : 1.7);
+      glowRef.current.scale.setScalar(cur + (tgt - cur) * 0.08);
       const curOp = glowRef.current.material.opacity;
-      glowRef.current.material.opacity = curOp + ((glowing ? 0.28 : 0.15) - curOp) * 0.06;
+      glowRef.current.material.opacity = curOp + ((glowing ? 0.35 : 0.2) - curOp) * 0.08;
     }
     if (lightRef.current) {
-      const tgt = glowing ? 4.0 : 2;
-      lightRef.current.intensity += (tgt - lightRef.current.intensity) * 0.06;
+      const tgt = glowing ? 5.0 : 2.5;
+      lightRef.current.intensity += (tgt - lightRef.current.intensity) * 0.08;
     }
   });
 
@@ -274,18 +274,24 @@ const TechNode = ({ tech, hovered, selected, onClick, onHover }) => {
     // ── Main sphere ──────────────────────────────────────────────────────
     if (meshRef.current) {
       const tgtEmissive = isHovered
-        ? 1.5 + Math.sin(state.clock.elapsedTime * 4) * 0.4
-        : isSelected ? 1.2 : 0.5;
+        ? 1.8 + Math.sin(state.clock.elapsedTime * 4.5) * 0.5
+        : isSelected ? 1.5 : 0.7;
       meshRef.current.material.emissiveIntensity +=
-        (tgtEmissive - meshRef.current.material.emissiveIntensity) * 0.15;
-      meshRef.current.scale.setScalar((isHovered ? 1.4 : 1) * popRef.current);
+        (tgtEmissive - meshRef.current.material.emissiveIntensity) * 0.12;
+      meshRef.current.scale.setScalar((isHovered ? 1.5 : 1) * popRef.current);
+    }
+
+    // ── Per-node glow light intensity ──────────────────────────────────
+    if (lightRef.current) {
+      const tgtIntensity = isHovered ? 1.5 : isSelected ? 1.2 : 0.3;
+      lightRef.current.intensity += (tgtIntensity - lightRef.current.intensity) * 0.15;
     }
 
     // ── Hover orbit ring (spins + fades in) ───────────────────────────────
     if (ringRef.current) {
-      const tgt = isHovered ? 0.75 : 0;
-      ringRef.current.material.opacity += (tgt - ringRef.current.material.opacity) * 0.1;
-      if (isHovered) ringRef.current.rotation.z += delta * 1.4;
+      const tgt = isHovered ? 0.85 : 0;
+      ringRef.current.material.opacity += (tgt - ringRef.current.material.opacity) * 0.12;
+      if (isHovered) ringRef.current.rotation.z += delta * 1.8;
     }
 
     // ── Per-node point light ─────────────────────────────────────────────
@@ -309,18 +315,37 @@ const TechNode = ({ tech, hovered, selected, onClick, onHover }) => {
         <meshBasicMaterial color={tech.color} transparent opacity={0} depthWrite={false} />
       </mesh>
 
-      {/* Per-node glow light */}
-      <pointLight ref={lightRef} color={tech.color} intensity={0} distance={3.5} />
+      {/* Per-node glow light - more prominent on hover/select */}
+      <pointLight ref={lightRef} color={tech.color} intensity={isHovered ? 1.2 : isSelected ? 1.5 : 0.3} distance={4} />
 
-      {/* Main sphere */}
+      {/* Main sphere - enhanced for better visibility and interaction */}
       <mesh
         ref={meshRef}
-        onPointerOver={(e) => { e.stopPropagation(); onHover(tech); }}
-        onPointerOut={() => onHover(null)}
-        onClick={(e) => { e.stopPropagation(); onClick(tech); }}
+        onPointerOver={(e) => { 
+          e.stopPropagation(); 
+          document.body.style.cursor = 'pointer';
+          onHover(tech); 
+        }}
+        onPointerOut={() => { 
+          document.body.style.cursor = 'auto';
+          onHover(null); 
+        }}
+        onClick={(e) => { 
+          e.stopPropagation(); 
+          onClick(tech); 
+        }}
+        castShadow
+        receiveShadow
       >
-        <sphereGeometry args={[0.28, 14, 14]} />
-        <meshStandardMaterial color={col} emissive={col} emissiveIntensity={0.5} roughness={0.2} metalness={0.7} />
+        <sphereGeometry args={[0.32, 18, 18]} />
+        <meshStandardMaterial 
+          color={col} 
+          emissive={col} 
+          emissiveIntensity={isHovered ? 1.8 : isSelected ? 1.5 : 0.6}
+          roughness={0.15} 
+          metalness={0.85}
+          envMapIntensity={1}
+        />
       </mesh>
 
       {/* Billboard label */}
@@ -462,11 +487,14 @@ const GalaxyScene = ({ onHover, onNodeClick, hovered, selected, isMobile }) => {
 
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[5, 5, 5]} intensity={0.5} />
+      {/* Enhanced lighting for better node visibility and depth */}
+      <ambientLight intensity={0.6} />
+      <directionalLight position={[10, 8, 10]} intensity={1} />
+      <pointLight position={[-10, -5, -10]} intensity={0.6} color="#0ea5e9" />
+      <pointLight position={[0, 12, 0]} intensity={0.8} color="#8b5cf6" />
 
-      {/* Starfield background */}
-      <Stars radius={40} depth={20} count={isMobile ? 300 : 600} factor={2} saturation={0} fade />
+      {/* Starfield background - more visible */}
+      <Stars radius={50} depth={30} count={isMobile ? 400 : 800} factor={3} saturation={0.2} fade={false} />
 
       {/* Auto-orbit + pointer parallax camera controller */}
       <CameraController />
@@ -513,72 +541,72 @@ const TechInfoCard = ({ tech, onClose }) => (
     {tech && (
       <motion.div
         key={tech.id}
-        className="absolute top-4 left-4 z-10 w-64 rounded-2xl glass-morphism-dark border border-primary-500/30 p-5 pointer-events-auto"
-        initial={{ opacity: 0, scale: 0.88, x: -14 }}
-        animate={{ opacity: 1, scale: 1, x: 0 }}
-        exit={{ opacity: 0, scale: 0.88, x: -14 }}
-        transition={{ type: "spring", stiffness: 340, damping: 26 }}
+        className="absolute top-4 left-4 z-10 w-72 rounded-2xl glass-morphism-dark border border-primary-500/40 p-6 pointer-events-auto shadow-2xl"
+        initial={{ opacity: 0, scale: 0.85, x: -20, y: -10 }}
+        animate={{ opacity: 1, scale: 1, x: 0, y: 0 }}
+        exit={{ opacity: 0, scale: 0.85, x: -20, y: -10 }}
+        transition={{ type: "spring", stiffness: 360, damping: 28 }}
       >
-        {/* Close button — spins 90° on hover */}
+        {/* Close button — rotates on hover */}
         <motion.button
           onClick={onClose}
-          className="absolute top-3 right-3 text-neutral-500 hover:text-neutral-200 p-1 rounded-lg hover:bg-white/10 transition-colors"
-          whileHover={{ scale: 1.15, rotate: 90 }}
-          whileTap={{ scale: 0.82 }}
+          className="absolute top-3 right-3 text-neutral-400 hover:text-neutral-100 p-1.5 rounded-lg hover:bg-primary-500/10 transition-all"
+          whileHover={{ scale: 1.2, rotate: 90 }}
+          whileTap={{ scale: 0.9 }}
           aria-label="Close"
         >
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
           </svg>
         </motion.button>
 
         {/* Pulsing colour dot + name */}
-        <div className="flex items-center gap-2 mb-2">
+        <div className="flex items-center gap-3 mb-4">
           <motion.span
-            className="w-3 h-3 rounded-full flex-shrink-0"
+            className="w-4 h-4 rounded-full flex-shrink-0"
             style={{ backgroundColor: tech.color }}
-            animate={{ boxShadow: [`0 0 4px ${tech.color}55`, `0 0 14px ${tech.color}cc`, `0 0 4px ${tech.color}55`] }}
-            transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+            animate={{ boxShadow: [`0 0 6px ${tech.color}66`, `0 0 18px ${tech.color}dd`, `0 0 6px ${tech.color}66`] }}
+            transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
           />
-          <h3 className="font-bold text-neutral-100 text-base">{tech.label}</h3>
+          <h3 className="font-bold text-neutral-50 text-lg">{tech.label}</h3>
         </div>
 
         {/* Skill level badge + animated progress bar */}
         {tech.level && (
-          <div className="mb-3">
-            <div className="flex items-center justify-between mb-1.5">
-              <span className={`inline-block text-[10px] font-semibold px-2 py-0.5 rounded-full border ${LEVEL_STYLES[tech.level] ?? LEVEL_STYLES["Intermediate"]}`}>
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className={`inline-block text-[11px] font-bold px-2.5 py-1 rounded-full border ${LEVEL_STYLES[tech.level] ?? LEVEL_STYLES["Intermediate"]}`}>
                 {tech.level}
               </span>
-              <span className="text-[10px] text-neutral-500 tabular-nums">{LEVEL_PROGRESS[tech.level] ?? 52}%</span>
+              <span className="text-xs text-neutral-400 font-semibold">{LEVEL_PROGRESS[tech.level] ?? 52}%</span>
             </div>
-            <div className="h-1 rounded-full bg-neutral-800 overflow-hidden">
+            <div className="h-1.5 rounded-full bg-neutral-800/60 overflow-hidden">
               <motion.div
                 className="h-full rounded-full"
-                style={{ background: `linear-gradient(90deg, ${tech.color}55, ${tech.color})` }}
+                style={{ background: `linear-gradient(90deg, ${tech.color}77, ${tech.color}ff)` }}
                 initial={{ width: 0 }}
                 animate={{ width: `${LEVEL_PROGRESS[tech.level] ?? 52}%` }}
-                transition={{ duration: 0.75, delay: 0.12, ease: [0.33, 1, 0.68, 1] }}
+                transition={{ duration: 0.8, delay: 0.15, ease: [0.33, 1, 0.68, 1] }}
               />
             </div>
           </div>
         )}
 
-        <p className="text-neutral-400 text-xs leading-relaxed mb-3">{tech.description}</p>
+        <p className="text-neutral-300 text-sm leading-relaxed mb-4 font-light">{tech.description}</p>
 
         {/* Project chips — staggered spring entrance + hover lift */}
         {tech.projects?.length > 0 && (
           <div>
-            <p className="text-[10px] font-semibold text-primary-400 uppercase tracking-wider mb-1.5">Used in</p>
-            <div className="flex flex-wrap gap-1">
+            <p className="text-xs font-bold text-primary-400/90 uppercase tracking-wider mb-2.5">Used in</p>
+            <div className="flex flex-wrap gap-2">
               {tech.projects.map((p, i) => (
                 <motion.span
                   key={p}
-                  initial={{ opacity: 0, scale: 0.6, y: 4 }}
+                  initial={{ opacity: 0, scale: 0.6, y: 6 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                  transition={{ delay: 0.08 + i * 0.07, type: "spring", stiffness: 380, damping: 22 }}
-                  whileHover={{ scale: 1.1, y: -1 }}
-                  className="text-[10px] px-2 py-0.5 bg-primary-500/10 border border-primary-500/20 text-primary-300 rounded-full cursor-default"
+                  transition={{ delay: 0.1 + i * 0.08, type: "spring", stiffness: 400, damping: 24 }}
+                  whileHover={{ scale: 1.12, y: -2 }}
+                  className="text-xs px-2.5 py-1 bg-primary-500/15 border border-primary-500/35 text-primary-300 rounded-full cursor-default font-medium hover:bg-primary-500/25 transition-colors"
                 >
                   {p}
                 </motion.span>
@@ -595,17 +623,22 @@ const TechInfoCard = ({ tech, onClose }) => (
 const TechGalaxy = ({ performanceMode = false }) => {
   const [hoveredTech, setHoveredTech] = useState(null);
   const [selectedTech, setSelectedTech] = useState(null);
-  // Safe client-side mobile detection (avoids SSR issues)
   const [isMobile, setIsMobile] = useState(false);
+  const canvasRef = useRef(null);
+
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
   }, []);
+
   const dpr = useMemo(() => {
     if (typeof window === "undefined") return 1;
     return isMobile ? 1 : Math.min(window.devicePixelRatio, 1.5);
   }, [isMobile]);
 
-  if (performanceMode) {
+  // Force 3D rendering for desktop, only use grid for very low-end devices
+  const shouldUsePerformanceMode = performanceMode && isMobile;
+
+  if (shouldUsePerformanceMode) {
     return (
       <div className="w-full grid grid-cols-3 sm:grid-cols-4 gap-3 py-8">
         {techData.map((tech, i) => (
@@ -637,6 +670,7 @@ const TechGalaxy = ({ performanceMode = false }) => {
     );
   }
 
+  // Full 3D galaxy for all desktop devices
   return (
     <motion.div
       className="relative w-full"
@@ -648,10 +682,18 @@ const TechGalaxy = ({ performanceMode = false }) => {
       data-cursor="canvas"
     >
       <Canvas
+        ref={canvasRef}
         camera={{ position: [0, 4, 14], fov: 55 }}
-        gl={{ antialias: !isMobile, alpha: true, powerPreference: "default" }}
+        gl={{ 
+          antialias: true, 
+          alpha: true, 
+          powerPreference: "high-performance",
+          stencil: false,
+          depth: true,
+          preserveDrawingBuffer: false
+        }}
         dpr={dpr}
-        style={{ background: "transparent" }}
+        style={{ background: "transparent", width: "100%", height: "100%" }}
         onPointerMissed={() => setSelectedTech(null)}
       >
         <Suspense fallback={null}>
