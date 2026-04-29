@@ -1,5 +1,5 @@
-import { atom } from "jotai";
-
+// Framer Motion Spring Configuration
+// Used across all animations for consistent feel
 export const framerMotionConfig = {
   type: "spring",
   mass: 5,
@@ -8,4 +8,5 @@ export const framerMotionConfig = {
   restDelta: 0.0001,
 };
 
-export const themeAtom = atom("dark");
+// Note: Theme state has been migrated to Zustand
+// See: src/store/themeStore.js
