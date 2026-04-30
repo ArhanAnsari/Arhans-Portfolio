@@ -54,7 +54,7 @@ export const appRegistry = {
     id: 'terminal',
     name: 'Terminal',
     title: 'Terminal',
-    icon: '💻',
+    icon: '/images/terminal.png',
     component: TerminalApp,
   },
   content: {
@@ -90,14 +90,14 @@ export const appRegistry = {
     id: 'finder',
     name: 'Finder',
     title: 'Finder',
-    icon: '📁',
+    icon: '/images/finder.png',
     component: FinderApp,
   },
   safari: {
     id: 'safari',
     name: 'Safari',
     title: 'Safari Browser',
-    icon: '🧭',
+    icon: '/images/safari.png',
     component: SafariApp,
   },
   launchpad: {

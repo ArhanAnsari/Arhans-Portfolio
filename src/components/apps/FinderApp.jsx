@@ -15,8 +15,8 @@ const FinderApp = ({ windowId, windowData }) => {
       items: [
         { id: 1, name: 'Projects', type: 'folder', icon: '📁' },
         { id: 2, name: 'Resume.pdf', type: 'file', icon: '📄' },
-        { id: 3, name: 'GitHub', type: 'link', icon: '🔗', url: 'https://github.com' },
-        { id: 4, name: 'YouTube', type: 'link', icon: '📺', url: 'https://youtube.com' },
+        { id: 3, name: 'GitHub', type: 'link', icon: '🔗', url: 'https://github.com/ArhanAnsari' },
+        { id: 4, name: 'YouTube', type: 'link', icon: '📺', url: 'https://youtube.com/@codewitharhanofficial' },
       ],
     },
     Projects: {

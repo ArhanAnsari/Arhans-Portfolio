@@ -12,13 +12,13 @@ const LaunchpadApp = ({ windowId, onAppSelect }) => {
     { id: 'about', name: 'About', icon: '👨‍💻', category: 'system' },
     { id: 'projects', name: 'Projects', icon: '🚀', category: 'system' },
     { id: 'skills', name: 'Skills', icon: '⚡', category: 'system' },
-    { id: 'terminal', name: 'Terminal', icon: '💻', category: 'system' },
+    { id: 'terminal', name: 'Terminal', icon: '/images/terminal.png', category: 'system' },
     { id: 'resume', name: 'Resume', icon: '📄', category: 'system' },
     { id: 'content', name: 'Content', icon: '📹', category: 'system' },
     { id: 'contact', name: 'Contact', icon: '📬', category: 'system' },
     { id: 'ai', name: 'AI Twin', icon: '🤖', category: 'system' },
-    { id: 'finder', name: 'Finder', icon: '/images/finder.png"' , category: 'system' },
-    { id: 'safari', name: 'Safari', icon: '🧭', category: 'system' },
+    { id: 'finder', name: 'Finder', icon: '/images/finder.png', category: 'system' }, 
+    { id: 'safari', name: 'Safari', icon: '/images/safari.png', category: 'system' },
     { id: 'codewitharhan', name: 'CodeWithArhan', icon: '📺', category: 'apps' },
     { id: 'saas', name: 'SaaS Dashboard', icon: '📊', category: 'apps' },
     { id: 'devtimeline', name: 'Dev Timeline', icon: '📅', category: 'apps' },
@@ -121,6 +121,9 @@ const LaunchpadApp = ({ windowId, onAppSelect }) => {
 };
 
 const LaunchpadIcon = ({ app, index, onClick }) => {
+  // Logic to detect if the icon is an image path
+  const isImagePath = typeof app.icon === 'string' && (app.icon.startsWith('/') || app.icon.includes('.'));
+
   return (
     <motion.button
       onClick={onClick}
@@ -133,12 +136,20 @@ const LaunchpadIcon = ({ app, index, onClick }) => {
     >
       {/* Icon Container */}
       <motion.div
-        className="w-16 h-16 rounded-2xl bg-gradient-to-br from-neutral-800 to-neutral-900 border border-white/10 flex items-center justify-center text-4xl group-hover:border-primary-500/50 transition-all shadow-lg"
+        className="w-16 h-16 rounded-2xl bg-gradient-to-br from-neutral-800 to-neutral-900 border border-white/10 flex items-center justify-center text-4xl group-hover:border-primary-500/50 transition-all shadow-lg overflow-hidden"
         whileHover={{
           boxShadow: '0 0 20px rgba(139, 220, 255, 0.3)',
         }}
       >
-        {app.icon}
+        {isImagePath ? (
+          <img 
+            src={app.icon} 
+            alt={app.name} 
+            className="w-10 h-10 object-contain" 
+          />
+        ) : (
+          app.icon
+        )}
       </motion.div>
 
       {/* App Name */}

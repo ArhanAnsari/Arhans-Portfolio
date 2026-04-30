@@ -6,19 +6,11 @@ import { motion } from 'framer-motion';
  * Individual clickable icon in the dock
  */
 export const DockIcon = React.forwardRef(
-  (
-    {
-      icon,
-      label,
-      isActive = false,
-      onClick,
-      onMouseEnter,
-      onMouseLeave,
-      className = '',
-      ...props
-    },
-    ref
-  ) => {
+  ({ icon, label, isActive = false, onClick, onMouseEnter, onMouseLeave, className = '', ...props }, ref) => {
+    
+    // Check if the icon is a path or an emoji
+    const isImagePath = icon.startsWith('/') || icon.includes('.');
+
     return (
       <motion.button
         ref={ref}
@@ -39,7 +31,16 @@ export const DockIcon = React.forwardRef(
         title={label}
         {...props}
       >
-        <span className="text-2xl">{icon}</span>
+        {/* Conditional Rendering Logic */}
+        {isImagePath ? (
+          <img 
+            src={icon} 
+            alt={label} 
+            className="w-8 h-8 object-contain" 
+          />
+        ) : (
+          <span className="text-2xl">{icon}</span>
+        )}
 
         {/* Active indicator dot */}
         {isActive && (
