@@ -17,7 +17,7 @@ const LaunchpadApp = ({ windowId, onAppSelect }) => {
     { id: 'content', name: 'Content', icon: '📹', category: 'system' },
     { id: 'contact', name: 'Contact', icon: '📬', category: 'system' },
     { id: 'ai', name: 'AI Twin', icon: '🤖', category: 'system' },
-    { id: 'finder', name: 'Finder', icon: '📁', category: 'system' },
+    { id: 'finder', name: 'Finder', icon: '/images/finder.png"' , category: 'system' },
     { id: 'safari', name: 'Safari', icon: '🧭', category: 'system' },
     { id: 'codewitharhan', name: 'CodeWithArhan', icon: '📺', category: 'apps' },
     { id: 'saas', name: 'SaaS Dashboard', icon: '📊', category: 'apps' },

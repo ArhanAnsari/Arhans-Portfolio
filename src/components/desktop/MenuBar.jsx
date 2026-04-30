@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import dayjs from 'dayjs';
-import { Bell, Wifi, Battery, Settings, Search } from 'lucide-react';
+import { Bell, Wifi, Battery, Settings, Search, RotateCcw, Power } from 'lucide-react';
 import { useWindowStore } from '../../store/windowStore';
 
 /**
@@ -30,45 +30,65 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
     return activeWindow?.title || 'Finder';
   };
 
+  // Menu actions
+  const handleAboutArhanOS = () => {
+    alert('ArhanOS v1.0 - Premium Desktop Experience\nBuilt with React, Framer Motion & Tailwind CSS');
+  };
+
+  const handleSystemPreferences = () => {
+    alert('System Preferences\n\n📊 Display: Retina\n🔊 Sound: Enabled\n🔋 Battery Saver: Off\n🌙 Dark Mode: On');
+  };
+
+  const handleRestart = () => {
+    if (confirm('Are you sure you want to restart?')) {
+      window.location.reload();
+    }
+  };
+
+  const handleShutdown = () => {
+    if (confirm('Are you sure you want to shutdown?')) {
+      window.location.href = '/';
+    }
+  };
+
   const menus = [
     {
       id: 'arhan',
-      label: '󠀠',
-      icon: '🍎',
+      label: '/images/logo.svg',
       items: [
-        { label: 'About ArhanOS', action: () => {} },
-        { label: 'System Preferences', action: () => {} },
-        { label: 'Restart', action: () => {} },
-        { label: 'Shutdown', action: () => {} },
+        { label: 'About ArhanOS', action: handleAboutArhanOS },
+        { label: 'System Preferences', action: handleSystemPreferences },
+        { label: 'Restart', action: handleRestart },
+        { label: 'Shutdown', action: handleShutdown },
       ],
     },
     {
       id: 'file',
       label: 'File',
       items: [
-        { label: 'New Window', action: () => {} },
-        { label: 'New Tab', action: () => {} },
-        { label: 'Close', action: () => {} },
+        { label: 'New Window', action: () => alert('Opening new window...') },
+        { label: 'New Tab', action: () => alert('Opening new tab...') },
+        { label: 'Close Window', action: () => alert('Closing window...') },
       ],
     },
     {
       id: 'edit',
       label: 'Edit',
       items: [
-        { label: 'Undo', action: () => {} },
-        { label: 'Redo', action: () => {} },
-        { label: 'Cut', action: () => {} },
-        { label: 'Copy', action: () => {} },
-        { label: 'Paste', action: () => {} },
+        { label: 'Undo (⌘Z)', action: () => alert('Undo') },
+        { label: 'Redo (⌘Y)', action: () => alert('Redo') },
+        { label: 'Cut (⌘X)', action: () => alert('Cut') },
+        { label: 'Copy (⌘C)', action: () => alert('Copy') },
+        { label: 'Paste (⌘V)', action: () => alert('Paste') },
       ],
     },
     {
       id: 'view',
       label: 'View',
       items: [
-        { label: 'Zoom In', action: () => {} },
-        { label: 'Zoom Out', action: () => {} },
-        { label: 'Reset Zoom', action: () => {} },
+        { label: 'Zoom In (⌘+)', action: () => alert('Zooming in...') },
+        { label: 'Zoom Out (⌘-)', action: () => alert('Zooming out...') },
+        { label: 'Reset Zoom (⌘0)', action: () => alert('Zoom reset') },
       ],
     },
   ];
@@ -88,19 +108,19 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
       >
         {/* Left Section - Menus */}
         <div className="flex items-center gap-6 flex-1" ref={menuRef}>
-          {/* Apple Logo */}
+          {/* Apple Logo + Arhan's Portfolio (Same Line) */}
           <motion.button
             onClick={() => handleMenuClick('arhan')}
-            className="text-lg hover:bg-white/10 px-2 py-1 rounded transition-colors relative"
-            whileHover={{ scale: 1.1 }}
+            className="flex items-center gap-2 hover:bg-white/10 px-3 py-1 rounded transition-colors relative group"
+            whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
-            <img src="/images/logo.svg" className="dark:invert" />
-            <p className="font-bold">Arhan's Portfolio</p>
+            <span className="text-lg"><img src="/images/logo.svg" alt="Apple Logo" className="w-5 h-5" /></span>
+            <span className="text-xs font-bold text-neutral-200">Arhan's Portfolio</span>
             <AnimatePresence>
               {activeMenu === 'arhan' && (
                 <motion.div
-                  className="absolute top-full left-0 mt-2 bg-neutral-900/95 backdrop-blur-lg border border-white/20 rounded-lg shadow-2xl w-48 py-2"
+                  className="absolute top-full left-0 mt-2 bg-neutral-900/95 backdrop-blur-lg border border-white/20 rounded-lg shadow-2xl w-56 py-2 z-50"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
@@ -112,7 +132,7 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
                         item.action();
                         setActiveMenu(null);
                       }}
-                      className="block w-full text-left px-4 py-2 text-sm text-neutral-200 hover:bg-primary-500/30"
+                      className="block w-full text-left px-4 py-2 text-xs text-neutral-200 hover:bg-primary-500/30 transition-colors"
                       whileHover={{ paddingLeft: '1.25rem' }}
                     >
                       {item.label}
@@ -133,7 +153,7 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
             <motion.button
               key={menu.id}
               onClick={() => handleMenuClick(menu.id)}
-              className="text-xs hover:bg-white/10 px-2 py-1 rounded transition-colors relative text-neutral-200"
+              className="text-xs hover:bg-white/10 px-2 py-1 rounded transition-colors relative text-neutral-200 font-medium"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
@@ -141,7 +161,7 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
               <AnimatePresence>
                 {activeMenu === menu.id && (
                   <motion.div
-                    className="absolute top-full left-0 mt-2 bg-neutral-900/95 backdrop-blur-lg border border-white/20 rounded-lg shadow-2xl w-40 py-2"
+                    className="absolute top-full left-0 mt-2 bg-neutral-900/95 backdrop-blur-lg border border-white/20 rounded-lg shadow-2xl w-48 py-2 z-50"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -149,11 +169,12 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
                     {menu.items.map((item, idx) => (
                       <motion.button
                         key={idx}
-                        onClick={() => {
+                        onClick={(e) => {
+                          e.stopPropagation();
                           item.action();
                           setActiveMenu(null);
                         }}
-                        className="block w-full text-left px-4 py-2 text-xs text-neutral-200 hover:bg-primary-500/30"
+                        className="block w-full text-left px-4 py-2 text-xs text-neutral-200 hover:bg-primary-500/30 transition-colors"
                         whileHover={{ paddingLeft: '1.25rem' }}
                       >
                         {item.label}
