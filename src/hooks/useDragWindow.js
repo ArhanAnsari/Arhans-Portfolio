@@ -17,26 +17,30 @@ export const useDragWindow = (windowId, dragHandleRef) => {
   });
 
   const windowStore = useWindowStore();
-  const window = windowStore.getWindow(windowId);
+  const storeRef = useRef(windowStore);
+  storeRef.current = windowStore;
 
   useEffect(() => {
     const dragHandle = dragHandleRef?.current;
-    if (!dragHandle || !window) return;
+    if (!dragHandle) return;
 
     const handleMouseDown = (e) => {
       // Only drag from titlebar
       if (e.button !== 0) return; // Left click only
 
+      const currentWindow = storeRef.current.getWindow(windowId);
+      if (!currentWindow) return;
+
       dragState.current = {
         isDragging: true,
         startX: e.clientX,
         startY: e.clientY,
-        startWindowX: window.x,
-        startWindowY: window.y,
+        startWindowX: currentWindow.x,
+        startWindowY: currentWindow.y,
       };
 
       // Focus window on drag
-      windowStore.focusWindow(windowId);
+      storeRef.current.focusWindow(windowId);
 
       // Add drag listeners
       document.addEventListener('mousemove', handleMouseMove);
@@ -48,6 +52,9 @@ export const useDragWindow = (windowId, dragHandleRef) => {
     const handleMouseMove = (e) => {
       if (!dragState.current.isDragging) return;
 
+      const currentWindow = storeRef.current.getWindow(windowId);
+      if (!currentWindow) return;
+
       const deltaX = e.clientX - dragState.current.startX;
       const deltaY = e.clientY - dragState.current.startY;
 
@@ -58,11 +65,11 @@ export const useDragWindow = (windowId, dragHandleRef) => {
       const { x, y } = constrainWindowPosition(
         newX,
         newY,
-        window.width,
-        window.height
+        currentWindow.width,
+        currentWindow.height
       );
 
-      windowStore.dragWindow(windowId, x, y);
+      storeRef.current.dragWindow(windowId, x, y);
     };
 
     const handleMouseUp = () => {
@@ -78,5 +85,5 @@ export const useDragWindow = (windowId, dragHandleRef) => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
-  }, [windowId, window, windowStore, dragHandleRef]);
+  }, [windowId, dragHandleRef]);
 };

@@ -82,17 +82,16 @@ export const WindowFrame = React.forwardRef(
           height: displayHeight,
           zIndex,
         }}
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        initial={{ opacity: 0, scale: 0.9 }}
         animate={{
           opacity: 1,
           scale: 1,
-          y: 0,
           boxShadow: isFocused
             ? '0 30px 60px -12px rgba(56, 189, 248, 0.15), 0 18px 36px -8px rgba(0, 0, 0, 0.3)'
             : '0 10px 25px -5px rgba(0, 0, 0, 0.15)',
           borderColor: isFocused ? 'rgba(56, 189, 248, 0.2)' : 'rgba(100, 116, 139, 0.3)',
         }}
-        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        exit={{ opacity: 0, scale: 0.9 }}
         transition={{
           ...WINDOW_ANIMATIONS.open.transition,
           boxShadow: { duration: 0.2 },

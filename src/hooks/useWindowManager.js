@@ -28,6 +28,32 @@ export const useWindowManager = () => {
     [windowStore, appStore]
   );
 
+  /**
+   * Smart toggle: open/restore/focus depending on state
+   * - If window doesn't exist: open new
+   * - If minimized: restore
+   * - If already open: focus
+   */
+  const toggleWindow = useCallback(
+    (appId) => {
+      const windowId = `${appId}-main`;
+      const window = windowStore.getWindow(windowId);
+
+      if (!window) {
+        // Window doesn't exist - create new
+        openWindow(appId);
+      } else if (window.minimized) {
+        // Window is minimized - restore
+        windowStore.restoreWindow(windowId);
+        windowStore.focusWindow(windowId);
+      } else {
+        // Window is already open - focus it
+        windowStore.focusWindow(windowId);
+      }
+    },
+    [windowStore, appStore, openWindow]
+  );
+
   const closeWindow = useCallback(
     (windowId) => {
       windowStore.closeWindow(windowId);
@@ -71,6 +97,7 @@ export const useWindowManager = () => {
 
     // Actions
     openWindow,
+    toggleWindow,
     closeWindow,
     focusWindow,
     minimizeWindow,

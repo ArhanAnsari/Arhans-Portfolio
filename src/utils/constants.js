@@ -13,6 +13,12 @@ export const DOCK_APPS = [
   { id: 'contact', name: 'Contact', icon: '📬' },
   { id: 'resume', name: 'Resume', icon: '📄' },
   { id: 'ai', name: 'AI Twin', icon: '🤖' },
+  // Phase 3 Apps
+  { id: 'finder', name: 'Finder', icon: '📁' },
+  { id: 'safari', name: 'Safari', icon: '🧭' },
+  { id: 'codewitharhan', name: 'CodeWithArhan', icon: '📺' },
+  { id: 'saas', name: 'SaaS', icon: '📊' },
+  { id: 'devtimeline', name: 'Timeline', icon: '📅' },
 ];
 
 // Window defaults
