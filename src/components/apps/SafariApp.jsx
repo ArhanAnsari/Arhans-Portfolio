@@ -16,9 +16,9 @@ const SafariApp = ({ windowId, windowData }) => {
   const bookmarks = [
     { name: 'Portfolio', url: 'about:portfolio', icon: '🌐' },
     { name: 'GitHub', url: 'https://github.com', icon: '🐙' },
-    { name: 'YouTube', url: 'https://youtube.com', icon: '📺' },
+    { name: 'YouTube', url: 'https://youtube.com/@codewitharhanofficial', icon: '📺' },
     { name: 'LinkedIn', url: 'https://linkedin.com', icon: '💼' },
-    { name: 'Email', url: 'mailto:arhan@example.com', icon: '✉️' },
+    { name: 'Email', url: 'mailto:arhanansari2009@gmail.com', icon: '✉️' },
     { name: 'Resume', url: '/resume.pdf', icon: '📄' },
   ];
 
