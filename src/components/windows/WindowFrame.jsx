@@ -49,8 +49,15 @@ export const WindowFrame = React.forwardRef(
       if (onMinimize) onMinimize(id);
     };
 
+    // Toggle between maximize and restore
     const handleMaximize = () => {
-      if (onMaximize) onMaximize(id);
+      if (maximized) {
+        // Window is maximized, so restore it
+        if (onRestore) onRestore(id);
+      } else {
+        // Window is not maximized, so maximize it
+        if (onMaximize) onMaximize(id);
+      }
     };
 
     // Don't render if minimized

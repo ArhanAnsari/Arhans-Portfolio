@@ -7,7 +7,7 @@ import { useWindowManager } from '../../hooks/useWindowManager';
  * Window Container Component
  * Renders all open windows and handles their lifecycle
  */
-export const Window = ({ appRegistry }) => {
+export const Window = ({ appRegistry, onAppSelect }) => {
   const {
     windows,
     closeWindow,
@@ -44,7 +44,11 @@ export const Window = ({ appRegistry }) => {
           >
             {AppComponent ? (
               <Suspense fallback={<div className="p-8">Loading...</div>}>
-                <AppComponent windowId={window.id} windowData={window} />
+                <AppComponent
+                  windowId={window.id}
+                  windowData={window}
+                  onAppSelect={window.app === 'launchpad' ? onAppSelect : undefined}
+                />
               </Suspense>
             ) : (
               <div className="p-8 text-neutral-400">

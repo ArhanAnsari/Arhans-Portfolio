@@ -1,19 +1,27 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import dayjs from 'dayjs';
-import { Bell, Wifi, Battery, Settings, Search, RotateCcw, Power } from 'lucide-react';
+import { Bell, Wifi, Battery, Search } from 'lucide-react';
 import { useWindowStore } from '../../store/windowStore';
 
 /**
  * ArhanOS MenuBar
  * Premium system menu bar with dropdowns, system stats, and notifications
  */
-const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
+const MenuBar = ({ onSpotlightOpen, onNotificationOpen, onAppOpen }) => {
   const [currentTime, setCurrentTime] = useState(dayjs());
   const [activeMenu, setActiveMenu] = useState(null);
   const [batteryLevel, setBatteryLevel] = useState(92);
   const [wifiStrength, setWifiStrength] = useState(4);
-  const { windows, focusStack } = useWindowStore();
+  const [zoom, setZoom] = useState(1);
+  const {
+    windows,
+    focusStack,
+    closeWindow,
+    minimizeWindow,
+    restoreWindow,
+    focusWindow,
+  } = useWindowStore();
   const menuRef = useRef(null);
 
   // Update clock every second
@@ -29,6 +37,43 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
     const activeWindow = windows.find(w => w.id === activeWindowId);
     return activeWindow?.title || 'Finder';
   };
+
+  const getFocusedWindowId = () => focusStack[focusStack.length - 1] || null;
+
+  useEffect(() => {
+    document.body.style.zoom = `${zoom}`;
+    return () => {
+      document.body.style.zoom = '1';
+    };
+  }, [zoom]);
+
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'w') {
+        e.preventDefault();
+        const focusedWindowId = getFocusedWindowId();
+        if (focusedWindowId) closeWindow(focusedWindowId);
+      }
+
+      if ((e.metaKey || e.ctrlKey) && (e.key === '=' || e.key === '+')) {
+        e.preventDefault();
+        setZoom((prev) => Math.min(prev + 0.1, 1.5));
+      }
+
+      if ((e.metaKey || e.ctrlKey) && e.key === '-') {
+        e.preventDefault();
+        setZoom((prev) => Math.max(prev - 0.1, 0.7));
+      }
+
+      if ((e.metaKey || e.ctrlKey) && e.key === '0') {
+        e.preventDefault();
+        setZoom(1);
+      }
+    };
+
+    window.addEventListener('keydown', handleGlobalKeyDown);
+    return () => window.removeEventListener('keydown', handleGlobalKeyDown);
+  }, [focusStack, closeWindow]);
 
   // Menu actions
   const handleAboutArhanOS = () => {
@@ -51,10 +96,42 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
     }
   };
 
+  const handleOpenFinder = () => {
+    if (onAppOpen) onAppOpen('finder');
+  };
+
+  const handleCloseWindow = () => {
+    const focusedWindowId = getFocusedWindowId();
+    if (focusedWindowId) closeWindow(focusedWindowId);
+  };
+
+  const handleMinimizeWindow = () => {
+    const focusedWindowId = getFocusedWindowId();
+    if (focusedWindowId) minimizeWindow(focusedWindowId);
+  };
+
+  const handleFocusFinderWindow = () => {
+    const finderWindow = windows.find((w) => w.app === 'finder');
+    if (finderWindow) {
+      restoreWindow(finderWindow.id);
+      focusWindow(finderWindow.id);
+      return;
+    }
+    handleOpenFinder();
+  };
+
+  const execEditCommand = async (command) => {
+    try {
+      document.execCommand(command);
+    } catch (error) {
+      console.warn(`Edit command failed: ${command}`, error);
+    }
+  };
+
   const menus = [
     {
       id: 'arhan',
-      label: '/images/logo.svg',
+      label: "Arhan's Portfolio",
       items: [
         { label: 'About ArhanOS', action: handleAboutArhanOS },
         { label: 'System Preferences', action: handleSystemPreferences },
@@ -63,32 +140,42 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
       ],
     },
     {
+      id: 'finder',
+      label: getActiveAppName(),
+      items: [
+        { label: 'Open Finder', action: handleOpenFinder },
+        { label: 'Bring Finder to Front', action: handleFocusFinderWindow },
+        { label: 'Minimize Active Window', action: handleMinimizeWindow },
+        { label: 'Close Active Window', action: handleCloseWindow },
+      ],
+    },
+    {
       id: 'file',
       label: 'File',
       items: [
-        { label: 'New Window', action: () => alert('Opening new window...') },
-        { label: 'New Tab', action: () => alert('Opening new tab...') },
-        { label: 'Close Window', action: () => alert('Closing window...') },
+        { label: 'New Window', action: handleOpenFinder },
+        { label: 'Open Safari', action: () => onAppOpen && onAppOpen('safari') },
+        { label: 'Close Window (Ctrl+W)', action: handleCloseWindow },
       ],
     },
     {
       id: 'edit',
       label: 'Edit',
       items: [
-        { label: 'Undo (⌘Z)', action: () => alert('Undo') },
-        { label: 'Redo (⌘Y)', action: () => alert('Redo') },
-        { label: 'Cut (⌘X)', action: () => alert('Cut') },
-        { label: 'Copy (⌘C)', action: () => alert('Copy') },
-        { label: 'Paste (⌘V)', action: () => alert('Paste') },
+        { label: 'Undo (Ctrl+Z)', action: () => execEditCommand('undo') },
+        { label: 'Redo (Ctrl+Y)', action: () => execEditCommand('redo') },
+        { label: 'Cut (Ctrl+X)', action: () => execEditCommand('cut') },
+        { label: 'Copy (Ctrl+C)', action: () => execEditCommand('copy') },
+        { label: 'Paste (Ctrl+V)', action: () => execEditCommand('paste') },
       ],
     },
     {
       id: 'view',
       label: 'View',
       items: [
-        { label: 'Zoom In (⌘+)', action: () => alert('Zooming in...') },
-        { label: 'Zoom Out (⌘-)', action: () => alert('Zooming out...') },
-        { label: 'Reset Zoom (⌘0)', action: () => alert('Zoom reset') },
+        { label: 'Zoom In (Ctrl +)', action: () => setZoom((prev) => Math.min(prev + 0.1, 1.5)) },
+        { label: 'Zoom Out (Ctrl -)', action: () => setZoom((prev) => Math.max(prev - 0.1, 0.7)) },
+        { label: 'Reset Zoom (Ctrl 0)', action: () => setZoom(1) },
       ],
     },
   ];
@@ -108,15 +195,17 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
       >
         {/* Left Section - Menus */}
         <div className="flex items-center gap-6 flex-1" ref={menuRef}>
-          {/* Apple Logo + Arhan's Portfolio (Same Line) */}
-          <motion.button
-            onClick={() => handleMenuClick('arhan')}
-            className="flex items-center gap-2 hover:bg-white/10 px-3 py-1 rounded transition-colors relative group"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span className="text-lg"><img src="/images/logo.svg" alt="Apple Logo" className="w-5 h-5" /></span>
-            <span className="text-xs font-bold text-neutral-200">Arhan's Portfolio</span>
+          {/* Apple Logo + Menu Buttons */}
+          <div className="relative">
+            <motion.button
+              onClick={() => handleMenuClick('arhan')}
+              className="flex items-center gap-2 hover:bg-white/10 px-3 py-1 rounded transition-colors"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <span className="text-lg"><img src="/images/logo.svg" alt="Apple Logo" className="w-5 h-5" /></span>
+              <span className="text-xs font-bold text-neutral-200">Arhan's Portfolio</span>
+            </motion.button>
             <AnimatePresence>
               {activeMenu === 'arhan' && (
                 <motion.div
@@ -141,27 +230,22 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.button>
-
-          {/* Active App Name */}
-          <div className="text-xs text-neutral-300 font-medium">
-            {getActiveAppName()}
           </div>
 
-          {/* File, Edit, View Menus */}
-          {menus.slice(1, 4).map((menu) => (
-            <motion.button
-              key={menu.id}
-              onClick={() => handleMenuClick(menu.id)}
-              className="text-xs hover:bg-white/10 px-2 py-1 rounded transition-colors relative text-neutral-200 font-medium"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              {menu.label}
+          {menus.slice(1).map((menu) => (
+            <div key={menu.id} className="relative">
+              <motion.button
+                onClick={() => handleMenuClick(menu.id)}
+                className="text-xs hover:bg-white/10 px-2 py-1 rounded transition-colors text-neutral-200 font-medium"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {menu.label}
+              </motion.button>
               <AnimatePresence>
                 {activeMenu === menu.id && (
                   <motion.div
-                    className="absolute top-full left-0 mt-2 bg-neutral-900/95 backdrop-blur-lg border border-white/20 rounded-lg shadow-2xl w-48 py-2 z-50"
+                    className="absolute top-full left-0 mt-2 bg-neutral-900/95 backdrop-blur-lg border border-white/20 rounded-lg shadow-2xl w-56 py-2 z-50"
                     initial={{ opacity: 0, y: -10 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: -10 }}
@@ -169,8 +253,7 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
                     {menu.items.map((item, idx) => (
                       <motion.button
                         key={idx}
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onClick={() => {
                           item.action();
                           setActiveMenu(null);
                         }}
@@ -183,7 +266,7 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen }) => {
                   </motion.div>
                 )}
               </AnimatePresence>
-            </motion.button>
+            </div>
           ))}
         </div>
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Search, X } from 'lucide-react';
 
@@ -8,21 +8,23 @@ import { Search, X } from 'lucide-react';
  */
 const LaunchpadApp = ({ windowId, onAppSelect }) => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [apps, setApps] = useState([
-    { id: 'about', name: 'About', icon: '👨‍💻', category: 'system' },
-    { id: 'projects', name: 'Projects', icon: '🚀', category: 'system' },
-    { id: 'skills', name: 'Skills', icon: '⚡', category: 'system' },
+  const apps = [
+    { id: 'about', name: 'About', icon: '/icons/info.svg', category: 'system' },
+    { id: 'projects', name: 'Projects', icon: '/icons/work.svg', category: 'system' },
+    { id: 'skills', name: 'Skills', icon: '/icons/atom.svg', category: 'system' },
     { id: 'terminal', name: 'Terminal', icon: '/images/terminal.png', category: 'system' },
-    { id: 'resume', name: 'Resume', icon: '📄', category: 'system' },
-    { id: 'content', name: 'Content', icon: '📹', category: 'system' },
-    { id: 'contact', name: 'Contact', icon: '📬', category: 'system' },
-    { id: 'ai', name: 'AI Twin', icon: '🤖', category: 'system' },
-    { id: 'finder', name: 'Finder', icon: '/images/finder.png', category: 'system' }, 
+    { id: 'resume', name: 'Resume', icon: '/images/pdf.png', category: 'system' },
+    { id: 'content', name: 'Content', icon: '/images/notes.png', category: 'system' },
+    { id: 'contact', name: 'Contact', icon: '/icons/user.svg', category: 'system' },
+    { id: 'ai', name: 'AI Twin', icon: '/icons/info.svg', category: 'system' },
+    { id: 'finder', name: 'Finder', icon: '/images/finder.png', category: 'system' },
     { id: 'safari', name: 'Safari', icon: '/images/safari.png', category: 'system' },
-    { id: 'codewitharhan', name: 'CodeWithArhan', icon: '📺', category: 'apps' },
-    { id: 'saas', name: 'SaaS Dashboard', icon: '📊', category: 'apps' },
-    { id: 'devtimeline', name: 'Dev Timeline', icon: '📅', category: 'apps' },
-  ]);
+    { id: 'launchpad', name: 'Launchpad', icon: '/images/pages.png', category: 'system' },
+    { id: 'notifications', name: 'Notifications', icon: '/images/notes.png', category: 'apps' },
+    { id: 'codewitharhan', name: 'CodeWithArhan', icon: '/images/notes.png', category: 'apps' },
+    { id: 'saas', name: 'SaaS Dashboard', icon: '/icons/work.svg', category: 'apps' },
+    { id: 'devtimeline', name: 'Dev Timeline', icon: '/icons/info.svg', category: 'apps' },
+  ];
 
   const filteredApps = apps.filter((app) =>
     app.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -121,8 +123,13 @@ const LaunchpadApp = ({ windowId, onAppSelect }) => {
 };
 
 const LaunchpadIcon = ({ app, index, onClick }) => {
+  const [imageError, setImageError] = useState(false);
+
   // Logic to detect if the icon is an image path
-  const isImagePath = typeof app.icon === 'string' && (app.icon.startsWith('/') || app.icon.includes('.'));
+  const isImagePath =
+    typeof app.icon === 'string' &&
+    (app.icon.startsWith('/') || app.icon.includes('.')) &&
+    !imageError;
 
   return (
     <motion.button
@@ -146,6 +153,7 @@ const LaunchpadIcon = ({ app, index, onClick }) => {
             src={app.icon} 
             alt={app.name} 
             className="w-10 h-10 object-contain" 
+            onError={() => setImageError(true)}
           />
         ) : (
           app.icon

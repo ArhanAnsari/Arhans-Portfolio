@@ -7,9 +7,15 @@ import { motion } from 'framer-motion';
  */
 export const DockIcon = React.forwardRef(
   ({ icon, label, isActive = false, onClick, onMouseEnter, onMouseLeave, className = '', ...props }, ref) => {
+    const [imageError, setImageError] = React.useState(false);
     
     // Check if the icon is a path or an emoji
-    const isImagePath = icon.startsWith('/') || icon.includes('.');
+    const isImagePath =
+      typeof icon === 'string' &&
+      (icon.startsWith('/') || icon.includes('.')) &&
+      !imageError;
+
+    const fallbackEmoji = '🧩';
 
     return (
       <motion.button
@@ -37,9 +43,10 @@ export const DockIcon = React.forwardRef(
             src={icon} 
             alt={label} 
             className="w-8 h-8 object-contain" 
+            onError={() => setImageError(true)}
           />
         ) : (
-          <span className="text-2xl">{icon}</span>
+          <span className="text-2xl">{typeof icon === 'string' ? icon : fallbackEmoji}</span>
         )}
 
         {/* Active indicator dot */}

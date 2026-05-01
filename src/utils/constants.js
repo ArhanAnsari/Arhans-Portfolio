@@ -5,20 +5,22 @@
 
 // Dock configuration
 export const DOCK_APPS = [
-  { id: 'about', name: 'About', icon: '👨‍💻' },
-  { id: 'projects', name: 'Projects', icon: '🚀' },
-  { id: 'skills', name: 'Skills', icon: '⚡' },
+  { id: 'about', name: 'About', icon: '/icons/info.svg' },
+  { id: 'projects', name: 'Projects', icon: '/icons/work.svg' },
+  { id: 'skills', name: 'Skills', icon: '/icons/atom.svg' },
   { id: 'terminal', name: 'Terminal', icon: '/images/terminal.png' },
-  { id: 'content', name: 'Content', icon: '📹' },
-  { id: 'contact', name: 'Contact', icon: '📬' },
-  { id: 'resume', name: 'Resume', icon: '📄' },
-  { id: 'ai', name: 'AI Twin', icon: '🤖' },
+  { id: 'content', name: 'Content', icon: '/images/notes.png' },
+  { id: 'contact', name: 'Contact', icon: '/icons/user.svg' },
+  { id: 'resume', name: 'Resume', icon: '/images/pdf.png' },
+  { id: 'ai', name: 'AI Twin', icon: '/icons/info.svg' },
   // Phase 3 Apps
   { id: 'finder', name: 'Finder', icon: '/images/finder.png' },
   { id: 'safari', name: 'Safari', icon: '/images/safari.png' },
-  { id: 'codewitharhan', name: 'CodeWithArhan', icon: '📺' },
-  { id: 'saas', name: 'SaaS', icon: '📊' },
-  { id: 'devtimeline', name: 'Timeline', icon: '📅' },
+  { id: 'launchpad', name: 'Launchpad', icon: '/images/pages.png' },
+  { id: 'notifications', name: 'Notifications', icon: '/images/notes.png' },
+  { id: 'codewitharhan', name: 'CodeWithArhan', icon: '/images/notes.png' },
+  { id: 'saas', name: 'SaaS', icon: '/icons/work.svg' },
+  { id: 'devtimeline', name: 'Timeline', icon: '/icons/info.svg' },
 ];
 
 // Window defaults

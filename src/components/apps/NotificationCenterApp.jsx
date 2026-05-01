@@ -12,7 +12,7 @@ const NotificationCenterApp = ({ windowId, windowData }) => {
       id: 1,
       type: 'achievement',
       title: '🏆 Milestone Reached!',
-      description: '100K followers on YouTube',
+      description: '750 followers on YouTube',
       time: '2 hours ago',
       icon: '🎉',
     },
@@ -51,10 +51,10 @@ const NotificationCenterApp = ({ windowId, windowData }) => {
   ]);
 
   const [stats, setStats] = useState({
-    githubCommits: '1,247',
-    YouTubeSubscribers: '100K',
-    ProjectsCompleted: '50+',
-    CodingStreak: '47 days',
+    githubCommits: '2000+',
+    YouTubeSubscribers: '762',
+    ProjectsCompleted: '70+',
+    CodingStreak: '100 days',
   });
 
   const removeNotification = (id) => {

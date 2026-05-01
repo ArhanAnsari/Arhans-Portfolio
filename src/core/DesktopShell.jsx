@@ -84,6 +84,7 @@ export const DesktopShell = () => {
       {/* System MenuBar */}
       {!showWelcome && (
         <MenuBar
+          onAppOpen={handleAppOpen}
           onSpotlightOpen={() => setShowSpotlight(true)}
           onNotificationOpen={() => toggleWindow('notifications')}
         />
@@ -91,7 +92,7 @@ export const DesktopShell = () => {
 
       {/* Windows Container (Push down for menu bar) */}
       <div className={`${!showWelcome ? 'mt-8' : ''}`}>
-        <Window appRegistry={appRegistry} />
+        <Window appRegistry={appRegistry} onAppSelect={handleAppSelect} />
       </div>
 
       {/* Spotlight Search */}

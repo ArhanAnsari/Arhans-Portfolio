@@ -19,6 +19,28 @@ export const WindowTitleBar = React.forwardRef(
     },
     ref
   ) => {
+    const [imageError, setImageError] = React.useState(false);
+
+    // Render icon - support both images and emojis
+    const renderIcon = () => {
+      if (!icon) return null;
+      
+      // If icon starts with /, it's a file path
+      if (typeof icon === 'string' && icon.startsWith('/') && !imageError) {
+        return (
+          <img 
+            src={icon} 
+            alt="app icon"
+            className="w-4 h-4 object-contain"
+            onError={() => setImageError(true)}
+          />
+        );
+      }
+      
+      // Otherwise it's an emoji
+      return <span className="text-sm">{icon}</span>;
+    };
+
     return (
       <div
         ref={ref}
@@ -32,7 +54,7 @@ export const WindowTitleBar = React.forwardRef(
       >
         {/* Title */}
         <div className="flex items-center gap-2 min-w-0 flex-1">
-          {icon && <span className="text-sm">{icon}</span>}
+          {renderIcon()}
           <span className="text-sm font-medium text-neutral-200 truncate">
             {title}
           </span>
