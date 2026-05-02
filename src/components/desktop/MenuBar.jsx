@@ -257,7 +257,7 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen, onAppOpen }) => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              <span className="text-lg"><img src="/images/logo.svg" alt="Apple Logo" className="w-5 h-5" /></span>
+              <span className="text-lg"><img src="/images/logo.png" alt="Apple Logo" className="w-5 h-5" /></span>
               <span className="text-xs font-bold text-neutral-200">Arhan's Portfolio</span>
             </motion.button>
             <AnimatePresence>
