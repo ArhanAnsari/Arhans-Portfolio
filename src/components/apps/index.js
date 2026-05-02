@@ -23,6 +23,10 @@ const NotificationCenterApp = React.lazy(() => import('./NotificationCenterApp')
 const CodeWithArhanStudio = React.lazy(() => import('./CodeWithArhanStudio'));
 const SaaSDashboard = React.lazy(() => import('./SaaSDashboard'));
 const DevTimeline = React.lazy(() => import('./DevTimeline'));
+const TrashApp = React.lazy(() => import('./TrashApp'));
+const NotesApp = React.lazy(() => import('./NotesApp'));
+const PhotosApp = React.lazy(() => import('./PhotosApp'));
+const SettingsApp = React.lazy(() => import('./SettingsApp'));
 
 /**
  * App Registry
@@ -68,7 +72,7 @@ export const appRegistry = {
     id: 'contact',
     name: 'Contact',
     title: 'Get in Touch',
-    icon: '/icons/user.svg',
+    icon: '/images/contact.png',
     component: ContactApp,
   },
   resume: {
@@ -134,6 +138,34 @@ export const appRegistry = {
     title: 'Development Journey',
     icon: '/icons/info.svg',
     component: DevTimeline,
+  },
+  settings: {
+    id: 'settings',
+    name: 'Settings',
+    title: 'System Settings',
+    icon: '/images/settings.png',
+    component: SettingsApp,
+  },
+  trash: {
+    id: 'trash',
+    name: 'Trash',
+    title: 'Trash',
+    icon: '/images/trash.png',
+    component: TrashApp,
+  },
+  notes: {
+    id: 'notes',
+    name: 'Notes',
+    title: 'Notes',
+    icon: '/images/notes.png',
+    component: NotesApp,
+  },
+  photos: {
+    id: 'photos',
+    name: 'Photos',
+    title: 'Photos',
+    icon: '/images/photos.png',
+    component: PhotosApp,
   },
 };
 

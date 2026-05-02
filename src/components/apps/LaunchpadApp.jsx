@@ -15,15 +15,19 @@ const LaunchpadApp = ({ windowId, onAppSelect }) => {
     { id: 'terminal', name: 'Terminal', icon: '/images/terminal.png', category: 'system' },
     { id: 'resume', name: 'Resume', icon: '/images/pdf.png', category: 'system' },
     { id: 'content', name: 'Content', icon: '/images/notes.png', category: 'system' },
-    { id: 'contact', name: 'Contact', icon: '/icons/user.svg', category: 'system' },
+    { id: 'contact', name: 'Contact', icon: '/images/contact.png', category: 'system' },
     { id: 'ai', name: 'AI Twin', icon: '/icons/info.svg', category: 'system' },
     { id: 'finder', name: 'Finder', icon: '/images/finder.png', category: 'system' },
     { id: 'safari', name: 'Safari', icon: '/images/safari.png', category: 'system' },
     { id: 'launchpad', name: 'Launchpad', icon: '/images/pages.png', category: 'system' },
+    { id: 'settings', name: 'Settings', icon: '/images/settings.png', category: 'system' },
     { id: 'notifications', name: 'Notifications', icon: '/images/notes.png', category: 'apps' },
     { id: 'codewitharhan', name: 'CodeWithArhan', icon: '/images/notes.png', category: 'apps' },
     { id: 'saas', name: 'SaaS Dashboard', icon: '/icons/work.svg', category: 'apps' },
     { id: 'devtimeline', name: 'Dev Timeline', icon: '/icons/info.svg', category: 'apps' },
+    { id: 'notes', name: 'Notes', icon: '/images/notes.png', category: 'apps' },
+    { id: 'photos', name: 'Photos', icon: '/images/photos.png', category: 'apps' },
+    { id: 'trash', name: 'Trash', icon: '/images/trash.png', category: 'apps' },
   ];
 
   const filteredApps = apps.filter((app) =>

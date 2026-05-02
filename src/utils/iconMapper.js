@@ -10,7 +10,7 @@ export const APP_ICONS = {
   skills: { image: '/icons/atom.svg', emoji: '⚡' },
   terminal: { image: '/images/terminal.png', emoji: '💻' },
   content: { image: '/images/notes.png', emoji: '📹' },
-  contact: { image: '/icons/user.svg', emoji: '📬' },
+  contact: { image: '/images/contact.png', emoji: '📬' },
   resume: { image: '/images/pdf.png', emoji: '📄' },
   ai: { image: '/icons/info.svg', emoji: '🤖' },
 
@@ -22,6 +22,10 @@ export const APP_ICONS = {
   codewitharhan: { image: '/images/notes.png', emoji: '📺' },
   saas: { image: '/icons/work.svg', emoji: '📊' },
   devtimeline: { image: '/icons/info.svg', emoji: '📅' },
+  trash: { image: '/images/trash.png', emoji: '🗑️' },
+  notes: { image: '/images/notes.png', emoji: '📝' },
+  photos: { image: '/images/photos.png', emoji: '🖼️' },
+  settings: { image: '/images/settings.png', emoji: '⚙️' },
 };
 
 /**

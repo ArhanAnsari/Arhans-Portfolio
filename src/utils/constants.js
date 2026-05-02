@@ -10,7 +10,7 @@ export const DOCK_APPS = [
   { id: 'skills', name: 'Skills', icon: '/icons/atom.svg' },
   { id: 'terminal', name: 'Terminal', icon: '/images/terminal.png' },
   { id: 'content', name: 'Content', icon: '/images/notes.png' },
-  { id: 'contact', name: 'Contact', icon: '/icons/user.svg' },
+  { id: 'contact', name: 'Contact', icon: '/images/contact.png' },
   { id: 'resume', name: 'Resume', icon: '/images/pdf.png' },
   { id: 'ai', name: 'AI Twin', icon: '/icons/info.svg' },
   // Phase 3 Apps
@@ -18,6 +18,8 @@ export const DOCK_APPS = [
   { id: 'safari', name: 'Safari', icon: '/images/safari.png' },
   { id: 'launchpad', name: 'Launchpad', icon: '/images/pages.png' },
   { id: 'notifications', name: 'Notifications', icon: '/images/notes.png' },
+  { id: 'settings', name: 'Settings', icon: '/images/settings.png' },
+  { id: 'photos', name: 'Photos', icon: '/images/photos.png' },
   { id: 'codewitharhan', name: 'CodeWithArhan', icon: '/images/notes.png' },
   { id: 'saas', name: 'SaaS', icon: '/icons/work.svg' },
   { id: 'devtimeline', name: 'Timeline', icon: '/icons/info.svg' },

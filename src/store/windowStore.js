@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 
 // Default window dimensions
 const DEFAULT_WINDOW_WIDTH = 800;
@@ -14,9 +15,12 @@ const generateWindowPosition = (index = 0) => ({
  * Window State Store
  * Manages all open windows, their positions, focus state, and interactions
  */
-export const useWindowStore = create((set, get) => ({
+export const useWindowStore = create(
+  persist(
+    (set, get) => ({
   windows: [],
   focusStack: [],
+  snapPreview: null,
 
   // ============ CORE OPERATIONS ============
 
@@ -50,6 +54,8 @@ export const useWindowStore = create((set, get) => ({
         height: config.height ?? DEFAULT_WINDOW_HEIGHT,
         minimized: false,
         maximized: false,
+        snappedLayout: null,
+        previousBounds: null,
       };
 
       return {
@@ -87,6 +93,23 @@ export const useWindowStore = create((set, get) => ({
       ),
     })),
 
+  setWindowBounds: (id, bounds) =>
+    set((state) => ({
+      windows: state.windows.map((w) =>
+        w.id === id
+          ? {
+              ...w,
+              x: bounds.x ?? w.x,
+              y: bounds.y ?? w.y,
+              width: bounds.width ?? w.width,
+              height: bounds.height ?? w.height,
+              maximized: false,
+              minimized: false,
+            }
+          : w
+      ),
+    })),
+
   /**
    * Resize a window
    */
@@ -113,7 +136,20 @@ export const useWindowStore = create((set, get) => ({
   maximizeWindow: (id) =>
     set((state) => ({
       windows: state.windows.map((w) =>
-        w.id === id ? { ...w, maximized: true, minimized: false } : w
+        w.id === id
+          ? {
+              ...w,
+              previousBounds: {
+                x: w.x,
+                y: w.y,
+                width: w.width,
+                height: w.height,
+              },
+              maximized: true,
+              minimized: false,
+              snappedLayout: null,
+            }
+          : w
       ),
     })),
 
@@ -123,9 +159,59 @@ export const useWindowStore = create((set, get) => ({
   restoreWindow: (id) =>
     set((state) => ({
       windows: state.windows.map((w) =>
-        w.id === id ? { ...w, minimized: false, maximized: false } : w
+        w.id === id
+          ? {
+              ...w,
+              minimized: false,
+              maximized: false,
+              snappedLayout: null,
+              ...(w.previousBounds || {}),
+            }
+          : w
       ),
     })),
+
+  applySnapLayout: (id, layout, bounds) =>
+    set((state) => ({
+      windows: state.windows.map((w) =>
+        w.id === id
+          ? {
+              ...w,
+              previousBounds: w.previousBounds || {
+                x: w.x,
+                y: w.y,
+                width: w.width,
+                height: w.height,
+              },
+              x: bounds.x,
+              y: bounds.y,
+              width: bounds.width,
+              height: bounds.height,
+              maximized: false,
+              minimized: false,
+              snappedLayout: layout,
+            }
+          : w
+      ),
+    })),
+
+  unsnapWindow: (id) =>
+    set((state) => ({
+      windows: state.windows.map((w) => {
+        if (w.id !== id || !w.snappedLayout || !w.previousBounds) {
+          return w;
+        }
+
+        return {
+          ...w,
+          ...w.previousBounds,
+          snappedLayout: null,
+        };
+      }),
+    })),
+
+  setSnapPreview: (preview) => set({ snapPreview: preview }),
+  clearSnapPreview: () => set({ snapPreview: null }),
 
   /**
    * Close all windows
@@ -185,4 +271,13 @@ export const useWindowStore = create((set, get) => ({
     const state = get();
     return state.windows.filter((w) => w.minimized);
   },
-}));
+    }),
+    {
+      name: 'arhanos-window-store',
+      partialize: (state) => ({
+        windows: state.windows,
+        focusStack: state.focusStack,
+      }),
+    }
+  )
+);

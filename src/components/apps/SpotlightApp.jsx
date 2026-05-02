@@ -28,10 +28,14 @@ const SpotlightApp = ({ isOpen, onClose, onAppSelect }) => {
     { type: 'app', name: 'CodeWithArhan Studio', emoji: '📺', action: 'codewitharhan' },
     { type: 'app', name: 'SaaS Dashboard', emoji: '📊', action: 'saas' },
     { type: 'app', name: 'Dev Timeline', emoji: '📅', action: 'devtimeline' },
+    { type: 'app', name: 'Notes', emoji: '📝', action: 'notes' },
+    { type: 'app', name: 'Photos', emoji: '🖼️', action: 'photos' },
+    { type: 'app', name: 'Trash', emoji: '🗑️', action: 'trash' },
+    { type: 'app', name: 'Settings', emoji: '⚙️', action: 'settings' },
     
     // Quick Actions
     { type: 'action', name: 'Dark Mode', emoji: '🌙', action: 'toggle-theme' },
-    { type: 'action', name: 'System Preferences', emoji: '⚙️', action: 'settings' },
+    { type: 'action', name: 'System Preferences', emoji: '⚙️', action: 'open-settings' },
     { type: 'action', name: 'Lock Screen', emoji: '🔒', action: 'lock' },
     { type: 'action', name: 'Restart', emoji: '🔄', action: 'restart' },
     
@@ -92,7 +96,11 @@ const SpotlightApp = ({ isOpen, onClose, onAppSelect }) => {
     } else if (item.type === 'link') {
       window.open(item.action, '_blank');
     } else if (item.type === 'action') {
-      console.log('Action:', item.action);
+      if (item.action === 'open-settings') {
+        onAppSelect('settings');
+      } else {
+        console.log('Action:', item.action);
+      }
     } else if (item.type === 'project') {
       onAppSelect('projects');
     }

@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useSystemStore } from '../../store/systemStore';
 
 /**
  * Animated Wallpaper Component
@@ -10,6 +11,8 @@ export const Wallpaper = () => {
   const mouseRef = useRef({ x: 0, y: 0 });
   const particlesRef = useRef([]);
   const [particles, setParticles] = useState([]);
+  const { getActiveWallpaper, animationsEnabled } = useSystemStore();
+  const activeWallpaper = getActiveWallpaper();
 
   // Initialize particles
   useEffect(() => {
@@ -90,15 +93,24 @@ export const Wallpaper = () => {
       className="absolute inset-0 w-full h-full overflow-hidden"
       onMouseMove={handleMouseMove}
     >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeWallpaper.id}
+          className="absolute inset-0"
+          style={{ background: activeWallpaper.value }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.35 }}
+        />
+      </AnimatePresence>
+
       {/* Canvas for particle animation */}
       <canvas
         ref={canvasRef}
         className="absolute inset-0 w-full h-full"
         style={{ mixBlendMode: 'screen' }}
       />
-
-      {/* Gradient mesh background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-neutral-950 via-blue-900/80 to-cyan-900/60" />
 
       {/* Animated gradient overlays */}
       <motion.div
@@ -108,11 +120,11 @@ export const Wallpaper = () => {
             'radial-gradient(circle at 30% 50%, rgba(59, 130, 246, 0.1) 0%, transparent 50%)',
         }}
         animate={{
-          opacity: [0.3, 0.6, 0.3],
+          opacity: animationsEnabled ? [0.3, 0.6, 0.3] : 0.35,
         }}
         transition={{
           duration: 8,
-          repeat: Infinity,
+          repeat: animationsEnabled ? Infinity : 0,
           ease: 'easeInOut',
         }}
       />
@@ -124,11 +136,11 @@ export const Wallpaper = () => {
             'radial-gradient(circle at 70% 50%, rgba(34, 197, 228, 0.1) 0%, transparent 50%)',
         }}
         animate={{
-          opacity: [0.6, 0.3, 0.6],
+          opacity: animationsEnabled ? [0.6, 0.3, 0.6] : 0.4,
         }}
         transition={{
           duration: 10,
-          repeat: Infinity,
+          repeat: animationsEnabled ? Infinity : 0,
           ease: 'easeInOut',
         }}
       />
@@ -142,12 +154,12 @@ export const Wallpaper = () => {
           right: '-10%',
         }}
         animate={{
-          x: [0, 30, 0],
-          y: [0, -40, 0],
+          x: animationsEnabled ? [0, 30, 0] : 0,
+          y: animationsEnabled ? [0, -40, 0] : 0,
         }}
         transition={{
           duration: 20,
-          repeat: Infinity,
+          repeat: animationsEnabled ? Infinity : 0,
           ease: 'easeInOut',
         }}
       />
@@ -161,12 +173,12 @@ export const Wallpaper = () => {
           left: '-5%',
         }}
         animate={{
-          x: [0, -40, 0],
-          y: [0, 30, 0],
+          x: animationsEnabled ? [0, -40, 0] : 0,
+          y: animationsEnabled ? [0, 30, 0] : 0,
         }}
         transition={{
           duration: 25,
-          repeat: Infinity,
+          repeat: animationsEnabled ? Infinity : 0,
           ease: 'easeInOut',
         }}
       />

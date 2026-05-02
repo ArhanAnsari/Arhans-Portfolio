@@ -2,6 +2,57 @@ import { useEffect, useRef } from 'react';
 import { useWindowStore } from '../store/windowStore';
 import { constrainWindowPosition } from '../utils/windowUtils';
 
+const SNAP_THRESHOLD = 24;
+
+const getSnapLayout = (x, y) => {
+  const nearLeft = x <= SNAP_THRESHOLD;
+  const nearRight = x >= window.innerWidth - SNAP_THRESHOLD;
+  const nearTop = y <= SNAP_THRESHOLD;
+
+  if (nearTop && nearLeft) return 'top-left';
+  if (nearTop && nearRight) return 'top-right';
+  if (nearTop) return 'top';
+  if (nearLeft) return 'left';
+  if (nearRight) return 'right';
+
+  return null;
+};
+
+const getSnapBounds = (layout) => {
+  const padding = 16;
+  const width = window.innerWidth - padding * 2;
+  const height = window.innerHeight - padding * 2;
+  const halfWidth = Math.floor(width / 2);
+  const halfHeight = Math.floor(height / 2);
+
+  if (layout === 'left') {
+    return { x: padding, y: padding, width: halfWidth, height };
+  }
+
+  if (layout === 'right') {
+    return { x: padding + halfWidth, y: padding, width: width - halfWidth, height };
+  }
+
+  if (layout === 'top-left') {
+    return { x: padding, y: padding, width: halfWidth, height: halfHeight };
+  }
+
+  if (layout === 'top-right') {
+    return {
+      x: padding + halfWidth,
+      y: padding,
+      width: width - halfWidth,
+      height: halfHeight,
+    };
+  }
+
+  if (layout === 'top') {
+    return { x: padding, y: padding, width, height };
+  }
+
+  return null;
+};
+
 /**
  * Hook to handle window dragging
  * @param {string} windowId - Window ID to drag
@@ -28,8 +79,15 @@ export const useDragWindow = (windowId, dragHandleRef) => {
       // Only drag from titlebar
       if (e.button !== 0) return; // Left click only
 
-      const currentWindow = storeRef.current.getWindow(windowId);
+      let currentWindow = storeRef.current.getWindow(windowId);
       if (!currentWindow) return;
+
+      if (currentWindow.snappedLayout) {
+        storeRef.current.unsnapWindow(windowId);
+        currentWindow = storeRef.current.getWindow(windowId);
+      }
+
+      storeRef.current.clearSnapPreview();
 
       dragState.current = {
         isDragging: true,
@@ -70,9 +128,30 @@ export const useDragWindow = (windowId, dragHandleRef) => {
       );
 
       storeRef.current.dragWindow(windowId, x, y);
+
+      const snapLayout = getSnapLayout(e.clientX, e.clientY);
+      if (snapLayout) {
+        storeRef.current.setSnapPreview({
+          windowId,
+          layout: snapLayout,
+          bounds: getSnapBounds(snapLayout),
+        });
+      } else {
+        storeRef.current.clearSnapPreview();
+      }
     };
 
     const handleMouseUp = () => {
+      const preview = storeRef.current.snapPreview;
+      if (preview && preview.windowId === windowId) {
+        if (preview.layout === 'top') {
+          storeRef.current.maximizeWindow(windowId);
+        } else if (preview.bounds) {
+          storeRef.current.applySnapLayout(windowId, preview.layout, preview.bounds);
+        }
+      }
+
+      storeRef.current.clearSnapPreview();
       dragState.current.isDragging = false;
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);

@@ -46,7 +46,7 @@ export const useAppStore = create((set) => ({
       id: 'contact',
       name: 'Contact',
       title: 'Get in Touch',
-      icon: '/icons/user.svg',
+      icon: '/images/contact.png',
       description: 'Contact information',
     },
     resume: {
@@ -111,6 +111,34 @@ export const useAppStore = create((set) => ({
       title: 'Development Journey',
       icon: '/icons/info.svg',
       description: 'Career timeline',
+    },
+    settings: {
+      id: 'settings',
+      name: 'Settings',
+      title: 'System Settings',
+      icon: '/images/settings.png',
+      description: 'Appearance, wallpaper, and system preferences',
+    },
+    trash: {
+      id: 'trash',
+      name: 'Trash',
+      title: 'Trash',
+      icon: '/images/trash.png',
+      description: 'Deleted files and restore',
+    },
+    notes: {
+      id: 'notes',
+      name: 'Notes',
+      title: 'Notes',
+      icon: '/images/notes.png',
+      description: 'Sticky notes, autosave',
+    },
+    photos: {
+      id: 'photos',
+      name: 'Photos',
+      title: 'Photos',
+      icon: '/images/photos.png',
+      description: 'Photo gallery',
     },
   },
 

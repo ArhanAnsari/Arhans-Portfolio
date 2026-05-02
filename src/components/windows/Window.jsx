@@ -47,7 +47,7 @@ export const Window = ({ appRegistry, onAppSelect }) => {
                 <AppComponent
                   windowId={window.id}
                   windowData={window}
-                  onAppSelect={window.app === 'launchpad' ? onAppSelect : undefined}
+                  onAppSelect={onAppSelect}
                 />
               </Suspense>
             ) : (

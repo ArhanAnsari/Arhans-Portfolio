@@ -11,7 +11,7 @@ import { useWindowStore } from '../../store/windowStore';
 const MenuBar = ({ onSpotlightOpen, onNotificationOpen, onAppOpen }) => {
   const [currentTime, setCurrentTime] = useState(dayjs());
   const [activeMenu, setActiveMenu] = useState(null);
-  const [batteryLevel, setBatteryLevel] = useState(92);
+  const [batteryLevel, setBatteryLevel] = useState(100);
   const [wifiStrength, setWifiStrength] = useState(4);
   const [zoom, setZoom] = useState(1);
   const {
@@ -22,6 +22,58 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen, onAppOpen }) => {
     restoreWindow,
     focusWindow,
   } = useWindowStore();
+
+  // Global keyboard shortcuts and menu/UI handling
+  useEffect(() => {
+    const onKey = (e) => {
+      const meta = e.metaKey || e.ctrlKey;
+
+      // Spotlight
+      if (meta && e.code === 'Space') {
+        e.preventDefault();
+        if (onSpotlightOpen) onSpotlightOpen();
+        return;
+      }
+
+      // Cmd+N Finder new window
+      if (meta && e.key.toLowerCase() === 'n') {
+        if (onAppOpen) onAppOpen('finder');
+        return;
+      }
+
+      // Cmd+W close focused window (best-effort)
+      if (meta && e.key.toLowerCase() === 'w') {
+        e.preventDefault();
+        const s = useWindowStore.getState();
+        if (s && s.focusStack && s.focusStack.length) {
+          const top = s.focusStack[s.focusStack.length - 1];
+          if (top && s.closeWindow) s.closeWindow(top);
+        }
+        return;
+      }
+
+      // Cmd+Tab app switcher (cycle)
+      if (meta && e.key === 'Tab') {
+        e.preventDefault();
+        const s = useWindowStore.getState();
+        const stack = s.focusStack || [];
+        if (stack.length > 1 && s.focusWindow) {
+          const next = stack[stack.length - 2] || stack[0];
+          s.focusWindow(next);
+        }
+        return;
+      }
+
+      // Esc closes active menus
+      if (e.key === 'Escape') {
+        setActiveMenu(null);
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onSpotlightOpen, onAppOpen]);
   const menuRef = useRef(null);
 
   // Update clock every second
@@ -81,7 +133,9 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen, onAppOpen }) => {
   };
 
   const handleSystemPreferences = () => {
-    alert('System Preferences\n\n📊 Display: Retina\n🔊 Sound: Enabled\n🔋 Battery Saver: Off\n🌙 Dark Mode: On');
+    if (onAppOpen) {
+      onAppOpen('settings');
+    }
   };
 
   const handleRestart = () => {
