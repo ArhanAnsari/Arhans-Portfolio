@@ -90,11 +90,20 @@ const normalizeUrlInput = (value) => {
 const resolveTitle = (url) => {
   const internal = INTERNAL_ROUTES[url.toLowerCase()];
   if (internal) return internal.title;
-  if (url.startsWith('https://github.com')) return 'GitHub';
-  if (url.startsWith('https://youtube.com')) return 'YouTube';
-  if (url.startsWith('https://openai.com')) return 'OpenAI';
-  if (url.startsWith('https://vercel.com')) return 'Vercel';
-  if (url.startsWith('https://www.google.com/search')) return 'Search Results';
+
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.toLowerCase();
+
+    if (host === 'github.com' || host === 'www.github.com') return 'GitHub';
+    if (host === 'youtube.com' || host === 'www.youtube.com') return 'YouTube';
+    if (host === 'openai.com' || host === 'www.openai.com') return 'OpenAI';
+    if (host === 'vercel.com' || host === 'www.vercel.com') return 'Vercel';
+    if (host === 'www.google.com' && parsed.pathname === '/search') return 'Search Results';
+  } catch {
+    // Non-URL values (for example internal routes) fall through to default formatting.
+  }
+
   return url.replace(/^https?:\/\//, '').replace(/\/$/, '');
 };
 
