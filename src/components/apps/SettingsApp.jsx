@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { useSystemStore } from '../../store/systemStore';
 import { useWindowStore } from '../../store/windowStore';
+import { useNotificationStore } from '../../store/notificationStore';
 
 const SettingsApp = () => {
   const {
@@ -12,8 +13,11 @@ const SettingsApp = () => {
     toggleAnimations,
     theme,
     setTheme,
+    clockPreferences,
+    setClockPreferences,
   } = useSystemStore();
   const { windows, focusStack } = useWindowStore();
+  const { pushNotification } = useNotificationStore();
 
   return (
     <div className="h-full bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 text-neutral-100 overflow-auto">
@@ -28,7 +32,6 @@ const SettingsApp = () => {
               Dark
             </button>
             <button
-              className={`px-3 py-1 rounded-md text-sm ${theme === 'light' ? 'bg-cyan-500/25 border border-cyan-300/60' : 'bg-white/10'}`}
               onClick={() => setTheme('light')}
             >
               Light
@@ -51,7 +54,10 @@ const SettingsApp = () => {
             {wallpapers.map((wallpaper) => (
               <motion.button
                 key={wallpaper.id}
-                onClick={() => setWallpaper(wallpaper.id)}
+                onClick={() => {
+                  setWallpaper(wallpaper.id);
+                  pushNotification({ type: 'wallpaper', title: 'Wallpaper changed', description: wallpaper.name, source: 'settings' });
+                }}
                 className={`rounded-xl border p-2 text-left flex-shrink-0 ${activeWallpaperId === wallpaper.id ? 'border-cyan-300 bg-cyan-500/20' : 'border-white/15 bg-white/5'}`}
                 whileHover={{ scale: 1.02 }}
               >
@@ -69,6 +75,41 @@ const SettingsApp = () => {
                 )}
                 <div className="text-xs text-neutral-200 line-clamp-2">{wallpaper.name}</div>
               </motion.button>
+            ))}
+          </div>
+        </section>
+
+        <section className="rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-lg">
+          <h2 className="text-lg font-semibold mb-4">Clock</h2>
+          <div className="flex flex-wrap items-center gap-2 mb-4">
+            <button
+              className={`px-3 py-1 rounded-md text-sm ${clockPreferences.timeFormat === '24h' ? 'bg-cyan-500/25 border border-cyan-300/60' : 'bg-white/10'}`}
+              onClick={() => setClockPreferences({ timeFormat: '24h' })}
+            >
+              24h default
+            </button>
+            <button
+              className={`px-3 py-1 rounded-md text-sm ${clockPreferences.timeFormat === '12h' ? 'bg-cyan-500/25 border border-cyan-300/60' : 'bg-white/10'}`}
+              onClick={() => setClockPreferences({ timeFormat: '12h' })}
+            >
+              12h
+            </button>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            {[
+              { key: 'showWeekday', label: 'Show weekday' },
+              { key: 'showMonth', label: 'Show month' },
+              { key: 'showSeconds', label: 'Show seconds' },
+            ].map((item) => (
+              <label key={item.key} className="inline-flex items-center gap-2 rounded-xl border border-white/10 bg-white/5 px-3 py-2">
+                <input
+                  type="checkbox"
+                  checked={Boolean(clockPreferences[item.key])}
+                  onChange={(event) => setClockPreferences({ [item.key]: event.target.checked })}
+                  className="accent-cyan-400"
+                />
+                {item.label}
+              </label>
             ))}
           </div>
         </section>

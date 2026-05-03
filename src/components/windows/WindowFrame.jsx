@@ -72,6 +72,7 @@ export const WindowFrame = React.forwardRef(
     const displayY = maximized ? padding : y;
     const displayWidth = maximized ? windowWidth - padding * 2 : width;
     const displayHeight = maximized ? windowHeight - padding * 2 : height;
+    const isHidden = minimized;
 
     return (
       <motion.div
@@ -79,29 +80,35 @@ export const WindowFrame = React.forwardRef(
         className={`
           fixed flex flex-col
           bg-neutral-900 border border-neutral-700/50
-          rounded-lg overflow-hidden
+          rounded-xl overflow-hidden
           ${className}
         `}
+        layout
         style={{
           x: displayX,
           y: displayY,
           width: displayWidth,
           height: displayHeight,
           zIndex,
+          pointerEvents: isHidden ? 'none' : 'auto',
         }}
-        initial={{ opacity: 0, scale: 0.9 }}
+        initial={{ opacity: 0, scale: 0.94, y: displayY + 10 }}
         animate={{
-          opacity: 1,
-          scale: 1,
+          opacity: isHidden ? 0 : 1,
+          scale: isHidden ? 0.82 : 1,
+          y: isHidden ? displayY + 24 : displayY,
           boxShadow: isFocused
             ? '0 30px 60px -12px rgba(56, 189, 248, 0.15), 0 18px 36px -8px rgba(0, 0, 0, 0.3)'
             : '0 10px 25px -5px rgba(0, 0, 0, 0.15)',
           borderColor: isFocused ? 'rgba(56, 189, 248, 0.2)' : 'rgba(100, 116, 139, 0.3)',
         }}
-        exit={{ opacity: 0, scale: 0.9 }}
+        exit={{ opacity: 0, scale: 0.9, y: displayY + 16 }}
         transition={{
           ...WINDOW_ANIMATIONS.open.transition,
           boxShadow: { duration: 0.2 },
+          opacity: { duration: isHidden ? 0.22 : 0.18 },
+          scale: { duration: isHidden ? 0.22 : 0.18 },
+          y: { duration: isHidden ? 0.22 : 0.18 },
         }}
         onMouseDown={() => {
           // Focus on click (will be handled by useFocusManager)
@@ -123,7 +130,7 @@ export const WindowFrame = React.forwardRef(
         />
 
         {/* Content */}
-        <div className="flex-1 overflow-auto">
+        <div className={`flex-1 overflow-auto ${isHidden ? 'pointer-events-none' : ''}`}>
           {children}
         </div>
       </motion.div>

@@ -1,153 +1,96 @@
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Bell, X, Trash2 } from 'lucide-react';
+import React, { useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Bell, Clock3, Trash2, CheckCheck, X } from 'lucide-react';
+import { useNotificationStore } from '../../store/notificationStore';
+import { useSystemStore } from '../../store/systemStore';
 
-/**
- * Notification Center App
- * System notifications and recent updates
- */
-const NotificationCenterApp = ({ windowId, windowData }) => {
-  const [notifications, setNotifications] = useState([
-    {
-      id: 1,
-      type: 'achievement',
-      title: '🏆 Milestone Reached!',
-      description: '750 followers on YouTube',
-      time: '2 hours ago',
-      icon: '🎉',
-    },
-    {
-      id: 2,
-      type: 'github',
-      title: '💻 GitHub Activity',
-      description: '12 commits pushed today',
-      time: '1 hour ago',
-      icon: '📝',
-    },
-    {
-      id: 3,
-      type: 'project',
-      title: '🚀 Project Published',
-      description: 'AutoYT v2.0 launched',
-      time: '30 mins ago',
-      icon: '✨',
-    },
-    {
-      id: 4,
-      type: 'content',
-      title: '📹 New Upload',
-      description: 'Latest YouTube short published',
-      time: '15 mins ago',
-      icon: '📺',
-    },
-    {
-      id: 5,
-      type: 'streak',
-      title: '🔥 Coding Streak',
-      description: '47 days in a row!',
-      time: '5 mins ago',
-      icon: '⚡',
-    },
-  ]);
+const NotificationCenterApp = () => {
+  const { items, dismissNotification, clearAll, markAsRead } = useNotificationStore();
+  const { clockPreferences, activeWallpaperId, wallpapers } = useSystemStore();
 
-  const [stats, setStats] = useState({
-    githubCommits: '2000+',
-    YouTubeSubscribers: '762',
-    ProjectsCompleted: '70+',
-    CodingStreak: '100 days',
-  });
-
-  const removeNotification = (id) => {
-    setNotifications(notifications.filter((n) => n.id !== id));
-  };
-
-  const clearAll = () => {
-    setNotifications([]);
-  };
+  const latestWallpaper = useMemo(() => wallpapers.find((wallpaper) => wallpaper.id === activeWallpaperId), [activeWallpaperId, wallpapers]);
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-neutral-900 to-neutral-800 overflow-hidden">
-      {/* Header */}
-      <div className="border-b border-white/10 p-4 bg-black/20 backdrop-blur flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-white flex items-center gap-2">
-          <Bell size={20} className="text-primary-400" />
-          Notifications
-        </h2>
-        <motion.button
-          onClick={clearAll}
-          className="text-xs px-3 py-1 bg-white/5 hover:bg-white/10 rounded transition-colors text-neutral-400 hover:text-white"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <Trash2 size={14} />
-        </motion.button>
-      </div>
-
-      {/* Stats Bar */}
-      <div className="grid grid-cols-4 gap-2 p-3 bg-black/30 border-b border-white/10">
-        <div className="text-center">
-          <div className="text-lg font-bold text-primary-400">{stats.githubCommits}</div>
-          <div className="text-xs text-neutral-500">GitHub</div>
+    <div className="flex h-full flex-col overflow-hidden bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 text-white">
+      <div className="flex items-center justify-between border-b border-white/10 bg-black/20 px-5 py-4 backdrop-blur-xl">
+        <div>
+          <div className="flex items-center gap-2 text-lg font-semibold">
+            <Bell size={18} className="text-cyan-300" />
+            Notification Center
+          </div>
+          <div className="text-xs text-neutral-400">System events, app actions, and widgets</div>
         </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-accent-400">{stats.YouTubeSubscribers}</div>
-          <div className="text-xs text-neutral-500">YouTube</div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-green-400">{stats.ProjectsCompleted}</div>
-          <div className="text-xs text-neutral-500">Projects</div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-red-400">{stats.CodingStreak}</div>
-          <div className="text-xs text-neutral-500">Streak</div>
+        <div className="flex items-center gap-2">
+          <button onClick={() => clearAll()} className="rounded-full border border-white/10 bg-white/5 px-3 py-2 text-xs text-neutral-200 hover:bg-white/10">
+            Clear all
+          </button>
         </div>
       </div>
 
-      {/* Notifications List */}
-      <div className="flex-1 overflow-y-auto">
-        {notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-full">
-            <Bell size={48} className="text-neutral-600 mb-4" />
-            <p className="text-neutral-500 text-sm">No notifications</p>
+      <div className="grid gap-4 border-b border-white/10 bg-white/5 p-4 md:grid-cols-3">
+        <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+          <div className="flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-neutral-500">
+            <Clock3 size={12} />
+            Clock
+          </div>
+          <div className="mt-2 text-2xl font-semibold tabular-nums">
+            {new Intl.DateTimeFormat('en-US', {
+              weekday: clockPreferences.showWeekday ? 'short' : undefined,
+              month: clockPreferences.showMonth ? 'short' : undefined,
+              day: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: clockPreferences.timeFormat === '12h',
+            }).format(new Date())}
+          </div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+          <div className="text-xs uppercase tracking-[0.25em] text-neutral-500">Quick Notes</div>
+          <div className="mt-2 text-sm text-neutral-300">Notifications surface note saves, wallpaper changes, downloads, and terminal completions.</div>
+        </div>
+        <div className="rounded-2xl border border-white/10 bg-black/20 p-4">
+          <div className="text-xs uppercase tracking-[0.25em] text-neutral-500">Wallpaper</div>
+          <div className="mt-2 text-sm text-neutral-300">{latestWallpaper?.name || 'Unknown wallpaper'}</div>
+        </div>
+      </div>
+
+      <div className="min-h-0 flex-1 overflow-auto p-4">
+        {items.length === 0 ? (
+          <div className="flex h-full flex-col items-center justify-center rounded-3xl border border-white/10 bg-white/[0.03] p-10 text-neutral-400">
+            <Bell size={42} className="mb-4 text-neutral-600" />
+            <div className="text-lg font-medium text-neutral-200">No notifications</div>
+            <div className="mt-1 text-sm text-neutral-500">System notifications will appear here.</div>
           </div>
         ) : (
-          <div className="p-4 space-y-2">
+          <div className="space-y-3">
             <AnimatePresence mode="popLayout">
-              {notifications.map((notification, idx) => (
+              {items.map((item) => (
                 <motion.div
-                  key={notification.id}
-                  initial={{ opacity: 0, x: 20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className="bg-white/5 border border-white/10 rounded-lg p-3 hover:bg-white/10 hover:border-white/20 transition-all group"
+                  key={item.id}
+                  layout
+                  initial={{ opacity: 0, x: 18, scale: 0.98 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: 18, scale: 0.98 }}
+                  className={`rounded-2xl border px-4 py-3 shadow-lg ${item.read ? 'border-white/10 bg-white/[0.03]' : 'border-cyan-300/30 bg-cyan-400/10'}`}
+                  onClick={() => markAsRead(item.id)}
                 >
-                  <div className="flex gap-3">
-                    {/* Icon */}
-                    <div className="text-2xl flex-shrink-0">{notification.icon}</div>
-
-                    {/* Content */}
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-white text-sm">
-                        {notification.title}
-                      </h3>
-                      <p className="text-xs text-neutral-400 mt-1">
-                        {notification.description}
-                      </p>
-                      <p className="text-xs text-neutral-600 mt-2">
-                        {notification.time}
-                      </p>
+                  <div className="flex items-start gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-lg">{item.type === 'wallpaper' ? '🖼️' : item.type === 'terminal' ? '⌘' : item.type === 'finder' ? '📁' : item.type === 'safari' ? '🧭' : '🔔'}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between gap-3">
+                        <div className="truncate font-semibold text-white">{item.title}</div>
+                        <div className="text-[11px] uppercase tracking-[0.25em] text-neutral-500">{item.source}</div>
+                      </div>
+                      <div className="mt-1 text-sm text-neutral-300">{item.description}</div>
                     </div>
-
-                    {/* Close Button */}
-                    <motion.button
-                      onClick={() => removeNotification(notification.id)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-red-500/20 rounded"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <X size={14} className="text-red-400" />
-                    </motion.button>
+                    <div className="flex items-center gap-1">
+                      <button onClick={(event) => { event.stopPropagation(); markAsRead(item.id); }} className="rounded-full p-2 text-neutral-400 hover:bg-white/10 hover:text-white" title="Mark read">
+                        <CheckCheck size={14} />
+                      </button>
+                      <button onClick={(event) => { event.stopPropagation(); dismissNotification(item.id); }} className="rounded-full p-2 text-neutral-400 hover:bg-white/10 hover:text-white" title="Dismiss">
+                        <X size={14} />
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               ))}
@@ -156,11 +99,13 @@ const NotificationCenterApp = ({ windowId, windowData }) => {
         )}
       </div>
 
-      {/* Quick Stats */}
-      <div className="border-t border-white/10 p-4 bg-black/20 backdrop-blur">
-        <p className="text-xs text-neutral-500 text-center">
-          Keep crushing it! You're on fire 🔥
-        </p>
+      <div className="border-t border-white/10 bg-black/20 px-4 py-3 text-xs text-neutral-500 backdrop-blur-xl">
+        <div className="flex items-center justify-between gap-3">
+          <span>Live system events stay in sync with wallpaper, Finder, Safari, and Terminal.</span>
+          <button onClick={() => clearAll()} className="rounded-full bg-white/5 px-3 py-1 text-neutral-300 hover:bg-white/10">
+            <Trash2 size={12} className="mr-1 inline-block" /> Clear all
+          </button>
+        </div>
       </div>
     </div>
   );

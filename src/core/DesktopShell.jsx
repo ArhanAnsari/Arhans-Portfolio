@@ -9,9 +9,12 @@ import MenuBar from '../components/desktop/MenuBar';
 import SpotlightApp from '../components/apps/SpotlightApp';
 import Welcome from '../components/desktop/Welcome';
 import DesktopLayer from '../components/desktop/DesktopLayer';
+import ControlCenter from '../components/desktop/ControlCenter';
+import MissionControl from '../components/desktop/MissionControl';
 import appRegistry from '../components/apps/index';
 import { useSystemStore } from '../store/systemStore';
 import { useWindowStore } from '../store/windowStore';
+import { useUIStore } from '../store/uiStore';
 
 /**
  * Desktop Shell Component
@@ -20,10 +23,17 @@ import { useWindowStore } from '../store/windowStore';
  */
 export const DesktopShell = () => {
   const { toggleWindow } = useWindowManager();
+  const windows = useWindowStore((state) => state.windows);
   const { snapPreview } = useWindowStore();
   const [showSpotlight, setShowSpotlight] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(true);
-  const { wallpapers, activeWallpaperId, setWallpaper, theme } = useSystemStore();
+  const [showWelcome, setShowWelcome] = useState(false);
+  const [hasHydrated, setHasHydrated] = useState(() => {
+    const windowHydrated = useWindowStore.persist?.hasHydrated?.() ?? false;
+    const systemHydrated = useSystemStore.persist?.hasHydrated?.() ?? false;
+    return windowHydrated && systemHydrated;
+  });
+  const { wallpapers, activeWallpaperId, setWallpaper, theme, hasEnteredDesktop, markDesktopEntered } = useSystemStore();
+  const { showControlCenter, showMissionControl, toggleControlCenter, toggleMissionControl, closeAllPanels } = useUIStore();
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -33,6 +43,15 @@ export const DesktopShell = () => {
         e.preventDefault();
         setShowSpotlight(!showSpotlight);
       }
+
+        if (e.key === 'F3') {
+          e.preventDefault();
+          toggleMissionControl();
+        }
+
+        if (e.key === 'Escape') {
+          closeAllPanels();
+        }
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -43,7 +62,34 @@ export const DesktopShell = () => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+  useEffect(() => {
+    const syncHydration = () => {
+      const windowHydrated = useWindowStore.persist?.hasHydrated?.() ?? true;
+      const systemHydrated = useSystemStore.persist?.hasHydrated?.() ?? true;
+      setHasHydrated(windowHydrated && systemHydrated);
+    };
+
+    syncHydration();
+
+    const unsubscribeWindow = useWindowStore.persist?.onFinishHydration?.(syncHydration);
+    const unsubscribeSystem = useSystemStore.persist?.onFinishHydration?.(syncHydration);
+
+    return () => {
+      unsubscribeWindow?.();
+      unsubscribeSystem?.();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!hasHydrated) {
+      return;
+    }
+
+    setShowWelcome(!hasEnteredDesktop && windows.length === 0);
+  }, [hasHydrated, hasEnteredDesktop, windows.length]);
+
   const handleAppOpen = (appId) => {
+    markDesktopEntered();
     setShowWelcome(false);
     toggleWindow(appId);
   };
@@ -95,7 +141,10 @@ export const DesktopShell = () => {
         >
           <Welcome />
           <motion.button
-            onClick={() => setShowWelcome(false)}
+            onClick={() => {
+              markDesktopEntered();
+              setShowWelcome(false);
+            }}
             className="mt-16 px-8 py-3 bg-gradient-to-r from-primary-500 to-accent-500 text-white rounded-full font-semibold hover:shadow-lg hover:shadow-primary-500/50 transition-all"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
@@ -147,6 +196,18 @@ export const DesktopShell = () => {
 
       {/* Dock */}
       {!showWelcome && <Dock onAppOpen={handleAppOpen} />}
+
+      <MissionControl isOpen={showMissionControl} onClose={toggleMissionControl} />
+      <ControlCenter isOpen={showControlCenter} onClose={toggleControlCenter} />
+
+      {!hasHydrated && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-neutral-950 text-neutral-200">
+          <div className="text-center">
+            <div className="mb-3 text-4xl"></div>
+            <div className="text-sm uppercase tracking-[0.3em] text-neutral-500">Restoring session</div>
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 };

@@ -15,6 +15,7 @@ export const WindowTitleBar = React.forwardRef(
       onMinimize,
       onMaximize,
       isMaximized = false,
+      isMobile = false,
       className = '',
     },
     ref
@@ -46,67 +47,71 @@ export const WindowTitleBar = React.forwardRef(
         ref={ref}
         className={`
           flex items-center justify-between
-          h-8 px-4 bg-gradient-to-r from-neutral-800 to-neutral-900
-          border-b border-neutral-700/50
+          h-10 px-3 bg-neutral-950/80 backdrop-blur-xl
+          border-b border-white/10
           select-none cursor-move
           ${className}
         `}
       >
-        {/* Title */}
-        <div className="flex items-center gap-2 min-w-0 flex-1">
-          {renderIcon()}
-          <span className="text-sm font-medium text-neutral-200 truncate">
-            {title}
-          </span>
+        <div className="flex items-center gap-3 min-w-0 flex-1">
+          {!isMobile && (
+            <div className="flex items-center gap-2">
+              {onClose && (
+                <motion.button
+                  className="group flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#ff5f57] shadow-sm shadow-black/20 ring-1 ring-black/10"
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.94 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onClose();
+                  }}
+                  title="Close"
+                >
+                  <X size={9} className="opacity-0 text-[#4a0a07] transition-opacity duration-150 group-hover:opacity-100" />
+                </motion.button>
+              )}
+
+              {onMinimize && (
+                <motion.button
+                  className="group flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#febc2e] shadow-sm shadow-black/20 ring-1 ring-black/10"
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.94 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMinimize();
+                  }}
+                  title="Minimize"
+                >
+                  <Minus size={9} className="opacity-0 text-[#4a3600] transition-opacity duration-150 group-hover:opacity-100" />
+                </motion.button>
+              )}
+
+              {onMaximize && (
+                <motion.button
+                  className="group flex h-3.5 w-3.5 items-center justify-center rounded-full bg-[#28c840] shadow-sm shadow-black/20 ring-1 ring-black/10"
+                  whileHover={{ scale: 1.06 }}
+                  whileTap={{ scale: 0.94 }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMaximize();
+                  }}
+                  title={isMaximized ? 'Restore' : 'Maximize'}
+                >
+                  <Square size={8} className="opacity-0 text-[#05330b] transition-opacity duration-150 group-hover:opacity-100" />
+                </motion.button>
+              )}
+            </div>
+          )}
+
+          <div className="flex min-w-0 items-center gap-2">
+            {renderIcon()}
+            <span className="truncate text-sm font-medium text-neutral-200">
+              {title}
+            </span>
+          </div>
         </div>
 
-        {/* Control buttons */}
-        <div className="flex items-center gap-1">
-          {onMinimize && (
-            <motion.button
-              className="flex items-center justify-center w-6 h-6 hover:bg-neutral-700/50 rounded transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onMinimize();
-              }}
-              title="Minimize"
-            >
-              <Minus size={14} className="text-neutral-400" />
-            </motion.button>
-          )}
-
-          {onMaximize && (
-            <motion.button
-              className="flex items-center justify-center w-6 h-6 hover:bg-neutral-700/50 rounded transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onMaximize();
-              }}
-              title={isMaximized ? 'Restore' : 'Maximize'}
-            >
-              <Square size={14} className="text-neutral-400" />
-            </motion.button>
-          )}
-
-          {onClose && (
-            <motion.button
-              className="flex items-center justify-center w-6 h-6 hover:bg-red-500/20 rounded transition-colors"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={(e) => {
-                e.stopPropagation();
-                onClose();
-              }}
-              title="Close"
-            >
-              <X size={14} className="text-red-400" />
-            </motion.button>
-          )}
-        </div>
+        <div className="w-20" />
       </div>
     );
   }

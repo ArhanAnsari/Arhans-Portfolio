@@ -45,6 +45,13 @@ export const useSystemStore = create(
       activeWallpaperId: 'dark-gradient',
       theme: 'dark',
       animationsEnabled: true,
+      hasEnteredDesktop: false,
+      clockPreferences: {
+        timeFormat: '24h',
+        showWeekday: true,
+        showMonth: false,
+        showSeconds: false,
+      },
       bootTime: Date.now(),
 
       setWallpaper: (wallpaperId) => {
@@ -60,6 +67,14 @@ export const useSystemStore = create(
 
       toggleAnimations: () => set((state) => ({ animationsEnabled: !state.animationsEnabled })),
       setTheme: (theme) => set({ theme }),
+      markDesktopEntered: () => set({ hasEnteredDesktop: true }),
+      setClockPreferences: (updates) =>
+        set((state) => ({
+          clockPreferences: {
+            ...state.clockPreferences,
+            ...updates,
+          },
+        })),
     }),
     {
       name: 'arhanos-system-store',
@@ -67,6 +82,8 @@ export const useSystemStore = create(
         activeWallpaperId: state.activeWallpaperId,
         theme: state.theme,
         animationsEnabled: state.animationsEnabled,
+        hasEnteredDesktop: state.hasEnteredDesktop,
+        clockPreferences: state.clockPreferences,
         bootTime: state.bootTime,
       }),
     }

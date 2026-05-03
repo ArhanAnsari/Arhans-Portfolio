@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DesktopShell } from './DesktopShell';
+import { MobileShell } from './MobileShell';
 
 /**
  * Desktop Entry Point
@@ -9,5 +10,17 @@ import { DesktopShell } from './DesktopShell';
  * In future phases, could add: theme provider, analytics, etc
  */
 export const DesktopEntry = () => {
-  return <DesktopShell />;
+  const [mode, setMode] = useState('desktop');
+
+  useEffect(() => {
+    const updateMode = () => {
+      setMode(window.innerWidth < 640 ? 'mobile' : 'desktop');
+    };
+
+    updateMode();
+    window.addEventListener('resize', updateMode);
+    return () => window.removeEventListener('resize', updateMode);
+  }, []);
+
+  return mode === 'mobile' ? <MobileShell /> : <DesktopShell />;
 };

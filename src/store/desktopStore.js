@@ -5,7 +5,7 @@ const DEFAULT_DESKTOP_ICONS = [
   { id: 'resume', name: 'Resume.pdf', appId: 'resume', type: 'file', icon: '/images/pdf.png', x: 40, y: 72 },
   { id: 'projects', name: 'Projects', appId: 'projects', type: 'folder', icon: '/icons/work.svg', x: 40, y: 168 },
   { id: 'github', name: 'GitHub', url: 'https://github.com/ArhanAnsari', type: 'link', icon: '/icons/github.svg', x: 40, y: 264 },
-  { id: 'youtube', name: 'YouTube', url: 'https://youtube.com/@codewitharhanofficial', type: 'link', icon: '/icons/twitter.svg', x: 40, y: 360 },
+  { id: 'youtube', name: 'YouTube', url: 'https://youtube.com/@codewitharhanofficial', type: 'link', icon: '/icons/youtube.png', x: 40, y: 360 },
   { id: 'contact', name: 'Contact', appId: 'contact', type: 'app', icon: '/images/contact.png', x: 40, y: 456 },
   { id: 'ai', name: 'AI Twin', appId: 'ai', type: 'app', icon: '/icons/info.svg', x: 160, y: 72 },
   { id: 'saas', name: 'SaaS Dashboard', appId: 'saas', type: 'app', icon: '/icons/work.svg', x: 160, y: 168 },

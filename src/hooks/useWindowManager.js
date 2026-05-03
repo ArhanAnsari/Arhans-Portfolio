@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { useWindowStore } from '../store/windowStore';
 import { useAppStore } from '../store/appStore';
+import { useUIStore } from '../store/uiStore';
 
 /**
  * Hook to interact with window manager
@@ -91,7 +92,7 @@ export const useWindowManager = () => {
 
   return {
     // State
-    windows: windowStore.windows,
+    windows: windowStore.windows.filter((window) => window.spaceId === useUIStore.getState().activeSpace),
     focusStack: windowStore.focusStack,
     focusedWindowId: windowStore.getFocusedWindowId(),
 

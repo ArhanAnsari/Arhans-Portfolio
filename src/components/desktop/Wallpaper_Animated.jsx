@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useSystemStore } from '../../store/systemStore';
 
@@ -11,8 +11,13 @@ export const Wallpaper = () => {
   const mouseRef = useRef({ x: 0, y: 0 });
   const particlesRef = useRef([]);
   const [particles, setParticles] = useState([]);
-  const { getActiveWallpaper, animationsEnabled } = useSystemStore();
-  const activeWallpaper = getActiveWallpaper();
+  const wallpapers = useSystemStore((state) => state.wallpapers);
+  const activeWallpaperId = useSystemStore((state) => state.activeWallpaperId);
+  const animationsEnabled = useSystemStore((state) => state.animationsEnabled);
+
+  const activeWallpaper = useMemo(() => {
+    return wallpapers.find((wallpaper) => wallpaper.id === activeWallpaperId) || wallpapers[0];
+  }, [activeWallpaperId, wallpapers]);
 
   // Initialize particles
   useEffect(() => {
@@ -97,11 +102,20 @@ export const Wallpaper = () => {
         <motion.div
           key={activeWallpaper.id}
           className="absolute inset-0"
-          style={{ background: activeWallpaper.value }}
+          style={
+            activeWallpaper.type === 'image'
+              ? {
+                  backgroundImage: `url("${activeWallpaper.value}")`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundRepeat: 'no-repeat',
+                }
+              : { background: activeWallpaper.value }
+          }
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.35 }}
+          transition={{ duration: 0.45, ease: 'easeOut' }}
         />
       </AnimatePresence>
 

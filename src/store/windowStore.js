@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { useUIStore } from './uiStore';
 
 // Default window dimensions
 const DEFAULT_WINDOW_WIDTH = 800;
@@ -56,6 +57,7 @@ export const useWindowStore = create(
         maximized: false,
         snappedLayout: null,
         previousBounds: null,
+        spaceId: config.spaceId || useUIStore.getState().activeSpace || 1,
       };
 
       return {

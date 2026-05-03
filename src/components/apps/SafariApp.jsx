@@ -1,191 +1,489 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ChevronLeft, ChevronRight, RotateCcw, Plus, X } from 'lucide-react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import {
+  ArrowLeft,
+  ArrowRight,
+  Plus,
+  RefreshCw,
+  Share2,
+  SquareStack,
+  PanelLeft,
+  MoreHorizontal,
+  Loader2,
+  X,
+  ShieldAlert,
+  Link2,
+  Bookmark,
+  BookmarkPlus,
+  Copy,
+  ExternalLink,
+  Globe,
+} from 'lucide-react';
+import { useBrowserStore } from '../../store/browserStore';
+import { useNotificationStore } from '../../store/notificationStore';
 
-/**
- * Safari App
- * Internal browser for portfolio links and external sites
- */
-const SafariApp = ({ windowId, windowData }) => {
-  const [currentUrl, setCurrentUrl] = useState('about:home');
-  const [urlInput, setUrlInput] = useState('');
-  const [tabs, setTabs] = useState([{ id: 1, url: 'about:home', active: true }]);
-  const [history, setHistory] = useState(['about:home']);
-  const [historyIndex, setHistoryIndex] = useState(0);
-
-  const bookmarks = [
-    { name: 'Portfolio', url: 'about:portfolio', icon: '🌐' },
-    { name: 'GitHub', url: 'https://github.com', icon: '🐙' },
-    { name: 'YouTube', url: 'https://youtube.com/@codewitharhanofficial', icon: '📺' },
-    { name: 'LinkedIn', url: 'https://linkedin.com', icon: '💼' },
-    { name: 'Email', url: 'mailto:arhanansari2009@gmail.com', icon: '✉️' },
-    { name: 'Resume', url: '/resume.pdf', icon: '📄' },
-  ];
-
-  const pages = {
-    'about:home': {
-      title: 'Safari Start',
-      content: (
-        <div className="flex flex-col items-center justify-center h-full gap-8">
-          <h1 className="text-4xl font-bold text-white">Safari</h1>
-          <p className="text-neutral-400">ArhanOS Portfolio Browser</p>
-          <div className="grid grid-cols-3 gap-4">
-            {bookmarks.map((bookmark) => (
-              <motion.button
-                key={bookmark.url}
-                onClick={() => navigate(bookmark.url)}
-                className="flex flex-col items-center gap-2 p-4 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
-                whileHover={{ scale: 1.05 }}
-              >
-                <div className="text-3xl">{bookmark.icon}</div>
-                <div className="text-xs text-neutral-300 text-center">{bookmark.name}</div>
-              </motion.button>
-            ))}
+const INTERNAL_PAGE_RENDERERS = {
+  about: {
+    title: 'About ArhanOS',
+    render: () => (
+      <div className="space-y-4 text-neutral-100">
+        <div className="text-3xl font-semibold">ArhanOS Safari</div>
+        <p className="text-neutral-300">A browser shell for internal routes, live websites, and portfolio navigation.</p>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="text-sm font-medium">Internal routes</div>
+            <div className="mt-1 text-xs text-neutral-400">about, projects, skills, contact, terminal, finder, notes, photos, settings</div>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
+            <div className="text-sm font-medium">Real websites</div>
+            <div className="mt-1 text-xs text-neutral-400">GitHub, YouTube, OpenAI, Vercel, and any secure URL.</div>
           </div>
         </div>
-      ),
-    },
-    'about:portfolio': {
-      title: 'Arhan Ansari - Portfolio',
-      content: (
-        <div className="p-8 space-y-6">
-          <h1 className="text-3xl font-bold text-white">Welcome to ArhanOS</h1>
-          <p className="text-neutral-300">Full Stack Developer & 3D Artist</p>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="bg-primary-500/10 border border-primary-500/30 p-4 rounded-lg">
-              <h3 className="font-semibold text-white mb-2">Specializations</h3>
-              <ul className="text-sm text-neutral-300 space-y-1">
-                <li>• React & Next.js</li>
-                <li>• Three.js & 3D</li>
-                <li>• AI/ML Integration</li>
-                <li>• Full Stack MERN</li>
-              </ul>
-            </div>
-            <div className="bg-accent-500/10 border border-accent-500/30 p-4 rounded-lg">
-              <h3 className="font-semibold text-white mb-2">Experience</h3>
-              <ul className="text-sm text-neutral-300 space-y-1">
-                <li>• 4+ Years Development</li>
-                <li>• 50+ Projects Completed</li>
-                <li>• AI Products Built</li>
-                <li>• 100K+ Followers</li>
-              </ul>
-            </div>
-          </div>
+      </div>
+    ),
+  },
+  projects: {
+    title: 'Projects',
+    render: () => (
+      <div className="space-y-4 text-neutral-100">
+        <div className="text-2xl font-semibold">Projects</div>
+        <p className="text-neutral-300">Browse featured work in the portfolio Projects app or jump to the project pages from Spotlight.</p>
+      </div>
+    ),
+  },
+  contact: {
+    title: 'Contact',
+    render: () => (
+      <div className="space-y-4 text-neutral-100">
+        <div className="text-2xl font-semibold">Contact</div>
+        <p className="text-neutral-300">Use the contact app or open live profiles from bookmarks.</p>
+      </div>
+    ),
+  },
+  skills: {
+    title: 'Skills',
+    render: () => (
+      <div className="space-y-4 text-neutral-100">
+        <div className="text-2xl font-semibold">Skills</div>
+        <p className="text-neutral-300">Frontend, backend, AI, and 3D portfolio work.</p>
+      </div>
+    ),
+  },
+  terminal: {
+    title: 'Terminal',
+    render: () => (
+      <div className="space-y-4 text-neutral-100">
+        <div className="text-2xl font-semibold">Terminal</div>
+        <p className="text-neutral-300">Use Terminal for filesystem commands and app launching.</p>
+      </div>
+    ),
+  },
+  finder: {
+    title: 'Finder',
+    render: () => (
+      <div className="space-y-4 text-neutral-100">
+        <div className="text-2xl font-semibold">Finder</div>
+        <p className="text-neutral-300">Navigate the virtual filesystem and preview assets.</p>
+      </div>
+    ),
+  },
+  notes: {
+    title: 'Notes',
+    render: () => (
+      <div className="space-y-4 text-neutral-100">
+        <div className="text-2xl font-semibold">Notes</div>
+        <p className="text-neutral-300">Quick note capture and autosave.</p>
+      </div>
+    ),
+  },
+  photos: {
+    title: 'Photos',
+    render: () => (
+      <div className="space-y-4 text-neutral-100">
+        <div className="text-2xl font-semibold">Photos</div>
+        <p className="text-neutral-300">Wallpaper and media previews render here.</p>
+      </div>
+    ),
+  },
+  settings: {
+    title: 'Settings',
+    render: () => (
+      <div className="space-y-4 text-neutral-100">
+        <div className="text-2xl font-semibold">Settings</div>
+        <p className="text-neutral-300">Theme, wallpaper, and clock preferences live in the system settings app.</p>
+      </div>
+    ),
+  },
+};
+
+const DEFAULT_BOOKMARKS = [
+  { id: 'github', title: 'GitHub', url: 'https://github.com', favicon: '🐙' },
+  { id: 'youtube', title: 'YouTube', url: 'https://youtube.com', favicon: '📺' },
+  { id: 'openai', title: 'OpenAI', url: 'https://openai.com', favicon: '🤖' },
+  { id: 'vercel', title: 'Vercel', url: 'https://vercel.com', favicon: '▲' },
+  { id: 'codewitharhan', title: 'CodeWithArhan', url: 'https://youtube.com/@codewitharhanofficial', favicon: '🧠' },
+];
+
+const getOriginLabel = (url) => {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+};
+
+const SafariApp = () => {
+  const {
+    tabs,
+    activeTabId,
+    bookmarks,
+    resolveUrl,
+    getActiveTab,
+    openTab,
+    closeTab,
+    duplicateTab,
+    setActiveTab,
+    navigateTab,
+    goBack,
+    goForward,
+    refreshTab,
+    addBookmark,
+    removeBookmark,
+  } = useBrowserStore();
+  const { pushNotification } = useNotificationStore();
+
+  const activeTab = getActiveTab();
+  const [addressInput, setAddressInput] = useState('');
+  const [showSidebar, setShowSidebar] = useState(true);
+  const [pendingAction, setPendingAction] = useState(null);
+  const [loadProgress, setLoadProgress] = useState(0);
+  const [iframeError, setIframeError] = useState(null);
+  const progressRef = useRef(null);
+
+  useEffect(() => {
+    setAddressInput(activeTab?.url || '');
+  }, [activeTabId]);
+
+  useEffect(() => {
+    if (!activeTab?.loading) {
+      setLoadProgress(100);
+      window.clearInterval(progressRef.current);
+      return;
+    }
+
+    setLoadProgress(8);
+    window.clearInterval(progressRef.current);
+    progressRef.current = window.setInterval(() => {
+      setLoadProgress((value) => Math.min(92, value + Math.random() * 12));
+    }, 140);
+
+    return () => window.clearInterval(progressRef.current);
+  }, [activeTab?.loading, activeTabId]);
+
+  useEffect(() => {
+    if (!activeTab?.url) return;
+    if (activeTab.url.startsWith('http')) {
+      setIframeError(null);
+      return;
+    }
+    setIframeError(null);
+  }, [activeTab?.url]);
+
+  const internalPage = activeTab && !activeTab.url.startsWith('http') ? INTERNAL_PAGE_RENDERERS[activeTab.url] : null;
+  const resolvedUrl = useMemo(() => resolveUrl(addressInput || activeTab?.url || 'about'), [addressInput, activeTab?.url, resolveUrl]);
+
+  const navigate = (input) => {
+    const nextUrl = resolveUrl(input);
+    setIframeError(null);
+    navigateTab(activeTabId, nextUrl);
+    if (/^https?:\/\//i.test(nextUrl)) {
+      pushNotification({
+        type: 'safari',
+        title: 'Safari navigation',
+        description: getOriginLabel(nextUrl),
+        source: 'safari',
+      });
+    }
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    navigate(addressInput);
+  };
+
+  const handleBookmark = () => {
+    if (!activeTab) return;
+    addBookmark({ title: activeTab.title, url: activeTab.url, favicon: activeTab.favicon || '🌐' });
+    pushNotification({ type: 'safari', title: 'Bookmark saved', description: activeTab.title, source: 'safari' });
+  };
+
+  const openBookmark = (bookmark) => {
+    setAddressInput(bookmark.url);
+    navigate(bookmark.url);
+  };
+
+  const renderActiveContent = () => {
+    if (!activeTab) {
+      return null;
+    }
+
+    if (activeTab.loading) {
+      return (
+        <div className="flex h-full items-center justify-center gap-3 text-neutral-200">
+          <Loader2 size={20} className="animate-spin text-cyan-300" />
+          Loading page...
         </div>
-      ),
-    },
-  };
-
-  const navigate = (url) => {
-    setCurrentUrl(url);
-    const newHistory = history.slice(0, historyIndex + 1);
-    newHistory.push(url);
-    setHistory(newHistory);
-    setHistoryIndex(newHistory.length - 1);
-    setUrlInput(url);
-  };
-
-  const goBack = () => {
-    if (historyIndex > 0) {
-      setHistoryIndex(historyIndex - 1);
-      setCurrentUrl(history[historyIndex - 1]);
+      );
     }
-  };
 
-  const goForward = () => {
-    if (historyIndex < history.length - 1) {
-      setHistoryIndex(historyIndex + 1);
-      setCurrentUrl(history[historyIndex + 1]);
+    if (activeTab.error) {
+      return (
+        <div className="flex h-full flex-col items-center justify-center gap-3 text-neutral-100">
+          <ShieldAlert size={40} className="text-red-300" />
+          <div className="text-lg font-semibold">Page blocked or unavailable</div>
+          <div className="max-w-lg text-center text-sm text-neutral-400">{activeTab.error}</div>
+        </div>
+      );
     }
-  };
 
-  const handleUrlSubmit = (e) => {
-    e.preventDefault();
-    if (urlInput.trim()) {
-      navigate(urlInput);
+    if (internalPage) {
+      const Page = internalPage.render;
+      return (
+        <div className="h-full overflow-auto bg-gradient-to-br from-neutral-950 via-slate-950 to-neutral-900 p-6">
+          <Page />
+        </div>
+      );
     }
+
+    if (!activeTab.url.startsWith('http')) {
+      return (
+        <div className="flex h-full items-center justify-center text-neutral-300">
+          Open a route or website to begin.
+        </div>
+      );
+    }
+
+    if (iframeError) {
+      return (
+        <div className="flex h-full flex-col items-center justify-center gap-3 bg-neutral-950 text-neutral-100">
+          <ShieldAlert size={40} className="text-yellow-300" />
+          <div className="text-lg font-semibold">Blocked by browser sandbox</div>
+          <div className="max-w-xl text-center text-sm text-neutral-400">This website could not be embedded in the sandboxed iframe. Open it externally or try a different site.</div>
+          <button
+            onClick={() => window.open(activeTab.url, '_blank', 'noopener,noreferrer')}
+            className="rounded-full bg-cyan-400/20 px-4 py-2 text-sm text-cyan-100"
+          >
+            Open externally
+          </button>
+        </div>
+      );
+    }
+
+    return (
+      <iframe
+        key={activeTab.id}
+        src={activeTab.url}
+        title={activeTab.title}
+        className="h-full w-full bg-white"
+        sandbox="allow-forms allow-scripts allow-popups allow-popups-to-escape-sandbox allow-downloads allow-top-navigation-by-user-activation"
+        referrerPolicy="no-referrer"
+        loading="eager"
+        onLoad={() => {
+          refreshTab(activeTab.id);
+          window.setTimeout(() => {
+            useBrowserStore.getState().finishTabLoad(activeTab.id);
+          }, 180);
+        }}
+        onError={() => {
+          setIframeError('Failed to load this site in the sandboxed browser frame.');
+          useBrowserStore.getState().setTabError(activeTab.id, 'Failed to load this site in the sandboxed browser frame.');
+        }}
+      />
+    );
   };
 
-  const currentPage = pages[currentUrl] || { title: currentUrl, content: <div /> };
+  const tabProgress = activeTab?.loading ? loadProgress : 100;
 
   return (
-    <div className="h-full flex flex-col bg-gradient-to-br from-neutral-900 to-neutral-800">
-      {/* Tabs */}
-      <div className="flex items-center gap-1 px-4 pt-2 bg-black/30 border-b border-white/10">
-        <div className="flex gap-1 flex-1 overflow-x-auto">
-          {tabs.map((tab) => (
-            <motion.div
-              key={tab.id}
-              className={`flex items-center gap-2 px-3 py-2 rounded-t-lg text-xs font-medium transition-colors ${
-                tab.active
-                  ? 'bg-neutral-700 border-t border-white/20 text-white'
-                  : 'bg-neutral-800 border-t border-transparent text-neutral-400 hover:bg-neutral-750'
-              }`}
-            >
-              <span className="line-clamp-1">{tab.url}</span>
-              <motion.button
-                onClick={() => setTabs(tabs.filter((t) => t.id !== tab.id))}
-                whileHover={{ scale: 1.1 }}
-                className="p-0.5 hover:bg-white/10 rounded"
+    <div className="flex h-full flex-col overflow-hidden bg-neutral-950 text-white">
+      <div className="border-b border-white/10 bg-neutral-950/95 px-3 py-2 backdrop-blur-xl">
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 pr-2">
+            <button className="h-3.5 w-3.5 rounded-full bg-[#ff5f57] shadow-sm shadow-black/20" title="Close" />
+            <button className="h-3.5 w-3.5 rounded-full bg-[#febc2e] shadow-sm shadow-black/20" title="Minimize" />
+            <button className="h-3.5 w-3.5 rounded-full bg-[#28c840] shadow-sm shadow-black/20" title="Fullscreen" />
+          </div>
+
+          <div className="flex flex-1 items-center gap-1 overflow-x-auto">
+            {tabs.map((tab) => (
+              <motion.div
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter' || event.key === ' ') {
+                    event.preventDefault();
+                    setActiveTab(tab.id);
+                  }
+                }}
+                className={`group flex min-w-[180px] items-center gap-2 rounded-t-xl border px-3 py-2 text-left text-xs transition-colors ${tab.id === activeTabId ? 'border-white/15 bg-white/10 text-white' : 'border-transparent bg-white/[0.03] text-neutral-400 hover:bg-white/5'}`}
+                whileHover={{ y: -1 }}
+                layout
               >
-                <X size={12} />
-              </motion.button>
-            </motion.div>
-          ))}
+                <span className="flex h-5 w-5 items-center justify-center rounded-md bg-white/10 text-[11px]">{tab.favicon || '🌐'}</span>
+                <span className="min-w-0 flex-1 truncate">{tab.title || tab.url}</span>
+                <button
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    closeTab(tab.id);
+                  }}
+                  className="rounded p-1 text-neutral-500 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-white/10 hover:text-white"
+                >
+                  <X size={12} />
+                </button>
+              </motion.div>
+            ))}
+            <button
+              onClick={() => openTab('about')}
+              className="ml-1 flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-neutral-300 hover:bg-white/10 hover:text-white"
+              title="New Tab"
+            >
+              <Plus size={16} />
+            </button>
+          </div>
         </div>
-        <motion.button
-          onClick={() =>
-            setTabs([...tabs, { id: Date.now(), url: 'about:home', active: true }])
-          }
-          className="p-1 hover:bg-white/10 rounded text-neutral-400"
-          whileHover={{ scale: 1.1 }}
-        >
-          <Plus size={16} />
-        </motion.button>
+
+        <div className="mt-3 flex items-center gap-2">
+          <button
+            onClick={() => goBack(activeTabId)}
+            disabled={!activeTab || activeTab.historyIndex <= 0}
+            className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+            title="Back"
+          >
+            <ArrowLeft size={16} />
+          </button>
+          <button
+            onClick={() => goForward(activeTabId)}
+            disabled={!activeTab || activeTab.historyIndex >= activeTab.history.length - 1}
+            className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+            title="Forward"
+          >
+            <ArrowRight size={16} />
+          </button>
+          <button
+            onClick={() => refreshTab(activeTabId)}
+            className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-white/10 hover:text-white"
+            title="Refresh"
+          >
+            <RefreshCw size={16} />
+          </button>
+          <form onSubmit={handleSubmit} className="flex flex-1 items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-2">
+            <Globe size={14} className="text-neutral-500" />
+            <input
+              value={addressInput}
+              onChange={(event) => setAddressInput(event.target.value)}
+              placeholder="Search or enter website address"
+              className="w-full bg-transparent text-sm text-white outline-none placeholder:text-neutral-500"
+            />
+            <button type="button" onClick={handleBookmark} className="rounded-full p-1 text-neutral-400 hover:bg-white/10 hover:text-white" title="Add Bookmark">
+              <BookmarkPlus size={14} />
+            </button>
+            <button type="submit" className="rounded-full bg-cyan-400/20 px-3 py-1 text-xs font-medium text-cyan-100 hover:bg-cyan-400/30">
+              Go
+            </button>
+          </form>
+          <button className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-white/10 hover:text-white" title="Share">
+            <Share2 size={16} />
+          </button>
+          <button onClick={() => setShowSidebar((value) => !value)} className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-white/10 hover:text-white" title="Sidebar">
+            <PanelLeft size={16} />
+          </button>
+          <button className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-white/10 hover:text-white" title="Tabs">
+            <SquareStack size={16} />
+          </button>
+          <button className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-white/10 hover:text-white" title="More">
+            <MoreHorizontal size={16} />
+          </button>
+        </div>
+
+        <div className="mt-2 h-1 overflow-hidden rounded-full bg-white/5">
+          <div className="h-full rounded-full bg-gradient-to-r from-cyan-400 via-sky-400 to-blue-500 transition-all duration-300" style={{ width: `${tabProgress}%`, opacity: activeTab?.loading ? 1 : 0 }} />
+        </div>
       </div>
 
-      {/* Address Bar */}
-      <div className="flex items-center gap-2 p-3 bg-black/30 border-b border-white/10">
-        <motion.button
-          onClick={goBack}
-          disabled={historyIndex === 0}
-          className="p-1 hover:bg-white/10 rounded disabled:opacity-30 disabled:cursor-not-allowed"
-          whileHover={{ scale: 1.05 }}
-        >
-          <ChevronLeft size={16} />
-        </motion.button>
-        <motion.button
-          onClick={goForward}
-          disabled={historyIndex === history.length - 1}
-          className="p-1 hover:bg-white/10 rounded disabled:opacity-30 disabled:cursor-not-allowed"
-          whileHover={{ scale: 1.05 }}
-        >
-          <ChevronRight size={16} />
-        </motion.button>
-        <motion.button
-          onClick={() => setCurrentUrl(currentUrl)}
-          className="p-1 hover:bg-white/10 rounded"
-          whileHover={{ scale: 1.05 }}
-        >
-          <RotateCcw size={16} />
-        </motion.button>
+      <div className="flex min-h-0 flex-1 overflow-hidden">
+        <AnimatePresence>
+          {showSidebar && (
+            <motion.aside
+              className="hidden w-72 shrink-0 border-r border-white/10 bg-neutral-950/90 p-4 backdrop-blur-xl md:block"
+              initial={{ x: -24, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              exit={{ x: -24, opacity: 0 }}
+            >
+              <div className="mb-3 flex items-center gap-2 text-xs uppercase tracking-[0.3em] text-neutral-500">
+                <Bookmark size={12} />
+                Bookmarks
+              </div>
+              <div className="space-y-2">
+                {bookmarks.map((bookmark) => (
+                  <button
+                    key={bookmark.id}
+                    onClick={() => openBookmark(bookmark)}
+                    className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left hover:bg-white/10"
+                  >
+                    <span className="text-lg">{bookmark.favicon}</span>
+                    <div className="min-w-0">
+                      <div className="truncate text-sm font-medium">{bookmark.title}</div>
+                      <div className="truncate text-xs text-neutral-500">{bookmark.url}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <div className="mt-6 rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-neutral-300">
+                <div className="font-medium text-white">Safari intelligence</div>
+                <div className="mt-1 text-xs text-neutral-400">Internal routes open native ArhanOS pages. Type a search phrase for web search. Type a domain like github and Safari resolves it automatically.</div>
+              </div>
+            </motion.aside>
+          )}
+        </AnimatePresence>
 
-        {/* URL Input */}
-        <form onSubmit={handleUrlSubmit} className="flex-1">
-          <input
-            type="text"
-            value={urlInput}
-            onChange={(e) => setUrlInput(e.target.value)}
-            onFocus={() => setUrlInput(currentUrl)}
-            className="w-full px-3 py-1 bg-neutral-700/50 border border-white/20 rounded text-xs text-white placeholder-neutral-500 focus:outline-none focus:border-primary-500/50"
-            placeholder="Enter URL..."
-          />
-        </form>
+        <div className="relative min-w-0 flex-1 bg-neutral-950">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTab?.id || 'empty'}
+              className="absolute inset-0"
+              initial={{ opacity: 0, scale: 0.985, filter: 'blur(10px)' }}
+              animate={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, scale: 0.985, filter: 'blur(10px)' }}
+              transition={{ duration: 0.22, ease: 'easeOut' }}
+            >
+              {renderActiveContent()}
+            </motion.div>
+          </AnimatePresence>
+        </div>
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-auto">
-        {currentPage.content}
+      <div className="border-t border-white/10 bg-neutral-950/95 px-4 py-2 text-xs text-neutral-500">
+        <div className="flex items-center gap-3 overflow-x-auto">
+          <span className="uppercase tracking-[0.3em] text-neutral-600">Bookmarks</span>
+          {bookmarks.map((bookmark) => (
+            <button
+              key={bookmark.id}
+              onClick={() => openBookmark(bookmark)}
+              className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-neutral-300 hover:bg-white/10"
+            >
+              {bookmark.title}
+            </button>
+          ))}
+          <button
+            onClick={() => removeBookmark(DEFAULT_BOOKMARKS[0].id)}
+            className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-neutral-300 hover:bg-white/10"
+            title="Remove a bookmark example"
+          >
+            Remove GitHub
+          </button>
+        </div>
       </div>
     </div>
   );

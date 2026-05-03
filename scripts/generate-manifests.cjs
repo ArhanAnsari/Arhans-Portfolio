@@ -8,6 +8,10 @@ function scanDirRecursive(dir, exts = ['.jpg', '.jpeg', '.png', '.webp']) {
   function walk(d) {
     const entries = fs.readdirSync(d, { withFileTypes: true });
     for (const e of entries) {
+      if (e.name === '__MACOSX' || e.name.startsWith('._')) {
+        continue;
+      }
+
       const full = path.join(d, e.name);
       if (e.isDirectory()) {
         walk(full);
@@ -20,7 +24,7 @@ function scanDirRecursive(dir, exts = ['.jpg', '.jpeg', '.png', '.webp']) {
   }
 
   walk(dir);
-  return out;
+  return [...new Set(out)];
 }
 
 function writeJson(targetPath, data) {

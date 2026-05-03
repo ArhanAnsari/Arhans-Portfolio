@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import dayjs from 'dayjs';
-import { Bell, Wifi, Battery, Search } from 'lucide-react';
+import { Bell, Wifi, Battery, Search, ChevronDown, CalendarDays, SlidersHorizontal } from 'lucide-react';
 import { useWindowStore } from '../../store/windowStore';
+import { useSystemStore } from '../../store/systemStore';
+import { useUIStore } from '../../store/uiStore';
 
 /**
  * ArhanOS MenuBar
@@ -11,9 +13,11 @@ import { useWindowStore } from '../../store/windowStore';
 const MenuBar = ({ onSpotlightOpen, onNotificationOpen, onAppOpen }) => {
   const [currentTime, setCurrentTime] = useState(dayjs());
   const [activeMenu, setActiveMenu] = useState(null);
+  const [showClockPanel, setShowClockPanel] = useState(false);
   const [batteryLevel, setBatteryLevel] = useState(100);
   const [wifiStrength, setWifiStrength] = useState(4);
   const [zoom, setZoom] = useState(1);
+  const { clockPreferences, setClockPreferences } = useSystemStore();
   const {
     windows,
     focusStack,
@@ -22,6 +26,7 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen, onAppOpen }) => {
     restoreWindow,
     focusWindow,
   } = useWindowStore();
+  const { toggleControlCenter } = useUIStore();
 
   // Global keyboard shortcuts and menu/UI handling
   useEffect(() => {
@@ -78,9 +83,29 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen, onAppOpen }) => {
 
   // Update clock every second
   useEffect(() => {
-    const interval = setInterval(() => setCurrentTime(dayjs()), 1000);
+    const intervalMs = clockPreferences.showSeconds ? 1000 : 60000;
+    setCurrentTime(dayjs());
+    const interval = setInterval(() => setCurrentTime(dayjs()), intervalMs);
     return () => clearInterval(interval);
-  }, []);
+  }, [clockPreferences.showSeconds]);
+
+  const formatClock = (time) => {
+    const parts = [];
+
+    if (clockPreferences.showWeekday) {
+      parts.push(time.format('ddd'));
+    }
+
+    parts.push(time.format('D'));
+
+    if (clockPreferences.showMonth) {
+      parts.push(time.format('MMM'));
+    }
+
+    parts.push(clockPreferences.timeFormat === '24h' ? time.format('HH:mm') : time.format('h:mm A'));
+
+    return parts.join(' ');
+  };
 
   // Get active app name
   const getActiveAppName = () => {
@@ -382,9 +407,71 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen, onAppOpen }) => {
             />
           </motion.button>
 
+          <motion.button
+            onClick={toggleControlCenter}
+            className="relative text-neutral-400 hover:text-white transition-colors"
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.95 }}
+            title="Control Center"
+          >
+            <SlidersHorizontal size={12} />
+          </motion.button>
+
           {/* Clock */}
-          <div className="text-neutral-300 text-xs font-mono ml-2 w-12 text-right">
-            {currentTime.format('h:mm A')}
+          <div className="relative ml-2">
+            <motion.button
+              onClick={() => setShowClockPanel((value) => !value)}
+              className="flex items-center gap-1 rounded-md px-2 py-1 text-neutral-200 hover:bg-white/10 transition-colors"
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <span className="min-w-[92px] text-right text-xs font-medium tracking-wide tabular-nums">
+                {formatClock(currentTime)}
+              </span>
+              <ChevronDown size={11} className="text-neutral-500" />
+            </motion.button>
+
+            <AnimatePresence>
+              {showClockPanel && (
+                <motion.div
+                  className="absolute right-0 top-full mt-2 w-64 rounded-2xl border border-white/10 bg-neutral-950/95 p-4 shadow-2xl backdrop-blur-xl"
+                  initial={{ opacity: 0, y: -8, scale: 0.98 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.98 }}
+                >
+                  <div className="flex items-center gap-2 text-xs uppercase tracking-[0.25em] text-neutral-500">
+                    <CalendarDays size={12} />
+                    Calendar
+                  </div>
+                  <div className="mt-3 text-xl font-semibold text-neutral-100">
+                    {currentTime.format('ddd D MMMM')}
+                  </div>
+                  <div className="mt-1 text-sm text-neutral-300">
+                    {currentTime.format(clockPreferences.timeFormat === '24h' ? 'HH:mm' : 'h:mm A')}
+                  </div>
+                  <div className="mt-4 grid grid-cols-3 gap-2 text-[11px] text-neutral-300">
+                    <button
+                      onClick={() => setClockPreferences({ timeFormat: '24h' })}
+                      className={`rounded-lg px-2 py-1 ${clockPreferences.timeFormat === '24h' ? 'bg-cyan-400/20 text-cyan-200' : 'bg-white/5'}`}
+                    >
+                      24h
+                    </button>
+                    <button
+                      onClick={() => setClockPreferences({ timeFormat: '12h' })}
+                      className={`rounded-lg px-2 py-1 ${clockPreferences.timeFormat === '12h' ? 'bg-cyan-400/20 text-cyan-200' : 'bg-white/5'}`}
+                    >
+                      12h
+                    </button>
+                    <button
+                      onClick={() => setClockPreferences({ showSeconds: !clockPreferences.showSeconds })}
+                      className={`rounded-lg px-2 py-1 ${clockPreferences.showSeconds ? 'bg-cyan-400/20 text-cyan-200' : 'bg-white/5'}`}
+                    >
+                      Seconds
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
       </motion.div>
