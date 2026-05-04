@@ -16,20 +16,15 @@ const INTERNAL_ROUTES = {
 };
 
 const DEFAULT_BOOKMARKS = [
-  { id: "github", title: "GitHub", url: "https://github.com", favicon: "🐙" },
-  {
-    id: "youtube",
-    title: "YouTube",
-    url: "https://youtube.com",
-    favicon: "📺",
-  },
+  { id: "github", title: "GitHub", url: "https://github.com", favicon: "/icons/github.svg" },
+  { id: "youtube", title: "YouTube", url: "https://youtube.com", favicon: "/icons/youtube.png" },
   { id: "openai", title: "OpenAI", url: "https://openai.com", favicon: "🤖" },
   { id: "vercel", title: "Vercel", url: "https://vercel.com", favicon: "▲" },
   {
     id: "codewitharhan",
     title: "CodeWithArhan",
     url: "https://youtube.com/@codewitharhanofficial",
-    favicon: "🧠",
+    favicon: "/icons/youtube.png",
   },
 ];
 
@@ -45,12 +40,11 @@ const DEFAULT_INTERNAL_PAGES = {
   },
   contact: {
     title: "Contact",
-    content: "Reach out through the Contact app or the bookmarked profiles.",
+    content: "Reach out through the Contact app or bookmarked profiles.",
   },
   skills: {
     title: "Skills",
-    content:
-      "Frontend, backend, AI, 3D, and product design experiences live here.",
+    content: "Frontend, backend, AI, 3D, and product design experiences.",
   },
   terminal: {
     title: "Terminal",
@@ -62,7 +56,7 @@ const DEFAULT_INTERNAL_PAGES = {
   },
   notes: {
     title: "Notes",
-    content: "Capture notes, ideas, and snippets in the Notes app.",
+    content: "Capture notes, ideas, and snippets.",
   },
   photos: {
     title: "Photos",
@@ -70,7 +64,7 @@ const DEFAULT_INTERNAL_PAGES = {
   },
   settings: {
     title: "Settings",
-    content: "Adjust wallpaper, clock, appearance, and system preferences.",
+    content: "Adjust wallpaper, clock, appearance, and preferences.",
   },
   launchpad: {
     title: "Launchpad",
@@ -78,14 +72,15 @@ const DEFAULT_INTERNAL_PAGES = {
   },
 };
 
+const isExternalUrl = (url) => /^https?:\/\//i.test(url);
+
 const normalizeUrlInput = (value) => {
   const input = value.trim();
-  if (!input) return "about:blank";
+
+  if (!input) return "about";
 
   const internal = INTERNAL_ROUTES[input.toLowerCase()];
-  if (internal) {
-    return internal.url;
-  }
+  if (internal) return internal.url;
 
   if (
     /^https?:\/\//i.test(input) ||
@@ -96,41 +91,40 @@ const normalizeUrlInput = (value) => {
   }
 
   if (input.includes(".") && !input.includes(" ")) {
-    return input.startsWith("www.") ? `https://${input}` : `https://${input}`;
+    return `https://${input}`;
   }
 
-  const search = encodeURIComponent(input);
-  return `https://www.google.com/search?q=${search}`;
+  return `https://www.google.com/search?q=${encodeURIComponent(input)}`;
 };
 
 const resolveTitle = (url) => {
-  const internal = INTERNAL_ROUTES[url.toLowerCase()];
+  const internal = INTERNAL_ROUTES[url?.toLowerCase?.()];
   if (internal) return internal.title;
 
   try {
     const parsed = new URL(url);
     const host = parsed.hostname.toLowerCase();
 
-    if (host === "github.com" || host === "www.github.com") return "GitHub";
-    if (host === "youtube.com" || host === "www.youtube.com") return "YouTube";
-    if (host === "openai.com" || host === "www.openai.com") return "OpenAI";
-    if (host === "vercel.com" || host === "www.vercel.com") return "Vercel";
-    if (host === "www.google.com" && parsed.pathname === "/search")
+    if (host.includes("github")) return "GitHub";
+    if (host.includes("youtube")) return "YouTube";
+    if (host.includes("openai")) return "OpenAI";
+    if (host.includes("vercel")) return "Vercel";
+    if (host === "www.google.com" && parsed.pathname === "/search") {
       return "Search Results";
-  } catch {
-    // Non-URL values (for example internal routes) fall through to default formatting.
-  }
+    }
+  } catch {}
 
-  return url.replace(/^https?:\/\//, "").replace(/\/$/, "");
+  return url?.replace(/^https?:\/\//, "").replace(/\/$/, "") || "New Tab";
 };
 
 const createTab = (url = "about") => {
   const resolvedUrl = normalizeUrlInput(url);
+
   return {
     id: nanoid(),
     title: resolveTitle(resolvedUrl),
     url: resolvedUrl,
-    favicon: resolvedUrl.startsWith("http") ? "🌐" : "",
+    favicon: isExternalUrl(resolvedUrl) ? "🌐" : "",
     history: [resolvedUrl],
     historyIndex: 0,
     loading: false,
@@ -140,6 +134,26 @@ const createTab = (url = "about") => {
 
 const initialTabs = [createTab("about")];
 
+const scheduleLoadFallback = (tabId, get) => {
+  window.setTimeout(() => {
+    const tab = get().tabs.find((t) => t.id === tabId);
+
+    if (tab?.loading) {
+      get().finishTabLoad(tabId);
+    }
+  }, 5000);
+};
+
+const updateTabNavigation = (tab, url, historyIndex = tab.historyIndex) => ({
+  ...tab,
+  url,
+  title: resolveTitle(url),
+  favicon: isExternalUrl(url) ? "🌐" : "",
+  historyIndex,
+  loading: isExternalUrl(url),
+  error: null,
+});
+
 export const useBrowserStore = create(
   persist(
     (set, get) => ({
@@ -148,8 +162,8 @@ export const useBrowserStore = create(
       bookmarks: DEFAULT_BOOKMARKS,
       internalPages: DEFAULT_INTERNAL_PAGES,
 
-      resolveUrl: (input) => normalizeUrlInput(input),
-      resolveTitle: (url) => resolveTitle(url),
+      resolveUrl: normalizeUrlInput,
+      resolveTitle,
 
       getActiveTab: () => {
         const state = get();
@@ -163,6 +177,7 @@ export const useBrowserStore = create(
       openTab: (url = "about") =>
         set((state) => {
           const nextTab = createTab(url);
+
           return {
             tabs: [...state.tabs, nextTab],
             activeTabId: nextTab.id,
@@ -171,28 +186,33 @@ export const useBrowserStore = create(
 
       closeTab: (tabId) =>
         set((state) => {
-          if (state.tabs.length === 1) {
-            const replacement = createTab("about");
-            return { tabs: [replacement], activeTabId: replacement.id };
+          if (state.tabs.length <= 1) {
+            const fallback = createTab("about");
+            return {
+              tabs: [fallback],
+              activeTabId: fallback.id,
+            };
           }
 
           const tabs = state.tabs.filter((tab) => tab.id !== tabId);
-          const activeTabId =
-            state.activeTabId === tabId
-              ? tabs[tabs.length - 1]?.id || tabs[0].id
-              : state.activeTabId;
-          return { tabs, activeTabId };
+
+          return {
+            tabs,
+            activeTabId:
+              state.activeTabId === tabId
+                ? tabs[tabs.length - 1]?.id || tabs[0]?.id
+                : state.activeTabId,
+          };
         }),
 
       duplicateTab: (tabId) => {
-        const tab = get().tabs.find((item) => item.id === tabId);
+        const tab = get().tabs.find((t) => t.id === tabId);
         if (!tab) return;
 
         const duplicated = {
           ...tab,
           id: nanoid(),
           history: [...tab.history],
-          historyIndex: tab.historyIndex,
           loading: false,
           error: null,
         };
@@ -207,97 +227,137 @@ export const useBrowserStore = create(
 
       navigateTab: (tabId, urlInput) => {
         const resolvedUrl = normalizeUrlInput(urlInput);
+
         set((state) => ({
           tabs: state.tabs.map((tab) => {
             if (tab.id !== tabId) return tab;
+
             const nextHistory = tab.history.slice(0, tab.historyIndex + 1);
             nextHistory.push(resolvedUrl);
+
             return {
-              ...tab,
-              url: resolvedUrl,
-              title: resolveTitle(resolvedUrl),
-              favicon: resolvedUrl.startsWith("http") ? "🌐" : "",
+              ...updateTabNavigation(
+                tab,
+                resolvedUrl,
+                nextHistory.length - 1
+              ),
               history: nextHistory,
-              historyIndex: nextHistory.length - 1,
-              loading: true,
-              error: null,
             };
           }),
           activeTabId: tabId,
         }));
 
-        // For internal routes, finish immediately. For external URLs, let iframe onLoad handler finish
-        if (!resolvedUrl.startsWith("http")) {
-          window.setTimeout(() => get().finishTabLoad(tabId), 100);
-        } else {
-          // Set fallback timeout for external sites (some might not fire onLoad due to CORS)
-          window.setTimeout(() => {
-            const tab = get().tabs.find((t) => t.id === tabId);
-            if (tab && tab.loading) {
-              get().finishTabLoad(tabId);
-            }
-          }, 5000);
+        if (isExternalUrl(resolvedUrl)) {
+          scheduleLoadFallback(tabId, get);
         }
       },
 
       finishTabLoad: (tabId) =>
         set((state) => ({
           tabs: state.tabs.map((tab) =>
-            tab.id === tabId ? { ...tab, loading: false } : tab,
+            tab.id === tabId ? { ...tab, loading: false } : tab
           ),
         })),
 
       goBack: (tabId) => {
+        let targetUrl = null;
+
         set((state) => ({
           tabs: state.tabs.map((tab) => {
             if (tab.id !== tabId || tab.historyIndex <= 0) return tab;
+
             const historyIndex = tab.historyIndex - 1;
-            const url = tab.history[historyIndex];
-            return {
-              ...tab,
-              url,
-              title: resolveTitle(url),
-              favicon: url.startsWith("http") ? "🌐" : "",
-              historyIndex,
-              loading: url.startsWith("http"),
-              error: null,
-            };
+            targetUrl = tab.history[historyIndex];
+
+            return updateTabNavigation(tab, targetUrl, historyIndex);
           }),
         }));
+
+        if (targetUrl && isExternalUrl(targetUrl)) {
+          scheduleLoadFallback(tabId, get);
+        }
       },
 
       goForward: (tabId) => {
+        let targetUrl = null;
+
         set((state) => ({
           tabs: state.tabs.map((tab) => {
             if (tab.id !== tabId || tab.historyIndex >= tab.history.length - 1)
               return tab;
+
             const historyIndex = tab.historyIndex + 1;
-            const url = tab.history[historyIndex];
-            return {
-              ...tab,
-              url,
-              title: resolveTitle(url),
-              favicon: url.startsWith("http") ? "🌐" : "",
-              historyIndex,
-              loading: url.startsWith("http"),
-              error: null,
-            };
+            targetUrl = tab.history[historyIndex];
+
+            return updateTabNavigation(tab, targetUrl, historyIndex);
           }),
         }));
+
+        if (targetUrl && isExternalUrl(targetUrl)) {
+          scheduleLoadFallback(tabId, get);
+        }
       },
 
-      refreshTab: (tabId) =>
+      refreshTab: (tabId) => {
+        const tab = get().tabs.find((t) => t.id === tabId);
+        if (!tab) return;
+
+        set((state) => ({
+          tabs: state.tabs.map((t) =>
+            t.id === tabId
+              ? {
+                  ...t,
+                  loading: isExternalUrl(t.url),
+                  error: null,
+                }
+              : t
+          ),
+        }));
+
+        if (isExternalUrl(tab.url)) {
+          scheduleLoadFallback(tabId, get);
+        }
+      },
+
+      setTabError: (tabId, error) =>
         set((state) => ({
           tabs: state.tabs.map((tab) =>
             tab.id === tabId
-              ? {
-                  ...tab,
-                  loading: tab.url.startsWith("http"),
-                  error: null,
-                }
-              : tab,
+              ? { ...tab, loading: false, error }
+              : tab
           ),
         })),
+
+      addBookmark: (bookmark) =>
+        set((state) => ({
+          bookmarks: [
+            ...state.bookmarks.filter(
+              (b) =>
+                b.title !== bookmark.title &&
+                b.url !== bookmark.url
+            ),
+            { ...bookmark, id: bookmark.id || nanoid() },
+          ],
+        })),
+
+      removeBookmark: (bookmarkId) =>
+        set((state) => ({
+          bookmarks: state.bookmarks.filter(
+            (b) => b.id !== bookmarkId
+          ),
+        })),
+
+      resetBookmarks: () =>
+        set({ bookmarks: DEFAULT_BOOKMARKS }),
+    }),
+    {
+      name: "arhanos-browser-store",
+
+      partialize: (state) => ({
+        tabs: state.tabs,
+        activeTabId: state.activeTabId,
+        bookmarks: state.bookmarks,
+      }),
 
       merge: (persistedState, currentState) => {
         const merged = {
@@ -313,43 +373,8 @@ export const useBrowserStore = create(
 
         return merged;
       },
-
-      setTabError: (tabId, error) =>
-        set((state) => ({
-          tabs: state.tabs.map((tab) =>
-            tab.id === tabId ? { ...tab, loading: false, error } : tab,
-          ),
-        })),
-
-      addBookmark: (bookmark) =>
-        set((state) => ({
-          bookmarks: [
-            ...state.bookmarks.filter(
-              (entry) =>
-                entry.title !== bookmark.title && entry.url !== bookmark.url,
-            ),
-            { ...bookmark, id: bookmark.id || nanoid() },
-          ],
-        })),
-
-      removeBookmark: (bookmarkId) =>
-        set((state) => ({
-          bookmarks: state.bookmarks.filter(
-            (bookmark) => bookmark.id !== bookmarkId,
-          ),
-        })),
-
-      resetBookmarks: () => set({ bookmarks: DEFAULT_BOOKMARKS }),
-    }),
-    {
-      name: "arhanos-browser-store",
-      partialize: (state) => ({
-        tabs: state.tabs,
-        activeTabId: state.activeTabId,
-        bookmarks: state.bookmarks,
-      }),
-    },
-  ),
+    }
+  )
 );
 
 export default useBrowserStore;
