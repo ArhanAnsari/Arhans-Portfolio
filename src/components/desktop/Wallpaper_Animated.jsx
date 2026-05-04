@@ -9,6 +9,7 @@ import { useSystemStore } from '../../store/systemStore';
 export const Wallpaper = () => {
   const canvasRef = useRef(null);
   const mouseRef = useRef({ x: 0, y: 0 });
+  const containerRef = useRef(null);
   const particlesRef = useRef([]);
   const [particles, setParticles] = useState([]);
   const wallpapers = useSystemStore((state) => state.wallpapers);
@@ -87,14 +88,20 @@ export const Wallpaper = () => {
   }, []);
 
   const handleMouseMove = (e) => {
-    mouseRef.current = {
-      x: (e.clientX / window.innerWidth) * 100,
-      y: (e.clientY / window.innerHeight) * 100,
-    };
+    const x = (e.clientX / window.innerWidth) * 100;
+    const y = (e.clientY / window.innerHeight) * 100;
+    mouseRef.current = { x, y };
+    // Update CSS variables directly on the container element so
+    // the gradient position updates without a React re-render.
+    if (containerRef.current && containerRef.current.style) {
+      containerRef.current.style.setProperty('--mouse-x', `${x}%`);
+      containerRef.current.style.setProperty('--mouse-y', `${y}%`);
+    }
   };
 
   return (
     <div
+      ref={containerRef}
       className="absolute inset-0 w-full h-full overflow-hidden"
       onMouseMove={handleMouseMove}
     >
@@ -203,10 +210,6 @@ export const Wallpaper = () => {
         style={{
           background:
             'radial-gradient(circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(139, 220, 255, 0.05) 0%, transparent 60%)',
-        }}
-        animate={{
-          '--mouse-x': `${mouseRef.current.x}%`,
-          '--mouse-y': `${mouseRef.current.y}%`,
         }}
       />
 

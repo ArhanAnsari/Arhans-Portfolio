@@ -289,10 +289,9 @@ const SafariApp = () => {
         referrerPolicy="no-referrer"
         loading="eager"
         onLoad={() => {
-          refreshTab(activeTab.id);
-          window.setTimeout(() => {
-            useBrowserStore.getState().finishTabLoad(activeTab.id);
-          }, 180);
+          // Finish loading immediately when iframe loads
+          useBrowserStore.getState().finishTabLoad(activeTab.id);
+          setIframeError(null);
         }}
         onError={() => {
           setIframeError('Failed to load this site in the sandboxed browser frame.');
@@ -402,7 +401,11 @@ const SafariApp = () => {
           <button className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-white/10 hover:text-white" title="Tabs">
             <SquareStack size={16} />
           </button>
-          <button className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-white/10 hover:text-white" title="More">
+          <button
+            onClick={() => setPendingAction(activeTab ? 'more-menu' : null)}
+            className="rounded-lg p-2 text-neutral-400 transition-colors hover:bg-white/10 hover:text-white"
+            title="More options"
+          >
             <MoreHorizontal size={16} />
           </button>
         </div>

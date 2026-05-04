@@ -169,11 +169,11 @@ export const useBrowserStore = create(
           id: nanoid(),
           history: [...tab.history],
           historyIndex: tab.historyIndex,
-          loading: true,
+          loading: false,
+          error: null,
         };
 
         set((state) => ({ tabs: [...state.tabs, duplicated], activeTabId: duplicated.id }));
-        get().finishTabLoad(duplicated.id);
       },
 
       setActiveTab: (tabId) => set({ activeTabId: tabId }),
@@ -199,7 +199,19 @@ export const useBrowserStore = create(
           activeTabId: tabId,
         }));
 
-        window.setTimeout(() => get().finishTabLoad(tabId), 350);
+
+        // For internal routes, finish immediately. For external URLs, let iframe onLoad handler finish
+        if (!resolvedUrl.startsWith('http')) {
+          window.setTimeout(() => get().finishTabLoad(tabId), 100);
+        } else {
+          // Set fallback timeout for external sites (some might not fire onLoad due to CORS)
+          window.setTimeout(() => {
+            const tab = get().tabs.find(t => t.id === tabId);
+            if (tab && tab.loading) {
+              get().finishTabLoad(tabId);
+            }
+          }, 5000);
+        }
       },
 
       finishTabLoad: (tabId) =>
@@ -207,7 +219,7 @@ export const useBrowserStore = create(
           tabs: state.tabs.map((tab) => (tab.id === tabId ? { ...tab, loading: false } : tab)),
         })),
 
-      goBack: (tabId) =>
+      goBack: (tabId) => {
         set((state) => ({
           tabs: state.tabs.map((tab) => {
             if (tab.id !== tabId || tab.historyIndex <= 0) return tab;
@@ -217,15 +229,16 @@ export const useBrowserStore = create(
               ...tab,
               url,
               title: resolveTitle(url),
-              favicon: url.startsWith('http') ? '🌐' : '',
+              favicon: url.startsWith('http') ? '🌐' : '',
               historyIndex,
-              loading: true,
+              loading: !url.startsWith('http'),
               error: null,
             };
           }),
-        })),
+        }));
+      },
 
-      goForward: (tabId) =>
+      goForward: (tabId) => {
         set((state) => ({
           tabs: state.tabs.map((tab) => {
             if (tab.id !== tabId || tab.historyIndex >= tab.history.length - 1) return tab;
@@ -235,13 +248,14 @@ export const useBrowserStore = create(
               ...tab,
               url,
               title: resolveTitle(url),
-              favicon: url.startsWith('http') ? '🌐' : '',
+              favicon: url.startsWith('http') ? '🌐' : '',
               historyIndex,
-              loading: true,
+              loading: !url.startsWith('http'),
               error: null,
             };
           }),
-        })),
+        }));
+      },
 
       refreshTab: (tabId) =>
         set((state) => ({

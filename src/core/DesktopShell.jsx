@@ -30,7 +30,8 @@ export const DesktopShell = () => {
   const [hasHydrated, setHasHydrated] = useState(() => {
     const windowHydrated = useWindowStore.persist?.hasHydrated?.() ?? false;
     const systemHydrated = useSystemStore.persist?.hasHydrated?.() ?? false;
-    return windowHydrated && systemHydrated;
+    const uiHydrated = useUIStore.persist?.hasHydrated?.() ?? false;
+    return windowHydrated && systemHydrated && uiHydrated;
   });
   const { wallpapers, activeWallpaperId, setWallpaper, theme, hasEnteredDesktop, markDesktopEntered } = useSystemStore();
   const { showControlCenter, showMissionControl, toggleControlCenter, toggleMissionControl, closeAllPanels } = useUIStore();
@@ -66,17 +67,20 @@ export const DesktopShell = () => {
     const syncHydration = () => {
       const windowHydrated = useWindowStore.persist?.hasHydrated?.() ?? true;
       const systemHydrated = useSystemStore.persist?.hasHydrated?.() ?? true;
-      setHasHydrated(windowHydrated && systemHydrated);
+      const uiHydrated = useUIStore.persist?.hasHydrated?.() ?? true;
+      setHasHydrated(windowHydrated && systemHydrated && uiHydrated);
     };
 
     syncHydration();
 
     const unsubscribeWindow = useWindowStore.persist?.onFinishHydration?.(syncHydration);
     const unsubscribeSystem = useSystemStore.persist?.onFinishHydration?.(syncHydration);
+    const unsubscribeUI = useUIStore.persist?.onFinishHydration?.(syncHydration);
 
     return () => {
       unsubscribeWindow?.();
       unsubscribeSystem?.();
+      unsubscribeUI?.();
     };
   }, []);
 

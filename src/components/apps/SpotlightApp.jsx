@@ -161,15 +161,15 @@ const SpotlightApp = ({ isOpen, onClose, onAppSelect }) => {
       {isOpen && (
         <>
           <motion.div className="fixed inset-0 z-[8000] bg-black/45 backdrop-blur-xl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
-          <motion.div className="fixed left-1/2 top-24 z-[8001] w-[min(92vw,960px)] -translate-x-1/2" initial={{ opacity: 0, scale: 0.96, y: -12 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: -12 }} transition={{ type: 'spring', damping: 24, stiffness: 320 }}>
-            <div className="overflow-hidden rounded-3xl border border-white/10 bg-neutral-950/95 shadow-2xl">
+          <motion.div className="fixed left-1/2 top-1/2 z-[8001] w-[min(92vw,960px)] -translate-x-1/2 -translate-y-1/2" initial={{ opacity: 0, scale: 0.96, y: 0 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 0 }} transition={{ type: 'spring', damping: 24, stiffness: 320 }}>
+            <div className="overflow-hidden rounded-3xl border border-white/10 bg-neutral-950/95 shadow-2xl max-h-[80vh] flex flex-col">
               <div className="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-4 py-4">
                 <Search size={18} className="text-neutral-500" />
                 <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={handleKeyDown} placeholder="Search apps, files, notes, bookmarks, commands" className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-neutral-500" />
                 <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[10px] uppercase tracking-[0.25em] text-neutral-500">Spotlight</span>
               </div>
 
-              <div className="grid max-h-[70vh] grid-cols-1 min-h-0 md:grid-cols-[1fr_260px]">
+              <div className="grid max-h-[calc(80vh-80px)] grid-cols-1 min-h-0 md:grid-cols-[1fr_260px] overflow-hidden">
                 <div className="min-h-0 overflow-auto p-3">
                   {filteredItems.length === 0 ? (
                     <div className="flex h-40 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.03] text-sm text-neutral-500">No results found for "{query}"</div>

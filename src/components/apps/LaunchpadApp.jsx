@@ -9,24 +9,38 @@ import { Search, X } from 'lucide-react';
 const LaunchpadApp = ({ windowId, onAppSelect }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const apps = [
-    { id: 'about', name: 'About', icon: '/icons/info.svg', category: 'system' },
-    { id: 'projects', name: 'Projects', icon: '/icons/work.svg', category: 'system' },
-    { id: 'skills', name: 'Skills', icon: '/icons/atom.svg', category: 'system' },
-    { id: 'terminal', name: 'Terminal', icon: '/images/terminal.png', category: 'system' },
-    { id: 'resume', name: 'Resume', icon: '/images/pdf.png', category: 'system' },
-    { id: 'content', name: 'Content', icon: '/images/notes.png', category: 'system' },
-    { id: 'contact', name: 'Contact', icon: '/images/contact.png', category: 'system' },
-    { id: 'ai', name: 'AI Twin', icon: '/icons/info.svg', category: 'system' },
+    // System Apps
     { id: 'finder', name: 'Finder', icon: '/images/finder.png', category: 'system' },
     { id: 'safari', name: 'Safari', icon: '/images/safari.png', category: 'system' },
-    { id: 'launchpad', name: 'Launchpad', icon: '/images/pages.png', category: 'system' },
+    { id: 'mail', name: 'Mail', icon: '/icons/mail.svg', category: 'system' },
+    { id: 'calendar', name: 'Calendar', icon: '/icons/calendar.svg', category: 'system' },
+    { id: 'notes', name: 'Notes', icon: '/images/notes.png', category: 'system' },
+    { id: 'photos', name: 'Photos', icon: '/images/photos.png', category: 'system' },
+    { id: 'music', name: 'Music', icon: '/icons/music.svg', category: 'system' },
+    { id: 'messages', name: 'Messages', icon: '/icons/messages.svg', category: 'system' },
+    { id: 'terminal', name: 'Terminal', icon: '/images/terminal.png', category: 'system' },
     { id: 'settings', name: 'Settings', icon: '/images/settings.png', category: 'system' },
-    { id: 'notifications', name: 'Notifications', icon: '/images/notes.png', category: 'apps' },
-    { id: 'codewitharhan', name: 'CodeWithArhan', icon: '/images/notes.png', category: 'apps' },
-    { id: 'saas', name: 'SaaS Dashboard', icon: '/icons/work.svg', category: 'apps' },
-    { id: 'devtimeline', name: 'Dev Timeline', icon: '/icons/info.svg', category: 'apps' },
-    { id: 'notes', name: 'Notes', icon: '/images/notes.png', category: 'apps' },
-    { id: 'photos', name: 'Photos', icon: '/images/photos.png', category: 'apps' },
+    { id: 'calculator', name: 'Calculator', icon: '/icons/calculator.svg', category: 'system' },
+    { id: 'maps', name: 'Maps', icon: '/icons/maps.svg', category: 'system' },
+    { id: 'weather', name: 'Weather', icon: '/icons/weather.svg', category: 'system' },
+    { id: 'stocks', name: 'Stocks', icon: '/icons/stocks.svg', category: 'system' },
+    { id: 'appstore', name: 'App Store', icon: '/icons/appstore.svg', category: 'system' },
+    { id: 'launchpad', name: 'Launchpad', icon: '/images/pages.png', category: 'system' },
+
+    // Personal / Portfolio Apps
+    { id: 'about', name: 'About', icon: '/icons/info.svg', category: 'personal' },
+    { id: 'projects', name: 'Projects', icon: '/icons/work.svg', category: 'personal' },
+    { id: 'skills', name: 'Skills', icon: '/icons/atom.svg', category: 'personal' },
+    { id: 'resume', name: 'Resume', icon: '/images/pdf.png', category: 'personal' },
+    { id: 'content', name: 'Content', icon: '/images/notes.png', category: 'personal' },
+    { id: 'contact', name: 'Contact', icon: '/images/contact.png', category: 'personal' },
+    { id: 'ai', name: 'AI Twin', icon: '/icons/user.svg', category: 'personal' },
+
+    // Applications
+    { id: 'notifications', name: 'Notifications', icon: '/icons/search.svg', category: 'apps' },
+    { id: 'codewitharhan', name: 'CodeWithArhan', icon: '/icons/github.svg', category: 'apps' },
+    { id: 'saas', name: 'SaaS Dashboard', icon: '/images/contact.png', category: 'apps' },
+    { id: 'devtimeline', name: 'Dev Timeline', icon: '/icons/edit.svg', category: 'apps' },
     { id: 'trash', name: 'Trash', icon: '/images/trash.png', category: 'apps' },
   ];
 
@@ -76,7 +90,7 @@ const LaunchpadApp = ({ windowId, onAppSelect }) => {
             {filteredApps.some((app) => app.category === 'system') && (
               <>
                 <h2 className="text-xl font-semibold text-white mb-4 ml-2">
-                  System Apps
+                  System
                 </h2>
                 <motion.div
                   className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-8"
@@ -96,8 +110,32 @@ const LaunchpadApp = ({ windowId, onAppSelect }) => {
               </>
             )}
 
+            {/* Personal / Portfolio Apps */}
+            {filteredApps.some((app) => app.category === 'personal') && (
+              <>
+                <h2 className="text-xl font-semibold text-white mb-4 ml-2">
+                  Personal
+                </h2>
+                <motion.div
+                  className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-4 mb-8"
+                  layout
+                >
+                  {filteredApps
+                    .filter((app) => app.category === 'personal')
+                    .map((app, idx) => (
+                      <LaunchpadIcon
+                        key={app.id}
+                        app={app}
+                        index={idx}
+                        onClick={() => handleAppClick(app.id)}
+                      />
+                    ))}
+                </motion.div>
+              </>
+            )}
+
             {/* Other Apps */}
-            {filteredApps.some((app) => app.category !== 'system') && (
+            {filteredApps.some((app) => app.category === 'apps') && (
               <>
                 <h2 className="text-xl font-semibold text-white mb-4 ml-2">
                   Applications
@@ -107,7 +145,7 @@ const LaunchpadApp = ({ windowId, onAppSelect }) => {
                   layout
                 >
                   {filteredApps
-                    .filter((app) => app.category !== 'system')
+                    .filter((app) => app.category === 'apps')
                     .map((app, idx) => (
                       <LaunchpadIcon
                         key={app.id}

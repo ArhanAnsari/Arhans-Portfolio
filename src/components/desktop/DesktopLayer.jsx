@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { RefreshCw, FolderPlus, Terminal, Folder, Info, Image as ImageIcon } from 'lucide-react';
 import { useDesktopStore } from '../../store/desktopStore';
 import { useTrashStore } from '../../store/trashStore';
+import { getAppEmoji, isImagePath } from '../../utils/iconMap';
 
 const DesktopContextMenu = ({ x, y, onAction }) => {
   const items = [
@@ -43,6 +44,10 @@ const DesktopContextMenu = ({ x, y, onAction }) => {
 const DesktopIcon = ({ icon, selected, onClick, onDoubleClick, onDragStart }) => {
   const [imageError, setImageError] = useState(false);
 
+  // Determine what to display
+  const shouldTryImage = isImagePath(icon.icon) && !imageError;
+  const fallbackEmoji = getAppEmoji(icon.appId) || icon.icon || '🧩';
+
   return (
     <motion.button
       type="button"
@@ -57,7 +62,7 @@ const DesktopIcon = ({ icon, selected, onClick, onDoubleClick, onDragStart }) =>
       onClick={onClick}
       onDoubleClick={onDoubleClick}
     >
-      {!imageError ? (
+      {shouldTryImage ? (
         <img
           src={icon.icon}
           alt={icon.name}
@@ -66,7 +71,7 @@ const DesktopIcon = ({ icon, selected, onClick, onDoubleClick, onDragStart }) =>
           draggable={false}
         />
       ) : (
-        <span className="text-3xl mt-1">🧩</span>
+        <span className="text-3xl mt-1">{fallbackEmoji}</span>
       )}
       <span className="text-[11px] text-white leading-tight text-center line-clamp-2 text-shadow-sm">
         {icon.name}
@@ -96,13 +101,23 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
   const sortedIcons = useMemo(() => [...icons], [icons]);
 
   const openIcon = (icon) => {
-    if (icon.appId) {
-      onOpenApp(icon.appId);
-      return;
-    }
+    try {
+      // Handle folder type - open in Finder
+      if (icon.type === 'folder') {
+        onOpenApp('finder');
+        return;
+      }
 
-    if (icon.url) {
-      onOpenExternal(icon.url);
+      if (icon.appId) {
+        onOpenApp(icon.appId);
+        return;
+      }
+
+      if (icon.url) {
+        onOpenExternal(icon.url);
+      }
+    } catch (error) {
+      console.error('Error opening icon:', error);
     }
   };
 

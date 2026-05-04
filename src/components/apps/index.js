@@ -28,6 +28,17 @@ const NotesApp = React.lazy(() => import('./NotesApp'));
 const PhotosApp = React.lazy(() => import('./PhotosApp'));
 const SettingsApp = React.lazy(() => import('./SettingsApp'));
 
+// System Apps
+const MailApp = React.lazy(() => import('./MailApp'));
+const CalendarApp = React.lazy(() => import('./CalendarApp'));
+const MusicApp = React.lazy(() => import('./MusicApp'));
+const MessagesApp = React.lazy(() => import('./MessagesApp'));
+const AppStoreApp = React.lazy(() => import('./AppStoreApp'));
+const MapsApp = React.lazy(() => import('./MapsApp'));
+const WeatherApp = React.lazy(() => import('./WeatherApp'));
+const StocksApp = React.lazy(() => import('./StocksApp'));
+const CalculatorApp = React.lazy(() => import('./CalculatorApp'));
+
 /**
  * App Registry
  * Central mapping of app IDs to components
@@ -122,7 +133,7 @@ export const appRegistry = {
     id: 'codewitharhan',
     name: 'CodeWithArhan',
     title: 'CodeWithArhan Studio',
-    icon: '/images/notes.png',
+    icon: '/images/youtube.png',
     component: CodeWithArhanStudio,
   },
   saas: {
@@ -166,6 +177,69 @@ export const appRegistry = {
     title: 'Photos',
     icon: '/images/photos.png',
     component: PhotosApp,
+  },
+  mail: {
+    id: 'mail',
+    name: 'Mail',
+    title: 'Mail',
+    icon: '✉️',
+    component: MailApp,
+  },
+  calendar: {
+    id: 'calendar',
+    name: 'Calendar',
+    title: 'Calendar',
+    icon: '📅',
+    component: CalendarApp,
+  },
+  music: {
+    id: 'music',
+    name: 'Music',
+    title: 'Music',
+    icon: '🎵',
+    component: MusicApp,
+  },
+  messages: {
+    id: 'messages',
+    name: 'Messages',
+    title: 'Messages',
+    icon: '💬',
+    component: MessagesApp,
+  },
+  appstore: {
+    id: 'appstore',
+    name: 'App Store',
+    title: 'App Store',
+    icon: '🛍️',
+    component: AppStoreApp,
+  },
+  maps: {
+    id: 'maps',
+    name: 'Maps',
+    title: 'Maps',
+    icon: '🗺️',
+    component: MapsApp,
+  },
+  weather: {
+    id: 'weather',
+    name: 'Weather',
+    title: 'Weather',
+    icon: '⛅',
+    component: WeatherApp,
+  },
+  stocks: {
+    id: 'stocks',
+    name: 'Stocks',
+    title: 'Stocks',
+    icon: '📈',
+    component: StocksApp,
+  },
+  calculator: {
+    id: 'calculator',
+    name: 'Calculator',
+    title: 'Calculator',
+    icon: '🧮',
+    component: CalculatorApp,
   },
 };
 
