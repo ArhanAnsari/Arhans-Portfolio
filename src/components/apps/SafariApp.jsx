@@ -159,6 +159,7 @@ const SafariApp = () => {
   const [loadProgress, setLoadProgress] = useState(0);
   const [iframeError, setIframeError] = useState(null);
   const progressRef = useRef(null);
+  const currentTabId = activeTab.id;
 
   useEffect(() => {
     setAddressInput(activeTab?.url || '');
@@ -289,8 +290,12 @@ const SafariApp = () => {
         referrerPolicy="no-referrer"
         loading="eager"
         onLoad={() => {
-          // Finish loading immediately when iframe loads
-          useBrowserStore.getState().finishTabLoad(activeTab.id);
+          const store = useBrowserStore.getState();
+
+          if (store.tabs.some(tab => tab.id === activeTab.id)) {
+            store.finishTabLoad(activeTab.id);
+          }
+
           setIframeError(null);
         }}
         onError={() => {
