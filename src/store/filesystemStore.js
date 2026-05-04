@@ -264,7 +264,7 @@ export const useFilesystemStore = create(
 
           return {
             nodes,
-            currentFolderId: state.currentFolderId === nodeId ? desktopRoot.id : state.currentFolderId,
+            currentFolderId: state.currentFolderId === nodeId ? ROOT_IDS.desktop : state.currentFolderId,
           };
         }),
 

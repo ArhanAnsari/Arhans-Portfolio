@@ -159,7 +159,7 @@ const SafariApp = () => {
   const [loadProgress, setLoadProgress] = useState(0);
   const [iframeError, setIframeError] = useState(null);
   const progressRef = useRef(null);
-  const currentTabId = activeTab.id;
+  const currentTabId = activeTab?.id;
 
   useEffect(() => {
     setAddressInput(activeTab?.url || '');
@@ -189,6 +189,12 @@ const SafariApp = () => {
     }
     setIframeError(null);
   }, [activeTab?.url]);
+
+  useEffect(() => {
+  if (!activeTab) {
+    openTab('about');
+  }
+}, [activeTab, openTab]);
 
   const internalPage = activeTab && !activeTab.url.startsWith('http') ? INTERNAL_PAGE_RENDERERS[activeTab.url] : null;
   const resolvedUrl = useMemo(() => resolveUrl(addressInput || activeTab?.url || 'about'), [addressInput, activeTab?.url, resolveUrl]);
