@@ -231,7 +231,7 @@ export const useBrowserStore = create(
               title: resolveTitle(url),
               favicon: url.startsWith('http') ? '🌐' : '',
               historyIndex,
-              loading: !url.startsWith('http'),
+              loading: url.startsWith('http'),
               error: null,
             };
           }),
@@ -250,7 +250,7 @@ export const useBrowserStore = create(
               title: resolveTitle(url),
               favicon: url.startsWith('http') ? '🌐' : '',
               historyIndex,
-              loading: !url.startsWith('http'),
+              loading: url.startsWith('http'),
               error: null,
             };
           }),
@@ -259,8 +259,16 @@ export const useBrowserStore = create(
 
       refreshTab: (tabId) =>
         set((state) => ({
-          tabs: state.tabs.map((tab) => (tab.id === tabId ? { ...tab, loading: true, error: null } : tab)),
-        })),
+          tabs: state.tabs.map((tab) =>
+            tab.id === tabId
+              ? {
+                  ...tab,
+                  loading: tab.url.startsWith('http'),
+                  error: null,
+                }
+              : tab
+          ),
+      })),
 
       setTabError: (tabId, error) =>
         set((state) => ({
