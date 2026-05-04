@@ -10,6 +10,7 @@ import { useUIStore } from '../store/uiStore';
 export const useWindowManager = () => {
   const windowStore = useWindowStore();
   const appStore = useAppStore();
+  const activeSpace = useUIStore((state) => state.activeSpace);
 
   const openWindow = useCallback(
     (appId) => {
@@ -92,7 +93,7 @@ export const useWindowManager = () => {
 
   return {
     // State
-    windows: windowStore.windows.filter((window) => window.spaceId === useUIStore.getState().activeSpace),
+    windows: windowStore.windows.filter((window) => window.spaceId === activeSpace),
     focusStack: windowStore.focusStack,
     focusedWindowId: windowStore.getFocusedWindowId(),
 
