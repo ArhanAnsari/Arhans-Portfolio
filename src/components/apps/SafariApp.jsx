@@ -132,6 +132,14 @@ const getOriginLabel = (url) => {
   }
 };
 
+// Helper to render favicon (image or emoji)
+const renderFavicon = (favicon) => {
+  if (favicon.startsWith('/') || favicon.endsWith('.svg') || favicon.endsWith('.png')) {
+    return <img src={favicon} alt="favicon" className="h-5 w-5 object-contain" />;
+  }
+  return <span className="text-lg">{favicon}</span>;
+};
+
 const SafariApp = () => {
   const {
     tabs,
@@ -158,6 +166,7 @@ const SafariApp = () => {
   const [pendingAction, setPendingAction] = useState(null);
   const [loadProgress, setLoadProgress] = useState(0);
   const [iframeError, setIframeError] = useState(null);
+  const [proxyContent, setProxyContent] = useState(null);
   const progressRef = useRef(null);
   const currentTabId = activeTab?.id;
 
@@ -189,6 +198,19 @@ const SafariApp = () => {
     }
     setIframeError(null);
   }, [activeTab?.url]);
+
+  // Auto-detect blocked iframes by timeout - most external sites are blocked
+  useEffect(() => {
+    if (!activeTab?.url?.startsWith('http') || currentTabId !== activeTab.id) return;
+    
+    const timer = window.setTimeout(() => {
+      // Most external sites that try to load in iframe get blocked
+      // Show error after load completes (browserStore timeout is 5s)
+      setIframeError('Failed to load this site in the sandboxed browser frame.');
+    }, 5500);
+    
+    return () => clearTimeout(timer);
+  }, [activeTab?.url, activeTab?.id, currentTabId]);
 
   useEffect(() => {
   if (!activeTab) {
@@ -276,12 +298,41 @@ const SafariApp = () => {
           <ShieldAlert size={40} className="text-yellow-300" />
           <div className="text-lg font-semibold">Blocked by browser sandbox</div>
           <div className="max-w-xl text-center text-sm text-neutral-400">This website could not be embedded in the sandboxed iframe. Open it externally or try a different site.</div>
-          <button
-            onClick={() => window.open(activeTab.url, '_blank', 'noopener,noreferrer')}
-            className="rounded-full bg-cyan-400/20 px-4 py-2 text-sm text-cyan-100"
-          >
-            Open externally
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => window.open(activeTab.url, '_blank', 'noopener,noreferrer')}
+              className="rounded-full bg-cyan-400/20 px-4 py-2 text-sm text-cyan-100"
+            >
+              Open externally
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  setProxyContent('Loading...');
+                  const proxyUrl = `https://r.jina.ai/http://${activeTab.url.replace(/^https?:\/\//, '')}`;
+                  const res = await fetch(proxyUrl);
+                  const html = await res.text();
+                  setProxyContent(html);
+                } catch (err) {
+                  setProxyContent('Proxy fetch failed.');
+                }
+              }}
+              className="rounded-full bg-white/5 px-4 py-2 text-sm text-white"
+            >
+              Open via proxy (limited)
+            </button>
+          </div>
+          {proxyContent && (
+            <div className="w-full h-80 mt-4 overflow-auto bg-white/5 p-4 text-sm text-neutral-100">
+              {proxyContent === 'Loading...' ? (
+                <div>Loading proxied content...</div>
+              ) : proxyContent === 'Proxy fetch failed.' ? (
+                <div>Proxy failed to fetch this page.</div>
+              ) : (
+                <div dangerouslySetInnerHTML={{ __html: proxyContent }} />
+              )}
+            </div>
+          )}
         </div>
       );
     }
@@ -438,7 +489,9 @@ const SafariApp = () => {
                     onClick={() => openBookmark(bookmark)}
                     className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left hover:bg-white/10"
                   >
-                    <span className="text-lg">{bookmark.favicon}</span>
+                    <div className="text-lg flex-shrink-0">
+                      {renderFavicon(bookmark.favicon)}
+                    </div>
                     <div className="min-w-0">
                       <div className="truncate text-sm font-medium">{bookmark.title}</div>
                       <div className="truncate text-xs text-neutral-500">{bookmark.url}</div>
@@ -477,9 +530,12 @@ const SafariApp = () => {
             <button
               key={bookmark.id}
               onClick={() => openBookmark(bookmark)}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-neutral-300 hover:bg-white/10"
+              className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-neutral-300 hover:bg-white/10 flex-shrink-0"
             >
-              {bookmark.title}
+              <div className="h-4 w-4 flex items-center justify-center">
+                {renderFavicon(bookmark.favicon)}
+              </div>
+              <span>{bookmark.title}</span>
             </button>
           ))}
           <button

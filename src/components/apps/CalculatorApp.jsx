@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Delete } from 'lucide-react';
 
 /**
@@ -11,6 +11,13 @@ const CalculatorApp = () => {
   const [waitingForNewValue, setWaitingForNewValue] = useState(false);
 
   const handleNumber = (num) => {
+    // If display currently shows an error, start fresh
+    if (display === 'Cannot divide by 0') {
+      setDisplay(String(num));
+      setWaitingForNewValue(false);
+      return;
+    }
+
     if (waitingForNewValue) {
       setDisplay(String(num));
       setWaitingForNewValue(false);
@@ -72,6 +79,33 @@ const CalculatorApp = () => {
     }
   };
 
+  const handleBackspace = () => {
+    if (display === 'Cannot divide by 0') {
+      setDisplay('0');
+      return;
+    }
+    if (display.length <= 1) {
+      setDisplay('0');
+    } else {
+      setDisplay(display.slice(0, -1));
+    }
+  };
+
+  const handleDecimal = () => {
+    if (display === 'Cannot divide by 0') {
+      setDisplay('0.');
+      setWaitingForNewValue(false);
+      return;
+    }
+
+    if (waitingForNewValue) {
+      setDisplay('0.');
+      setWaitingForNewValue(false);
+    } else if (!display.includes('.')) {
+      setDisplay(display + '.');
+    }
+  };
+
   const handleClear = () => {
     setDisplay('0');
     setPreviousValue(null);
@@ -96,6 +130,61 @@ const CalculatorApp = () => {
       </button>
     );
   };
+
+  // Keyboard support: numbers, operators, Enter, Backspace, C
+  useEffect(() => {
+    const handleKey = (e) => {
+      // Allow typing into other inputs normally
+      const tag = document.activeElement?.tagName?.toLowerCase();
+      if (tag === 'input' || tag === 'textarea') return;
+
+      const key = e.key;
+      if (/^[0-9]$/.test(key)) {
+        e.preventDefault();
+        handleNumber(Number(key));
+        return;
+      }
+
+      if (key === '.') {
+        e.preventDefault();
+        // prevent multiple decimals
+        if (waitingForNewValue) {
+          setDisplay('0.');
+          setWaitingForNewValue(false);
+        } else if (!display.includes('.')) {
+          setDisplay(display + '.');
+        }
+        return;
+      }
+
+      if (key === '+' || key === '-' || key === '*' || key === '/') {
+        e.preventDefault();
+        handleOperation(key);
+        return;
+      }
+
+      if (key === 'Enter' || key === '=') {
+        e.preventDefault();
+        handleEquals();
+        return;
+      }
+
+      if (key === 'Backspace') {
+        e.preventDefault();
+        handleBackspace();
+        return;
+      }
+
+      if (key.toLowerCase() === 'c') {
+        e.preventDefault();
+        handleClear();
+        return;
+      }
+    };
+
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [display, waitingForNewValue, operation, previousValue]);
 
   return (
     <div className="w-full h-full bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900 flex items-center justify-center p-4">
@@ -147,7 +236,7 @@ const CalculatorApp = () => {
           <Button onClick={() => handleNumber(0)} className="col-span-2">
             0
           </Button>
-          <Button onClick={() => setDisplay(display + '.')}>.</Button>
+          <Button onClick={handleDecimal}>.</Button>
         </div>
       </div>
     </div>
