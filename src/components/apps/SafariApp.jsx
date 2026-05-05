@@ -117,11 +117,11 @@ const INTERNAL_PAGE_RENDERERS = {
 };
 
 const DEFAULT_BOOKMARKS = [
-  { id: 'github', title: 'GitHub', url: 'https://github.com', favicon: '🐙' },
+  { id: 'github', title: 'GitHub', url: 'https://github.com', favicon: '/icons/github.svg' },
   { id: 'youtube', title: 'YouTube', url: 'https://youtube.com', favicon: '📺' },
   { id: 'openai', title: 'OpenAI', url: 'https://openai.com', favicon: '🤖' },
   { id: 'vercel', title: 'Vercel', url: 'https://vercel.com', favicon: '▲' },
-  { id: 'codewitharhan', title: 'CodeWithArhan', url: 'https://youtube.com/@codewitharhanofficial', favicon: '🧠' },
+  { id: 'codewitharhan', title: 'CodeWithArhan', url: 'https://youtube.com/@codewitharhanofficial', favicon: '/icons/youtube.png' },
 ];
 
 const getOriginLabel = (url) => {
@@ -317,15 +317,8 @@ const SafariApp = () => {
   return (
     <div className="flex h-full flex-col overflow-hidden bg-neutral-950 text-white">
       <div className="border-b border-white/10 bg-neutral-950/95 px-3 py-2 backdrop-blur-xl">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 pr-2">
-            <button className="h-3.5 w-3.5 rounded-full bg-[#ff5f57] shadow-sm shadow-black/20" title="Close" />
-            <button className="h-3.5 w-3.5 rounded-full bg-[#febc2e] shadow-sm shadow-black/20" title="Minimize" />
-            <button className="h-3.5 w-3.5 rounded-full bg-[#28c840] shadow-sm shadow-black/20" title="Fullscreen" />
-          </div>
-
-          <div className="flex flex-1 items-center gap-1 overflow-x-auto">
-            {tabs.map((tab) => (
+        <div className="flex flex-1 items-center gap-1 overflow-x-auto">
+          {tabs.map((tab) => (
               <motion.div
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -362,7 +355,6 @@ const SafariApp = () => {
               <Plus size={16} />
             </button>
           </div>
-        </div>
 
         <div className="mt-3 flex items-center gap-2">
           <button

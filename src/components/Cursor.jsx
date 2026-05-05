@@ -14,6 +14,17 @@ const resolveType = (el) => {
     if (tag === "input" || tag === "textarea" || node.contentEditable === "true") return "text";
     if (tag === "img" || tag === "video") return "media";
     if (tag === "canvas") return "canvas";
+    // Check for window resize handles
+    if (node.classList?.contains("resize-handle")) {
+      const classes = node.className;
+      if (classes.includes("n") && classes.includes("s")) return "resize-v";
+      if (classes.includes("e") && classes.includes("w")) return "resize-h";
+      if (classes.includes("nw") || classes.includes("se")) return "resize-nwse";
+      if (classes.includes("ne") || classes.includes("sw")) return "resize-nesw";
+      return "resize";
+    }
+    // Check for draggable windows
+    if (node.classList?.contains("draggable-window") || node.getAttribute("data-draggable")) return "grab";
     node = node.parentElement;
   }
   return "default";
@@ -21,12 +32,18 @@ const resolveType = (el) => {
 
 // ─── Per-state visual config ──────────────────────────────────────────────────
 const STATES = {
-  default: { ring: 32, dot: 8,  ringColor: "rgba(56,189,248,0.55)",   ringFill: "transparent",             label: null  },
-  button:  { ring: 58, dot: 0,  ringColor: "rgba(167,139,250,0.85)",  ringFill: "rgba(167,139,250,0.10)",  label: null  },
-  link:    { ring: 46, dot: 4,  ringColor: "rgba(56,189,248,0.90)",   ringFill: "rgba(56,189,248,0.06)",   label: null  },
-  text:    { ring: 3,  dot: 18, ringColor: "rgba(148,163,184,0.5)",   ringFill: "transparent",             label: null  },
-  media:   { ring: 70, dot: 0,  ringColor: "rgba(244,114,182,0.85)",  ringFill: "rgba(244,114,182,0.09)",  label: "View"},
-  canvas:  { ring: 44, dot: 5,  ringColor: "rgba(52,211,153,0.70)",   ringFill: "rgba(52,211,153,0.06)",   label: null  },
+  default:     { ring: 32, dot: 8,  ringColor: "rgba(56,189,248,0.55)",   ringFill: "transparent",             label: null  },
+  button:      { ring: 58, dot: 0,  ringColor: "rgba(167,139,250,0.85)",  ringFill: "rgba(167,139,250,0.10)",  label: null  },
+  link:        { ring: 46, dot: 4,  ringColor: "rgba(56,189,248,0.90)",   ringFill: "rgba(56,189,248,0.06)",   label: null  },
+  text:        { ring: 3,  dot: 18, ringColor: "rgba(148,163,184,0.5)",   ringFill: "transparent",             label: null  },
+  media:       { ring: 70, dot: 0,  ringColor: "rgba(244,114,182,0.85)",  ringFill: "rgba(244,114,182,0.09)",  label: "View"},
+  canvas:      { ring: 44, dot: 5,  ringColor: "rgba(52,211,153,0.70)",   ringFill: "rgba(52,211,153,0.06)",   label: null  },
+  resize:      { ring: 28, dot: 6,  ringColor: "rgba(251,146,60,0.75)",   ringFill: "rgba(251,146,60,0.08)",   label: null  },
+  "resize-h":  { ring: 28, dot: 6,  ringColor: "rgba(251,146,60,0.75)",   ringFill: "rgba(251,146,60,0.08)",   label: null  },
+  "resize-v":  { ring: 28, dot: 6,  ringColor: "rgba(251,146,60,0.75)",   ringFill: "rgba(251,146,60,0.08)",   label: null  },
+  "resize-nwse": { ring: 28, dot: 6, ringColor: "rgba(251,146,60,0.75)",  ringFill: "rgba(251,146,60,0.08)",   label: null  },
+  "resize-nesw": { ring: 28, dot: 6, ringColor: "rgba(251,146,60,0.75)",  ringFill: "rgba(251,146,60,0.08)",   label: null  },
+  grab:        { ring: 48, dot: 0,  ringColor: "rgba(59,130,246,0.80)",   ringFill: "rgba(59,130,246,0.08)",   label: null  },
 };
 
 let uid = 0;

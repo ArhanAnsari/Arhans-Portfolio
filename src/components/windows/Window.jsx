@@ -47,6 +47,7 @@ export const Window = ({ appRegistry, onAppSelect }) => {
                 <AppComponent
                   windowId={window.id}
                   windowData={window}
+                  windowState={window.windowState}
                   onAppSelect={onAppSelect}
                 />
               </Suspense>

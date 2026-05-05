@@ -43,6 +43,9 @@ const CalculatorApp = () => {
       case '*':
         return prev * current;
       case '/':
+        if (current === 0) {
+          return null; // Signal error
+        }
         return prev / current;
       default:
         return current;
@@ -51,7 +54,17 @@ const CalculatorApp = () => {
 
   const handleEquals = () => {
     if (operation && previousValue !== null) {
-      const result = calculate(previousValue, parseFloat(display), operation);
+      const currentValue = parseFloat(display);
+      
+      if (operation === '/' && currentValue === 0) {
+        setDisplay('Cannot divide by 0');
+        setPreviousValue(null);
+        setOperation(null);
+        setWaitingForNewValue(true);
+        return;
+      }
+      
+      const result = calculate(previousValue, currentValue, operation);
       setDisplay(String(result));
       setPreviousValue(null);
       setOperation(null);
