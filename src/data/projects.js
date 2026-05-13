@@ -390,7 +390,7 @@ export const projects = [
 		category: "game",
 		type: "original",
 		url: "https://simple-colour-flipper-app-yt.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/Simple-Colour-Flipper-App-YT",
 		image: "projects/Colour-Flipper.jpg",
 		description: "A simple and beautiful Colour Flipper built with HTML,CSS,JS.",
 		technologies: ["HTML5", "CSS3", "JavaScript"]
@@ -399,9 +399,10 @@ export const projects = [
 		id: 37,
 		title: "Chat to PDF",
 		category: "ai",
+		featured: true,
 		type: "original",
 		url: "https://arhans-chat-to-pdf.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/Chat-to-PDF",
 		image: "projects/chattopdf.jpg",
 		description: "My first AI SaaS app made with using Next.js, Clerk, React Dropzone, Shadcn UI, Pinecone, Langchain, Gemini, OpenAI, Stripe. Chat to PDF let's you PDF and then you can chat with AI if you any problems with PDF.",
 		technologies: ["Next.js", "TypeScript", "Shadcn UI", "Stripe", "Langchain"]
@@ -412,7 +413,7 @@ export const projects = [
 		category: "web",
 		type: "inspired",
 		url: "https://soundstream.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/SoundStream",
 		image: "projects/soundstream.jpg",
 		description: "This is a Spotify Clone made with Vite, Vue 3, Tailwind CSS, and Pinia.",
 		technologies: ["Vue 3", "Vite", "Tailwind CSS", "Pinia"]
@@ -423,7 +424,7 @@ export const projects = [
 		category: "web",
 		type: "original",
 		url: "https://ui-hexta.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/HextaUI",
 		image: "projects/ui-hexta.jpg",
 		description: "HextaUI is a user interface library that offers contemporary components, making it effortless to integrate into your projects. With the HextaUI CLI, you can quickly install and utilize these components without any hassle.",
 		technologies: ["React", "CLI", "TypeScript", "Tailwind CSS"]
@@ -445,7 +446,7 @@ export const projects = [
 		category: "productivity",
 		type: "inspired",
 		url: "https://arhans-google-translate.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/Google-Translate-Clone",
 		image: "projects/Google-Translate.jpg",
 		description: "A simple Google Translate Clone made with HTML, CSS, JS and Google Translate API. It has a Dark mode feature too.",
 		technologies: ["HTML5", "CSS3", "JavaScript", "Google Translate API"]
@@ -456,7 +457,7 @@ export const projects = [
 		category: "ai",
 		type: "original",
 		url: "https://gemini-ai-chatbot-pchm.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/Gemini-AI-Chatbot",
 		image: "projects/Gemini.jpg",
 		description: "A Gemini Chatbot built with Next.js, Vercel AI SDK and Google Gemini.",
 		technologies: ["Next.js", "Vercel AI SDK", "Google Gemini", "React"]
@@ -467,7 +468,7 @@ export const projects = [
 		category: "web",
 		type: "original",
 		url: "https://arhans-ecommerce.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/youtube_ecommerce",
 		image: "projects/CareeFour.jpg",
 		description: "This is a full stack Ecommerce website.",
 		technologies: ["React", "Node.js", "MongoDB", "Express", "Stripe"]
@@ -478,7 +479,7 @@ export const projects = [
 		category: "game",
 		type: "inspired",
 		url: "https://arhans-windows11.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/Windows11-3.0",
 		image: "projects/Windows11.jpg",
 		description: "A Windows 11 Clone app built with React, Tailwind CSS, Framer Motion, React Draggable, React Router DOM.",
 		technologies: ["React", "Tailwind CSS", "Framer Motion", "React Draggable"]
@@ -489,7 +490,7 @@ export const projects = [
 		category: "web",
 		type: "original",
 		url: "https://arhans-rentup.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/RentUP",
 		image: "projects/RentUP.png",
 		description: "A Real Estate Website built with React.",
 		technologies: ["React", "Tailwind CSS", "JavaScript"]
@@ -500,7 +501,7 @@ export const projects = [
 		category: "productivity",
 		type: "original",
 		url: "https://crousalmaker.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/crousal-maker",
 		image: "projects/Crousal Maker.jpg",
 		description: "My 2nd SaaS App. Crousal maker is a simple crousal editing platform with in-built crousals templates only you can edit heading , descriptions and Images and download it in both format PDF and JPEG. Built with Nextjs, Typescript, Shadcn UI, js-pdf, Html2canvas and tinyColor2.",
 		technologies: ["Next.js", "TypeScript", "Shadcn UI", "js-pdf", "HTML2Canvas"]
@@ -511,7 +512,7 @@ export const projects = [
 		category: "web",
 		type: "original",
 		url: "https://arhanblog.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/ArhanBlog",
 		image: "projects/ArhanBlog.jpg",
 		description: "A Markdown blog made with using Next.js, TailwindCSS, Shadcn, Pieces, Remark and Rehype.",
 		technologies: ["Next.js", "Tailwind CSS", "Markdown", "Remark", "Rehype"]
@@ -522,7 +523,7 @@ export const projects = [
 		category: "web",
 		type: "original",
 		url: "https://mixcnui.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/mixcnui",
 		image: "projects/Mixcnui.jpg",
 		description: "My 3rd SaaS App. Mixcnui is 20+ free and open-source animated components built with React, Typescript, Tailwind CSS, and Framer Motion. Built with React, Next.js, TailwindCSS, Framer Motion. ",
 		technologies: ["React", "Next.js", "Tailwind CSS", "Framer Motion", "TypeScript"]
@@ -533,7 +534,7 @@ export const projects = [
 		category: "web",
 		type: "original",
 		url: "https://arhans-metaverse.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/project_metaverse",
 		image: "projects/Metaverse.jpg",
 		description: "A Metaverse Website made with Next.js, TailwindCSS & Framer Motion.",
 		technologies: ["Next.js", "Tailwind CSS", "Framer Motion"]
@@ -555,7 +556,7 @@ export const projects = [
 		category: "web",
 		type: "inspired",
 		url: "https://nike-landing-page-seven-tan.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/nike_landing_page",
 		image: "projects/Nike-Landing-Page.png",
 		description: "A Nike Landing Page made with TailwindCSS.",
 		technologies: ["React", "Tailwind CSS", "JavaScript"]
@@ -566,7 +567,7 @@ export const projects = [
 		category: "ai",
 		type: "original",
 		url: "https://inspiregem.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/InspireGem",
 		image: "projects/InspireGem.png",
 		description: "InspireGem is a AI Powered Website made with Next.js, TailwindCSS, Google Gemini, Stripe amnd Google Firebase",
 		technologies: ["Next.js", "Tailwind CSS", "Google Gemini", "Stripe", "Firebase"]
@@ -577,7 +578,7 @@ export const projects = [
 		category: "web",
 		type: "original",
 		url: "https://yc-directory-red.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/YC-DIRECTORY",
 		image: "projects/YC-DIRECTORY.jpg",
 		description: "A Next.js 15 platform where entrepreneurs can submit their startup ideas for virtual pitch competitions, browse other pitches, and gain exposure through a clean minimalistic design for a smooth user experience. It is made with React 19, Next.js 15, Sanity, TailwindCSS, ShadCN, TypeScript",
 		technologies: ["Next.js 15", "React 19", "Sanity", "Tailwind CSS", "TypeScript"]
@@ -588,7 +589,7 @@ export const projects = [
 		category: "web",
 		type: "original",
 		url: "https://storeit-five.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/StoreIt",
 		image: "projects/StoreIt.png",
 		description: "A storage management and file sharing platform that lets users effortlessly upload, organize, and share files. Built with the latest Next.js 15 and the Appwrite Node SDK, utilizing advanced features for seamless file management. It is made with React 19, Next.js 15, Appwrite, TailwindCSS, ShadCN, TypeScript.",
 		technologies: ["Next.js 15", "React 19", "Appwrite", "Tailwind CSS", "TypeScript"]
@@ -621,7 +622,7 @@ export const projects = [
 		category: "education",
 		type: "original",
 		url: "https://immersilearn.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/Immersilearn",
 		image: "projects/immersilearn.png",
 		description: "Immersilearn is a platform for learning and it has a clean and minimalistic design for a smooth user experience. It is made with React 19, Next.js 15, TailwindCSS, TypeScript and Appwrite.",
 		technologies: ["Next.js 15", "React 19", "Tailwind CSS", "Appwrite", "TypeScript"]
@@ -632,7 +633,7 @@ export const projects = [
 		category: "productivity",
 		type: "original",
 		url: "https://codefount.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/CodeFount",
 		image: "projects/CodeFount.png",
 		description: "A sleek and modern online IDE built with Next.js 15, Convex, Sentry, Lemon Squeezy, Clerk and EmailJS, offering multi-language support, customization, and community-driven collaboration. Perfect for developers seeking a powerful and seamless coding environment. ",
 		technologies: ["Next.js 15", "Convex", "Clerk", "TypeScript", "EmailJS"]
@@ -643,7 +644,7 @@ export const projects = [
 		category: "web",
 		type: "original",
 		url: "https://happynewyear2025-olive.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/Happy-New-Year-2025",
 		image: "projects/happynewyear2025.png",
 		description: "A Happy New Year 2025 Website made with HTML, CSS, JS.",
 		technologies: ["HTML5", "CSS3", "JavaScript"]
@@ -654,7 +655,7 @@ export const projects = [
 		category: "web",
 		type: "original",
 		url: "https://happy-republic-day-one.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/Happy-Republic-Day-2025",
 		image: "projects/happyrepublicday2025.png",
 		description: "A Happy Republic Day 2025 Website made with HTML, CSS, JS.",
 		technologies: ["HTML5", "CSS3", "JavaScript"]
@@ -665,7 +666,7 @@ export const projects = [
 		category: "web",
 		type: "original",
 		url: "https://moodflix-theta.vercel.app/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/moodflix",
 		image: "projects/moodflix.png",
 		description: "Moodflix is a platform that allows users to discover movies based on their mood. It is made with React 19, Tailwind CSS, and the TMDb API.",
 		technologies: ["React 19", "Tailwind CSS", "TMDb API", "JavaScript"]
@@ -676,7 +677,7 @@ export const projects = [
 		category: "ai",
 		type: "original",
 		url: "https://synthara.is-a.dev/",
-		github: "",
+		github: "https://github.com/ArhanAnsari/Synthara",
 		image: "projects/Synthara.png",
 		description: "Synthara is an advanced AI-powered application designed to process and generate insights from various types of files. Initially focused on image processing. Made with Next.js, Tailwind CSS, Gemini, Shadcn/ui and Together AI.",
 		technologies: ["Next.js", "Tailwind CSS", "Gemini", "Together AI", "Shadcn/ui"]
@@ -708,6 +709,7 @@ export const projects = [
 		title: "Clystra Networks Pvt. Ltd.",
 		category: "client",
 		type: "client",
+		featured: true,
 		url: "https://www.clystranetworks.com/",
 		github: "https://github.com/ArhanAnsari/Clystra",
 		image: "projects/Clystra-Networks.png",
@@ -719,6 +721,7 @@ export const projects = [
 		title: "EduSync",
 		category: "education",
 		type: "original",
+		featured: true,
 		url: "https://edusync.appwrite.network/",
 		github: "https://github.com/ArhanAnsari/edusync",
 		image: "projects/EduSync.png",
@@ -762,6 +765,7 @@ export const projects = [
 		id: 70,
 		title: "ResuMate",
 		category: "productivity",
+		featured: true,
 		type: "original",
 		url: "https://github.com/ArhanAnsari/ResuMate",
 		github: "https://github.com/ArhanAnsari/ResuMate",
@@ -773,6 +777,7 @@ export const projects = [
 		id: 71,
 		title: "InvoiceFlow",
 		category: "productivity",
+		featured: true,
 		type: "original",
 		url: "https://invoiceflow.appwrite.network/",
 		github: "https://github.com/ArhanAnsari/InvoiceFlow",
@@ -784,13 +789,26 @@ export const projects = [
 		id: 72,
 		title: "HRMate",
 		category: "productivity",
+		featured: true,
 		type: "original",
 		url: "https://github.com/ArhanAnsari/HRMate",
 		github: "https://github.com/ArhanAnsari/HRMate",
 		image: "projects/hrmate.jpg",
 		description: "A comprehensive HR management system built with React Native and Appwrite.",
 		technologies: ["React Native", "Expo", "Appwrite", "TypeScript", "Gemini"]
-	}
+	},
+	{
+		id: 73,
+		title: "Skild",
+		category: "productivity",
+		featured: true,
+		type: "original",
+		url: "https://skild.appwrite.network/",
+		github: "https://github.com/ArhanAnsari/Skild",
+		image: 'projects/Skild.png',
+		description: "A high-performance registry for procedural agent skills. Discover, publish, and operate reusable agent capabilities from a route-driven workspace.",
+		technologies: ["TanStack Start", "React", "Clerk" ,"Appwrite", "TypeScript", "Shadcn/ui"]
+	},
 ];
 
 export default projects;
