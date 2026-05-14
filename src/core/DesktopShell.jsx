@@ -12,8 +12,10 @@ import Welcome from '../components/desktop/Welcome';
 import DesktopLayer from '../components/desktop/DesktopLayer';
 import ControlCenter from '../components/desktop/ControlCenter';
 import MissionControl from '../components/desktop/MissionControl';
+import Screensaver from '../components/desktop/Screensaver';
 import appRegistry from '../components/apps/index';
 import { useSystemStore } from '../store/systemStore';
+import { useSystemStateStore } from '../store/systemStateStore';
 import { useWindowStore } from '../store/windowStore';
 import { useUIStore } from '../store/uiStore';
 
@@ -32,7 +34,8 @@ export const DesktopShell = () => {
     const windowHydrated = useWindowStore.persist?.hasHydrated?.() ?? false;
     const systemHydrated = useSystemStore.persist?.hasHydrated?.() ?? false;
     const uiHydrated = useUIStore.persist?.hasHydrated?.() ?? false;
-    return windowHydrated && systemHydrated && uiHydrated;
+    const systemStateHydrated = useSystemStateStore?.persist?.hasHydrated?.() ?? false;
+    return windowHydrated && systemHydrated && uiHydrated && systemStateHydrated;
   });
   const { wallpapers, activeWallpaperId, setWallpaper, theme, hasEnteredDesktop, markDesktopEntered } = useSystemStore();
   const { showControlCenter, showMissionControl, toggleControlCenter, toggleMissionControl, closeAllPanels } = useUIStore();
@@ -64,12 +67,34 @@ export const DesktopShell = () => {
     document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
+  // Initialize Battery API and Screensaver
+  useEffect(() => {
+    useSystemStateStore.getState().initializeBatteryAPI();
+    
+    // Screensaver check interval
+    const interval = setInterval(() => {
+      useSystemStateStore.getState().checkScreensaver();
+    }, 60000); // Check every minute
+    
+    // Record user activity to reset screensaver timer
+    const recordActivity = () => useSystemStateStore.getState().recordUserActivity();
+    window.addEventListener('mousemove', recordActivity);
+    window.addEventListener('keydown', recordActivity);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('mousemove', recordActivity);
+      window.removeEventListener('keydown', recordActivity);
+    };
+  }, []);
+
   useEffect(() => {
     const syncHydration = () => {
       const windowHydrated = useWindowStore.persist?.hasHydrated?.() ?? true;
       const systemHydrated = useSystemStore.persist?.hasHydrated?.() ?? true;
       const uiHydrated = useUIStore.persist?.hasHydrated?.() ?? true;
-      setHasHydrated(windowHydrated && systemHydrated && uiHydrated);
+      const systemStateHydrated = useSystemStateStore?.persist?.hasHydrated?.() ?? true;
+      setHasHydrated(windowHydrated && systemHydrated && uiHydrated && systemStateHydrated);
     };
 
     syncHydration();
@@ -77,11 +102,13 @@ export const DesktopShell = () => {
     const unsubscribeWindow = useWindowStore.persist?.onFinishHydration?.(syncHydration);
     const unsubscribeSystem = useSystemStore.persist?.onFinishHydration?.(syncHydration);
     const unsubscribeUI = useUIStore.persist?.onFinishHydration?.(syncHydration);
+    const unsubscribeSystemState = useSystemStateStore?.persist?.onFinishHydration?.(syncHydration);
 
     return () => {
       unsubscribeWindow?.();
       unsubscribeSystem?.();
       unsubscribeUI?.();
+      unsubscribeSystemState?.();
     };
   }, []);
 
@@ -126,6 +153,9 @@ export const DesktopShell = () => {
 
       {/* Global Brightness Overlay */}
       <BrightnessOverlay />
+
+      {/* Screensaver */}
+      <Screensaver />
 
       {/* Wallpaper */}
       <Wallpaper />

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useBrowserStore } from '../../store/browserStore';
 import { useNotificationStore } from '../../store/notificationStore';
+import { useSystemStateStore } from '../../store/systemStateStore';
 
 const INTERNAL_PAGE_RENDERERS = {
   about: {
@@ -159,6 +160,7 @@ const SafariApp = () => {
     removeBookmark,
   } = useBrowserStore();
   const { pushNotification } = useNotificationStore();
+  const wifiEnabled = useSystemStateStore((state) => state.wifiEnabled);
 
   const activeTab = getActiveTab();
   const [addressInput, setAddressInput] = useState('');
@@ -254,6 +256,25 @@ const SafariApp = () => {
   const renderActiveContent = () => {
     if (!activeTab) {
       return null;
+    }
+
+    // Check Wi-Fi state for internet pages
+    if (!wifiEnabled && (!activeTab.url || activeTab.url.startsWith('http') || activeTab.url.includes('.'))) {
+      return (
+        <div className="flex h-full flex-col items-center justify-center gap-4 text-neutral-100 p-6 text-center">
+          <ShieldAlert size={48} className="text-yellow-400 opacity-50" />
+          <div className="text-2xl font-medium">You are not connected to the Internet</div>
+          <p className="max-w-md text-neutral-400">
+            ArhanOS cannot connect to the server because you turned off Wi-Fi in the Control Center.
+          </p>
+          <button 
+            onClick={() => useSystemStateStore.getState().setWifiEnabled(true)}
+            className="mt-4 px-6 py-2 bg-primary-600 hover:bg-primary-500 rounded-full text-white transition-colors"
+          >
+            Turn On Wi-Fi
+          </button>
+        </div>
+      );
     }
 
     if (activeTab.loading) {

@@ -164,10 +164,16 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
 
     const onMove = (moveEvent) => {
       if (!dragStateRef.current) return;
+      const newX = moveEvent.clientX - dragStateRef.current.offsetX;
+      const newY = moveEvent.clientY - dragStateRef.current.offsetY;
+      
+      dragStateRef.current.lastX = newX;
+      dragStateRef.current.lastY = newY;
+      
       moveIcon(
         dragStateRef.current.id,
-        moveEvent.clientX - dragStateRef.current.offsetX,
-        moveEvent.clientY - dragStateRef.current.offsetY
+        newX,
+        newY
       );
     };
 
@@ -179,7 +185,7 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
       // find trash icon
       const stateIcons = useDesktopStore.getState().icons;
       const trashIcon = stateIcons.find((i) => i.id === 'trash');
-      if (trashIcon) {
+      if (trashIcon && icon.id !== 'trash') {
         const trashRect = { x: trashIcon.x, y: trashIcon.y, width: 84, height: 92 };
         if (
           dropX >= trashRect.x &&
@@ -231,7 +237,7 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
     }
 
     if (actionId === 'about') {
-      alert('ArhanOS v1.0\nPhase 4 Desktop Interactivity Enabled');
+      onOpenApp('about-os');
       return;
     }
   };

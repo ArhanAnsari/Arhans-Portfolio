@@ -30,6 +30,7 @@ const NotesApp = React.lazy(() => import("./NotesApp"));
 const PhotosApp = React.lazy(() => import("./PhotosApp"));
 const SettingsApp = React.lazy(() => import("./SettingsApp"));
 const FileViewerApp = React.lazy(() => import("./FileViewerApp"));
+const AboutOSApp = React.lazy(() => import("./AboutOSApp"));
 
 // System Apps
 const MailApp = React.lazy(() => import("./MailApp"));
@@ -250,6 +251,13 @@ export const appRegistry = {
     title: "File Viewer",
     icon: "📄",
     component: FileViewerApp,
+  },
+  "about-os": {
+    id: "about-os",
+    name: "About This Mac",
+    title: "About ArhanOS",
+    icon: "/icons/info.svg",
+    component: AboutOSApp,
   },
 };
 

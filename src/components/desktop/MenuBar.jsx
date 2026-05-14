@@ -207,8 +207,7 @@ const MenuBar = ({ onSpotlightOpen, onNotificationOpen, onAppOpen }) => {
   const getFocusedWindowId = () => focusStack[focusStack.length - 1] || null;
 
   // ─── Menu Actions ──────────────────────────────────────────────────────
-  const handleAboutArhanOS = () =>
-    alert('ArhanOS v1.0 - Premium Desktop Experience\nBuilt with React, Framer Motion & Tailwind CSS');
+  const handleAboutArhanOS = () => onAppOpen?.('about-os');
 
   const handleSystemPreferences = () => onAppOpen?.('settings');
   const handleRestart = () => confirm('Are you sure you want to restart?') && window.location.reload();

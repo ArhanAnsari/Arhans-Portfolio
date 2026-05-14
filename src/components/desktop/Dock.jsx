@@ -31,7 +31,7 @@ export const Dock = ({ onAppOpen }) => {
 
   return (
     <motion.div
-      className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none"
+      className="fixed bottom-0 left-0 right-0 z-[9000] pointer-events-none"
       variants={DOCK_ANIMATIONS.dock}
       initial="initial"
       animate="animate"
