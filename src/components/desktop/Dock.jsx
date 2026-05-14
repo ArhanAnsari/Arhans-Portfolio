@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { DockIcon } from './DockIcon';
 import { DOCK_APPS, DESKTOP } from '../../utils/constants';
@@ -11,8 +11,16 @@ import { DOCK_ANIMATIONS } from '../../utils/animations';
 export const Dock = ({ onAppOpen }) => {
   const [hoveredApp, setHoveredApp] = useState(null);
   const [mouseX, setMouseX] = useState(null);
+  const [bouncedApp, setBouncedApp] = useState(null);
+
+  useEffect(() => {
+    if (!bouncedApp) return;
+    const timer = window.setTimeout(() => setBouncedApp(null), 450);
+    return () => window.clearTimeout(timer);
+  }, [bouncedApp]);
 
   const handleAppClick = (appId) => {
+    setBouncedApp(appId);
     if (onAppOpen) {
       onAppOpen(appId);
     }
@@ -62,6 +70,7 @@ export const Dock = ({ onAppOpen }) => {
               <DockIcon
                 icon={app.icon}
                 label={app.name}
+                bounce={bouncedApp === app.id}
                 onClick={() => handleAppClick(app.id)}
                 onMouseEnter={() => setHoveredApp(app.id)}
                 onMouseLeave={() => setHoveredApp(null)}

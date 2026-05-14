@@ -6,7 +6,7 @@ import { motion } from 'framer-motion';
  * Individual clickable icon in the dock
  */
 export const DockIcon = React.forwardRef(
-  ({ icon, label, isActive = false, onClick, onMouseEnter, onMouseLeave, className = '', ...props }, ref) => {
+  ({ icon, label, isActive = false, bounce = false, onClick, onMouseEnter, onMouseLeave, className = '', ...props }, ref) => {
     const [imageError, setImageError] = React.useState(false);
     
     // Check if the icon is a path or an emoji
@@ -26,6 +26,7 @@ export const DockIcon = React.forwardRef(
           bg-neutral-800/50 border border-neutral-700/50
           hover:bg-neutral-700/50 active:scale-95
           transition-all duration-150
+          ${bounce ? 'animate-bounce' : ''}
           ${isActive ? 'bg-neutral-700 border-neutral-600' : ''}
           ${className}
         `}

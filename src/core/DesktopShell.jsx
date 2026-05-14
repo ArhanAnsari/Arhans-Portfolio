@@ -12,6 +12,8 @@ import Welcome from '../components/desktop/Welcome';
 import DesktopLayer from '../components/desktop/DesktopLayer';
 import ControlCenter from '../components/desktop/ControlCenter';
 import MissionControl from '../components/desktop/MissionControl';
+import KonamiEasterEgg from '../components/EasterEggs';
+import FinderEasterEggs from '../components/FinderEasterEggs';
 import Screensaver from '../components/desktop/Screensaver';
 import appRegistry from '../components/apps/index';
 import { useSystemStore } from '../store/systemStore';
@@ -156,6 +158,10 @@ export const DesktopShell = () => {
 
       {/* Screensaver */}
       <Screensaver />
+
+      {/* Hidden overlays */}
+      <KonamiEasterEgg />
+      <FinderEasterEggs />
 
       {/* Wallpaper */}
       <Wallpaper />
