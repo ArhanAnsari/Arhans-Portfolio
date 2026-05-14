@@ -4,6 +4,7 @@ import { Wallpaper } from '../components/desktop/Wallpaper_Animated';
 import { Dock } from '../components/desktop/Dock';
 import { Window } from '../components/windows/Window';
 import { Cursor } from '../components/Cursor';
+import { BrightnessOverlay } from '../components/BrightnessOverlay';
 import { useWindowManager } from '../hooks/useWindowManager';
 import MenuBar from '../components/desktop/MenuBar';
 import SpotlightApp from '../components/apps/SpotlightApp';
@@ -122,6 +123,9 @@ export const DesktopShell = () => {
     >
       {/* Custom macOS Cursor */}
       <Cursor />
+
+      {/* Global Brightness Overlay */}
+      <BrightnessOverlay />
 
       {/* Wallpaper */}
       <Wallpaper />

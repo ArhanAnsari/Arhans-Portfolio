@@ -23,13 +23,24 @@ import { useNotificationStore } from '../../store/notificationStore';
 const SpotlightApp = ({ isOpen, onClose, onAppSelect }) => {
   const [query, setQuery] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [viewportSize, setViewportSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const inputRef = useRef(null);
+  const modalRef = useRef(null);
 
   const { apps } = useAppStore();
   const { bookmarks, resolveUrl, openTab } = useBrowserStore();
   const { nodes, listFolder, getDescendants, previewNode, deleteNode } = useFilesystemStore();
   const { notes } = useNotesStore();
   const { pushNotification } = useNotificationStore();
+
+  // Track viewport size for responsive positioning
+  useEffect(() => {
+    const handleResize = () => {
+      setViewportSize({ width: window.innerWidth, height: window.innerHeight });
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (isOpen) {
@@ -161,12 +172,31 @@ const SpotlightApp = ({ isOpen, onClose, onAppSelect }) => {
       {isOpen && (
         <>
           <motion.div className="fixed inset-0 z-[8000] bg-black/45 backdrop-blur-xl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
-          <motion.div className="fixed left-1/2 top-1/2 z-[8001] w-[min(92vw,960px)] -translate-x-1/2 -translate-y-1/2" initial={{ opacity: 0, scale: 0.96, y: 0 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.96, y: 0 }} transition={{ type: 'spring', damping: 24, stiffness: 320 }}>
+          
+          {/* Viewport-safe modal container with padding constraints */}
+          <motion.div 
+            ref={modalRef}
+            className="fixed left-1/2 top-1/2 z-[8001] w-[min(92vw,960px)] max-h-[min(90vh,85%)]"
+            style={{
+              transform: 'translate(-50%, -50%)',
+            }}
+            initial={{ opacity: 0, scale: 0.96, y: 0 }} 
+            animate={{ opacity: 1, scale: 1, y: 0 }} 
+            exit={{ opacity: 0, scale: 0.96, y: 0 }} 
+            transition={{ type: 'spring', damping: 24, stiffness: 320 }}
+          >
             <div className="overflow-hidden rounded-3xl border border-white/10 bg-neutral-950/95 shadow-2xl max-h-[80vh] flex flex-col">
-              <div className="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-4 py-4">
+              <div className="flex items-center gap-3 border-b border-white/10 bg-white/[0.03] px-4 py-4 flex-shrink-0">
                 <Search size={18} className="text-neutral-500" />
-                <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} onKeyDown={handleKeyDown} placeholder="Search apps, files, notes, bookmarks, commands" className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-neutral-500" />
-                <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[10px] uppercase tracking-[0.25em] text-neutral-500">Spotlight</span>
+                <input 
+                  ref={inputRef} 
+                  value={query} 
+                  onChange={(event) => setQuery(event.target.value)} 
+                  onKeyDown={handleKeyDown} 
+                  placeholder="Search apps, files, notes, bookmarks, commands" 
+                  className="flex-1 bg-transparent text-sm text-white outline-none placeholder:text-neutral-500" 
+                />
+                <span className="rounded-full border border-white/10 bg-white/5 px-2 py-1 text-[10px] uppercase tracking-[0.25em] text-neutral-500 whitespace-nowrap">Spotlight</span>
               </div>
 
               <div className="grid max-h-[calc(80vh-80px)] grid-cols-1 min-h-0 md:grid-cols-[1fr_260px] overflow-hidden">
@@ -180,14 +210,14 @@ const SpotlightApp = ({ isOpen, onClose, onAppSelect }) => {
                         const active = index === selectedIndex;
                         return (
                           <motion.button key={`${item.type}-${item.title}-${index}`} onClick={() => openResult(item)} className={`flex w-full items-center gap-3 rounded-2xl border px-4 py-3 text-left transition-colors ${active ? 'border-cyan-300/60 bg-cyan-400/15' : 'border-white/10 bg-white/[0.03] hover:bg-white/10'}`} whileHover={{ x: 2 }}>
-                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-neutral-100">
+                            <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-neutral-100 flex-shrink-0">
                               <Icon size={16} />
                             </div>
                             <div className="min-w-0 flex-1">
                               <div className="truncate text-sm font-medium text-white">{item.title}</div>
                               <div className="truncate text-xs text-neutral-500">{item.subtitle}</div>
                             </div>
-                            <div className="text-[10px] uppercase tracking-[0.25em] text-neutral-500">{item.type}</div>
+                            <div className="text-[10px] uppercase tracking-[0.25em] text-neutral-500 flex-shrink-0">{item.type}</div>
                           </motion.button>
                         );
                       })}
@@ -195,7 +225,7 @@ const SpotlightApp = ({ isOpen, onClose, onAppSelect }) => {
                   )}
                 </div>
 
-                <div className="border-t border-white/10 bg-white/[0.03] p-4 md:border-l md:border-t-0">
+                <div className="border-t border-white/10 bg-white/[0.03] p-4 md:border-l md:border-t-0 flex-shrink-0 min-h-0 overflow-auto">
                   <div className="text-xs uppercase tracking-[0.25em] text-neutral-500">Quick Actions</div>
                   <div className="mt-3 space-y-2">
                     {quickActions.map((action) => {
