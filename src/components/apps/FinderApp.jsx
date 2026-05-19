@@ -92,6 +92,7 @@ const FinderApp = () => {
     deleteNode,
     moveNode,
     duplicateNode,
+    getDescendants,
     previewNode,
     closePreview,
   } = useFilesystemStore();
@@ -217,7 +218,23 @@ const FinderApp = () => {
 
   const handleDelete = () => {
     if (!selectedNode) return;
-    deleteItem({ id: selectedNode.id, name: selectedNode.name, type: selectedNode.kind, original: selectedNode });
+    const descendants = getDescendants(selectedNode.id) || [];
+    const snapshotNodes = [selectedNode, ...descendants].map((node) => ({
+      ...node,
+      children: Array.isArray(node.children) ? [...node.children] : node.children,
+    }));
+
+    deleteItem({
+      id: selectedNode.id,
+      name: selectedNode.name,
+      type: selectedNode.kind,
+      source: 'filesystem',
+      original: selectedNode,
+      filesystem: {
+        rootId: selectedNode.id,
+        nodes: snapshotNodes,
+      },
+    });
     deleteNode(selectedNode.id);
     setSelectedIds([]);
     pushNotification({ type: 'finder', title: 'Moved to Trash', description: selectedNode.name, source: 'finder' });

@@ -164,7 +164,7 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
     if (!icon || icon.id === 'trash') return;
     useTrashStore
       .getState()
-      .deleteItem({ id: icon.id, name: icon.name, type: icon.type, appId: icon.appId, original: icon });
+      .deleteItem({ id: icon.id, name: icon.name, type: icon.type, appId: icon.appId, source: 'desktop', original: icon });
     useDesktopStore.getState().deleteIcon(icon.id);
     useDesktopStore.getState().clearSelection();
   };
