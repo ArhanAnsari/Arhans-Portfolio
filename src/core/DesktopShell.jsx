@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Wallpaper } from '../components/desktop/Wallpaper_Animated';
 import { Dock } from '../components/desktop/Dock';
+import ToastContainer from '../components/ui/ToastContainer';
 import { Window } from '../components/windows/Window';
 import { Cursor } from '../components/Cursor';
 import { BrightnessOverlay } from '../components/BrightnessOverlay';
@@ -211,6 +212,9 @@ export const DesktopShell = () => {
       <div className={`${!showWelcome ? 'mt-8' : ''}`}>
         <Window appRegistry={appRegistry} onAppSelect={handleAppSelect} />
       </div>
+
+      {/* Toasts */}
+      <ToastContainer />
 
       {/* Snap Preview Overlay */}
       {!showWelcome && snapPreview?.bounds && (
