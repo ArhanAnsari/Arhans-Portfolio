@@ -30,7 +30,10 @@ const ProjectsApp = ({ windowId, windowData }) => {
 
   const filtered = selectedCategory === 'all'
     ? projects
-    : projects.filter(p => p.category === selectedCategory || (selectedCategory === 'featured' && p.type === 'featured'));
+    : projects.filter(p => {
+        if (selectedCategory === 'featured') return p.featured === true || p.type === 'featured';
+        return p.category === selectedCategory;
+      });
 
   const getCategoryColor = (category) => categoryColors[category] || categoryColors.default;
 
@@ -88,7 +91,7 @@ const ProjectsApp = ({ windowId, windowData }) => {
                   )}
                   
                   {/* Status Badge */}
-                  {project.type === 'featured' && (
+                  {(project.featured === true || project.type === 'featured') && (
                     <div className="absolute top-2 right-2 px-2 py-1 bg-yellow-500/90 text-yellow-900 text-xs font-bold rounded-full">
                       ⭐ Featured
                     </div>

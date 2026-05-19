@@ -4,6 +4,7 @@ export const projects = [
 		title: "Arhan Sales",
 		category: "client",
 		type: "client",
+		featured: true,
 		url: "https://arhan-sales.infinityfreeapp.com/",
 		github: "https://github.com/ArhanAnsari/Arhan-Sales-Main",
 		image: "projects/arhansales.png",
@@ -476,8 +477,9 @@ export const projects = [
 	{
 		id: 44,
 		title: "Windows 11",
-		category: "game",
+		category: "productivity",
 		type: "inspired",
+		featured: true,
 		url: "https://arhans-windows11.vercel.app/",
 		github: "https://github.com/ArhanAnsari/Windows11-3.0",
 		image: "projects/Windows11.jpg",
@@ -588,6 +590,7 @@ export const projects = [
 		title: "StoreIt",
 		category: "web",
 		type: "original",
+		featured: true,
 		url: "https://storeit-five.vercel.app/",
 		github: "https://github.com/ArhanAnsari/StoreIt",
 		image: "projects/StoreIt.png",
@@ -687,6 +690,7 @@ export const projects = [
 		title: "Clipgen AI",
 		category: "web",
 		type: "original",
+		featured: true,
 		url: "https://clipgen-ai.vercel.app/",
 		github: "https://github.com/ArhanAnsari/Clipgen-ai",
 		image: "projects/Clipgen AI.png",
@@ -733,6 +737,7 @@ export const projects = [
 		title: "TruthMatrix",
 		category: "ai",
 		type: "original",
+		featured: true,
 		url: "https://truthmatrix.vercel.app/",
 		github: "https://github.com/ArhanAnsari/TruthMatrix",
 		image: "projects/TruthMatrix.png",
@@ -808,6 +813,17 @@ export const projects = [
 		image: 'projects/Skild.png',
 		description: "A high-performance registry for procedural agent skills. Discover, publish, and operate reusable agent capabilities from a route-driven workspace.",
 		technologies: ["TanStack Start", "React", "Clerk" ,"Appwrite", "TypeScript", "Shadcn/ui"]
+	},
+	{
+		id: 74,
+		title: "GTA 6 Landing Page",
+		category: "web",
+		type: "inspired",
+		url: "https://gta-vi-landing-page-ivory.vercel.app/",
+		github: "https://github.com/ArhanAnsari/gta-vi-landing-page",
+		image: "projects/gta-6-landing-page.png",
+		description: "GTA VI Website Clone built with React, Tailwind & GSAP. Scroll-driven cinematic experience with pinned sections, synced video, parallax, and image masking, all fully responsive and animation-rich.",
+		technologies: ["React", "Tailwind CSS", "GSAP", "JavaScript"]
 	},
 ];
 

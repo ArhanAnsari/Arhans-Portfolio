@@ -38,7 +38,7 @@ const LaunchpadApp = ({ windowId, onAppSelect }) => {
 
     // Applications
     { id: 'notifications', name: 'Notifications', icon: '/icons/search.svg', category: 'apps' },
-    { id: 'codewitharhan', name: 'CodeWithArhan', icon: '/icons/youtube.svg', category: 'apps' },
+    { id: 'codewitharhan', name: 'CodeWithArhan', icon: '/icons/youtube.png', category: 'apps' },
     { id: 'saas', name: 'SaaS Dashboard', icon: '/images/contact.png', category: 'apps' },
     { id: 'devtimeline', name: 'Dev Timeline', icon: '/icons/edit.svg', category: 'apps' },
     { id: 'trash', name: 'Trash', icon: '/images/trash.png', category: 'apps' },

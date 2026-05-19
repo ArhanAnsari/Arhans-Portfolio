@@ -41,6 +41,40 @@ const DesktopContextMenu = ({ x, y, onAction }) => {
   );
 };
 
+const IconContextMenu = ({ x, y, icon, onAction }) => {
+  const isTrashIcon = icon?.id === 'trash';
+  const items = [
+    { id: 'open', label: 'Open' },
+    { id: 'rename', label: 'Edit Name' },
+    { id: 'properties', label: 'Properties' },
+    ...(!isTrashIcon ? [{ id: 'move-to-trash', label: 'Move to Trash' }] : []),
+  ];
+
+  return (
+    <motion.div
+      className="fixed z-[7001] min-w-56 rounded-xl border border-white/20 bg-neutral-900/85 backdrop-blur-xl shadow-2xl py-2"
+      style={{ left: x, top: y }}
+      initial={{ opacity: 0, scale: 0.96, y: 8 }}
+      animate={{ opacity: 1, scale: 1, y: 0 }}
+      exit={{ opacity: 0, scale: 0.98, y: 6 }}
+      transition={{ duration: 0.14 }}
+    >
+      <div className="px-3 py-1 text-[11px] uppercase tracking-wide text-neutral-400 border-b border-white/10 mb-1">
+        {icon?.name || 'Item'}
+      </div>
+      {items.map((item) => (
+        <button
+          key={item.id}
+          onClick={() => onAction(item.id)}
+          className="w-full px-3 py-2 text-left text-sm text-neutral-100 hover:bg-primary-500/25 transition-colors"
+        >
+          {item.label}
+        </button>
+      ))}
+    </motion.div>
+  );
+};
+
 const DesktopIcon = ({ icon, selected, onClick, onDoubleClick, onDragStart }) => {
   const [imageError, setImageError] = useState(false);
 
@@ -90,12 +124,17 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
     clearSelection,
     moveIcon,
     resetIconPositions,
+    renameIcon,
     showContextMenu,
     hideContextMenu,
   } = useDesktopStore();
 
   const [selectionRect, setSelectionRect] = useState(null);
   const [ripple, setRipple] = useState(null);
+  const [iconMenu, setIconMenu] = useState({ visible: false, x: 0, y: 0, iconId: null });
+  const [renamingIcon, setRenamingIcon] = useState(null);
+  const [renameDraft, setRenameDraft] = useState('');
+  const [propertiesIcon, setPropertiesIcon] = useState(null);
   const dragStateRef = useRef(null);
 
   const sortedIcons = useMemo(() => [...icons], [icons]);
@@ -121,9 +160,19 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
     }
   };
 
+  const moveIconToTrash = (icon) => {
+    if (!icon || icon.id === 'trash') return;
+    useTrashStore
+      .getState()
+      .deleteItem({ id: icon.id, name: icon.name, type: icon.type, appId: icon.appId, source: 'desktop', original: icon });
+    useDesktopStore.getState().deleteIcon(icon.id);
+    useDesktopStore.getState().clearSelection();
+  };
+
   const handleDesktopMouseDown = (e) => {
     if (e.button !== 0) return;
     hideContextMenu();
+    setIconMenu({ visible: false, x: 0, y: 0, iconId: null });
 
     const clickedOnIcon = e.target.closest('[data-desktop-icon="true"]');
     if (clickedOnIcon) return;
@@ -155,6 +204,8 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
 
   const handleIconDragStart = (e, icon) => {
     e.stopPropagation();
+    hideContextMenu();
+    setIconMenu({ visible: false, x: 0, y: 0, iconId: null });
 
     dragStateRef.current = {
       id: icon.id,
@@ -177,25 +228,19 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
       );
     };
 
-    const onUp = () => {
-      // drop handling: if released over trash icon, move to trash
-      const dropX = dragStateRef.current ? dragStateRef.current.lastX || 0 : 0;
-      const dropY = dragStateRef.current ? dragStateRef.current.lastY || 0 : 0;
+    const onUp = (upEvent) => {
+      // Robust drop handling based on pointer location and rendered trash bounds.
+      const trashElement = document.querySelector('[data-icon-id="trash"]');
+      if (trashElement && icon.id !== 'trash') {
+        const rect = trashElement.getBoundingClientRect();
+        const isOverTrash =
+          upEvent.clientX >= rect.left &&
+          upEvent.clientX <= rect.right &&
+          upEvent.clientY >= rect.top &&
+          upEvent.clientY <= rect.bottom;
 
-      // find trash icon
-      const stateIcons = useDesktopStore.getState().icons;
-      const trashIcon = stateIcons.find((i) => i.id === 'trash');
-      if (trashIcon && icon.id !== 'trash') {
-        const trashRect = { x: trashIcon.x, y: trashIcon.y, width: 84, height: 92 };
-        if (
-          dropX >= trashRect.x &&
-          dropX <= trashRect.x + trashRect.width &&
-          dropY >= trashRect.y &&
-          dropY <= trashRect.y + trashRect.height
-        ) {
-          // move to trash store and remove from desktop
-          useTrashStore.getState().deleteItem({ id: icon.id, name: icon.name, type: icon.type, original: icon });
-          useDesktopStore.getState().deleteIcon(icon.id);
+        if (isOverTrash) {
+          moveIconToTrash(icon);
         }
       }
 
@@ -210,6 +255,7 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
 
   const handleContextMenuAction = (actionId) => {
     hideContextMenu();
+    setIconMenu({ visible: false, x: 0, y: 0, iconId: null });
 
     if (actionId === 'new-folder') {
       alert('New Folder (simulation): Finder handles folders in this version.');
@@ -242,12 +288,55 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
     }
   };
 
+  const handleIconMenuAction = (actionId) => {
+    const icon = sortedIcons.find((i) => i.id === iconMenu.iconId);
+    setIconMenu({ visible: false, x: 0, y: 0, iconId: null });
+
+    if (!icon) return;
+
+    if (actionId === 'open') {
+      openIcon(icon);
+      return;
+    }
+
+    if (actionId === 'rename') {
+      setRenamingIcon(icon);
+      setRenameDraft(icon.name || '');
+      return;
+    }
+
+    if (actionId === 'properties') {
+      setPropertiesIcon(icon);
+      return;
+    }
+
+    if (actionId === 'move-to-trash') {
+      moveIconToTrash(icon);
+    }
+  };
+
+  const submitRename = () => {
+    const nextName = renameDraft.trim();
+    if (!renamingIcon || !nextName) {
+      setRenamingIcon(null);
+      setRenameDraft('');
+      return;
+    }
+
+    renameIcon(renamingIcon.id, nextName);
+    setRenamingIcon(null);
+    setRenameDraft('');
+  };
+
   return (
     <div
       className="absolute inset-0 z-[15]"
       onMouseDown={handleDesktopMouseDown}
       onContextMenu={(e) => {
+        const iconTarget = e.target.closest('[data-desktop-icon="true"]');
+        if (iconTarget) return;
         e.preventDefault();
+        setIconMenu({ visible: false, x: 0, y: 0, iconId: null });
         showContextMenu(e.clientX, e.clientY);
       }}
       onClick={(e) => {
@@ -255,6 +344,7 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
           setRipple({ x: e.clientX, y: e.clientY, id: Date.now() });
           clearSelection();
           hideContextMenu();
+          setIconMenu({ visible: false, x: 0, y: 0, iconId: null });
         }
       }}
     >
@@ -262,8 +352,16 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
         <div
           key={icon.id}
           data-desktop-icon="true"
+          data-icon-id={icon.id}
           className="absolute"
           style={{ left: icon.x, top: icon.y }}
+          onContextMenu={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            hideContextMenu();
+            selectIcon(icon.id, false);
+            setIconMenu({ visible: true, x: e.clientX, y: e.clientY, iconId: icon.id });
+          }}
         >
           <DesktopIcon
             icon={icon}
@@ -311,6 +409,116 @@ export const DesktopLayer = ({ onOpenApp, onOpenExternal, onOpenSettings, onWall
               onAction={handleContextMenuAction}
             />
           </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {iconMenu.visible && (
+          <>
+            <div
+              className="fixed inset-0 z-[7000]"
+              onMouseDown={() => setIconMenu({ visible: false, x: 0, y: 0, iconId: null })}
+            />
+            <IconContextMenu
+              x={iconMenu.x}
+              y={iconMenu.y}
+              icon={sortedIcons.find((icon) => icon.id === iconMenu.iconId)}
+              onAction={handleIconMenuAction}
+            />
+          </>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {renamingIcon && (
+          <motion.div
+            className="fixed inset-0 z-[7100] bg-black/45 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onMouseDown={() => {
+              setRenamingIcon(null);
+              setRenameDraft('');
+            }}
+          >
+            <motion.div
+              className="w-full max-w-md rounded-xl border border-white/20 bg-neutral-900/90 backdrop-blur-xl p-4"
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: 6 }}
+              transition={{ duration: 0.14 }}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-base font-semibold text-neutral-100 mb-3">Rename Icon</h3>
+              <input
+                autoFocus
+                value={renameDraft}
+                onChange={(e) => setRenameDraft(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') submitRename();
+                  if (e.key === 'Escape') {
+                    setRenamingIcon(null);
+                    setRenameDraft('');
+                  }
+                }}
+                className="w-full rounded-lg border border-white/20 bg-white/10 px-3 py-2 text-neutral-100 outline-none focus:border-cyan-400"
+              />
+              <div className="mt-4 flex justify-end gap-2">
+                <button
+                  onClick={() => {
+                    setRenamingIcon(null);
+                    setRenameDraft('');
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-sm bg-white/10 text-neutral-200 hover:bg-white/20"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={submitRename}
+                  className="px-3 py-1.5 rounded-lg text-sm bg-cyan-500 text-white hover:bg-cyan-400"
+                >
+                  Save
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {propertiesIcon && (
+          <motion.div
+            className="fixed inset-0 z-[7100] bg-black/45 flex items-center justify-center p-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onMouseDown={() => setPropertiesIcon(null)}
+          >
+            <motion.div
+              className="w-full max-w-md rounded-xl border border-white/20 bg-neutral-900/90 backdrop-blur-xl p-4"
+              initial={{ opacity: 0, scale: 0.96, y: 8 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: 6 }}
+              transition={{ duration: 0.14 }}
+              onMouseDown={(e) => e.stopPropagation()}
+            >
+              <h3 className="text-base font-semibold text-neutral-100 mb-3">Properties</h3>
+              <div className="space-y-2 text-sm text-neutral-200">
+                <div><span className="text-neutral-400">Name:</span> {propertiesIcon.name}</div>
+                <div><span className="text-neutral-400">Type:</span> {propertiesIcon.type || 'unknown'}</div>
+                <div><span className="text-neutral-400">App ID:</span> {propertiesIcon.appId || 'n/a'}</div>
+                <div><span className="text-neutral-400">Position:</span> {Math.round(propertiesIcon.x)}, {Math.round(propertiesIcon.y)}</div>
+              </div>
+              <div className="mt-4 flex justify-end">
+                <button
+                  onClick={() => setPropertiesIcon(null)}
+                  className="px-3 py-1.5 rounded-lg text-sm bg-cyan-500 text-white hover:bg-cyan-400"
+                >
+                  Close
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
