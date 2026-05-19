@@ -11,10 +11,7 @@ const MusicApp = () => {
   const audioRef = useRef(null);
 
   const tracks = [
-    // Note: Audio files are placeholders. Add real audio assets to /public/audio/ directory
-    // { id: 'sample-1', title: 'Sample Track 1', src: '/audio/sample-1.mp3' },
-    // { id: 'sample-2', title: 'Sample Track 2', src: '/audio/sample-2.mp3' },
-    { id: 'demo-1', title: 'Demo Track (Placeholder)', src: '' },
+    { id: '1', title: 'Unstoppable', src: '/audio/unstoppable.mp3' },
   ];
 
   useEffect(() => {

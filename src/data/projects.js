@@ -809,6 +809,17 @@ export const projects = [
 		description: "A high-performance registry for procedural agent skills. Discover, publish, and operate reusable agent capabilities from a route-driven workspace.",
 		technologies: ["TanStack Start", "React", "Clerk" ,"Appwrite", "TypeScript", "Shadcn/ui"]
 	},
+	{
+		id: 74,
+		title: "GTA 6 Landing Page",
+		category: "web",
+		type: "inspired",
+		url: "https://gta-vi-landing-page-ivory.vercel.app/",
+		github: "https://github.com/ArhanAnsari/gta-vi-landing-page",
+		image: "projects/gta-6-landing-page.png",
+		description: "GTA VI Website Clone built with React, Tailwind & GSAP. Scroll-driven cinematic experience with pinned sections, synced video, parallax, and image masking, all fully responsive and animation-rich.",
+		technologies: ["React", "Tailwind CSS", "GSAP", "JavaScript"]
+	},
 ];
 
 export default projects;
