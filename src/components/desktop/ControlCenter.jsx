@@ -2,17 +2,15 @@ import React from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { SunMedium, Volume2, Wifi, Bluetooth, MoonStar, Wallpaper, PanelRightClose } from 'lucide-react';
 import { useSystemStore } from '../../store/systemStore';
+import { useSystemStateStore } from '../../store/systemStateStore';
 import { useUIStore } from '../../store/uiStore';
 
 const ControlCenter = ({ isOpen, onClose }) => {
   const { wallpapers, activeWallpaperId, setWallpaper, theme, setTheme } = useSystemStore();
+  const { brightness, setBrightness, wifiEnabled, setWifiEnabled } = useSystemStateStore();
   const {
-    displayBrightness,
-    setDisplayBrightness,
     volumeLevel,
     setVolumeLevel,
-    wifiEnabled,
-    toggleWifi,
     bluetoothEnabled,
     toggleBluetooth,
     doNotDisturb,
@@ -38,15 +36,15 @@ const ControlCenter = ({ isOpen, onClose }) => {
             </div>
 
             <div className="space-y-3 p-4">
-              <ControlRow icon={SunMedium} title="Display" value={`${Math.round(displayBrightness * 100)}%`}>
-                <input type="range" min="0.15" max="1" step="0.01" value={displayBrightness} onChange={(event) => setDisplayBrightness(Number(event.target.value))} className="w-full accent-cyan-400" />
+              <ControlRow icon={SunMedium} title="Display" value={`${brightness}%`}>
+                <input type="range" min="0" max="100" step="1" value={brightness} onChange={(event) => setBrightness(Number(event.target.value))} className="w-full accent-cyan-400" />
               </ControlRow>
               <ControlRow icon={Volume2} title="Sound" value={`${Math.round(volumeLevel * 100)}%`}>
                 <input type="range" min="0" max="1" step="0.01" value={volumeLevel} onChange={(event) => setVolumeLevel(Number(event.target.value))} className="w-full accent-cyan-400" />
               </ControlRow>
 
               <div className="grid grid-cols-2 gap-2">
-                <ToggleTile icon={Wifi} label="Wi‑Fi" active={wifiEnabled} onClick={toggleWifi} />
+                <ToggleTile icon={Wifi} label="Wi‑Fi" active={wifiEnabled} onClick={() => setWifiEnabled(!wifiEnabled)} />
                 <ToggleTile icon={Bluetooth} label="Bluetooth" active={bluetoothEnabled} onClick={toggleBluetooth} />
                 <ToggleTile icon={MoonStar} label="Do Not Disturb" active={doNotDisturb} onClick={toggleDoNotDisturb} />
                 <ToggleTile icon={Wallpaper} label={`Theme: ${theme}`} active={theme === 'dark'} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')} />

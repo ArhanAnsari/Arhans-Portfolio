@@ -15,10 +15,46 @@ import {
   Space,
   ArrowUp,
   Plus,
+  Home,
+  File,
+  FileCode,
+  Music,
+  Video,
 } from 'lucide-react';
 import { useFilesystemStore } from '../../store/filesystemStore';
 import { useTrashStore } from '../../store/trashStore';
 import { useNotificationStore } from '../../store/notificationStore';
+import { useWindowStore } from '../../store/windowStore';
+import { useAppStore } from '../../store/appStore';
+
+// File type to app mapping
+const FILE_TYPE_MAP = {
+  // All file types open in FileViewerApp for now
+  '.png': 'file-viewer',
+  '.jpg': 'file-viewer',
+  '.jpeg': 'file-viewer',
+  '.gif': 'file-viewer',
+  '.webp': 'file-viewer',
+  
+  // Text/Code
+  '.txt': 'file-viewer',
+  '.md': 'file-viewer',
+  '.js': 'file-viewer',
+  '.jsx': 'file-viewer',
+  '.py': 'file-viewer',
+  '.html': 'file-viewer',
+  '.css': 'file-viewer',
+  
+  // Media
+  '.mp3': 'file-viewer',
+  '.mp4': 'file-viewer',
+  '.mov': 'file-viewer',
+  
+  // Documents
+  '.pdf': 'file-viewer',
+  '.doc': 'file-viewer',
+  '.docx': 'file-viewer',
+};
 
 const ICON_BY_KIND = {
   folder: Folder,
@@ -27,6 +63,16 @@ const ICON_BY_KIND = {
   image: ImageIcon,
   shortcut: Link2,
   project: FolderOpen,
+};
+
+const getFileExtension = (filename) => {
+  const dot = filename.lastIndexOf('.');
+  return dot === -1 ? '' : filename.substring(dot).toLowerCase();
+};
+
+const getAppForFile = (filename) => {
+  const ext = getFileExtension(filename);
+  return FILE_TYPE_MAP[ext] || 'notes';
 };
 
 const FinderApp = () => {
@@ -49,11 +95,18 @@ const FinderApp = () => {
     previewNode,
     closePreview,
   } = useFilesystemStore();
+  
   const { deleteItem } = useTrashStore();
   const { pushNotification } = useNotificationStore();
+  const { openWindow } = useWindowStore();
+  const appMetadata = useAppStore((state) => state.apps);
 
   const [selectedIds, setSelectedIds] = useState([]);
-  const [renameDraft, setRenameDraft] = useState('');
+  const [renameDraft, setRenameDraft] = useState([]);
+  const [locationInput, setLocationInput] = useState('');
+  const [editingLocation, setEditingLocation] = useState(false);
+  const [showPreviewPane, setShowPreviewPane] = useState(true);
+  const [showSidebar, setShowSidebar] = useState(true);
 
   useEffect(() => {
     initialize();
@@ -63,6 +116,12 @@ const FinderApp = () => {
   const items = useMemo(() => listFolder(currentFolderId), [currentFolderId, listFolder]);
   const currentPreview = previewId ? getNode(previewId) : null;
   const breadcrumbs = currentFolderId ? getNodePath(currentFolderId) : [];
+  
+  // Update location input when folder changes
+  useEffect(() => {
+    const pathStr = breadcrumbs.slice(1).join('/') || 'ArhanOS';
+    setLocationInput(pathStr);
+  }, [breadcrumbs]);
 
   useEffect(() => {
     const handleKeyDown = (event) => {
@@ -81,6 +140,13 @@ const FinderApp = () => {
 
   const selectedNode = selectedIds.length === 1 ? getNode(selectedIds[0]) : null;
 
+  const handleLocationSubmit = () => {
+    if (!locationInput.trim()) return;
+    setEditingLocation(false);
+    // For now, navigate to root if user types a path
+    // This could be extended to support path navigation
+  };
+
   const handleSelect = (nodeId, additive = false) => {
     setSelectedIds((current) => {
       if (additive) {
@@ -92,15 +158,40 @@ const FinderApp = () => {
 
   const handleOpen = (node) => {
     if (!node) return;
+
+    // Open folders
     if (node.kind === 'folder') {
       openFolder(node.id);
       setSelectedIds([]);
       return;
     }
 
-    if (node.kind === 'shortcut' && node.appId) {
-      window.dispatchEvent(new CustomEvent('arhanos-open-app', { detail: { appId: node.appId } }));
-      return;
+    // Open files in FileViewerApp
+    if (node.kind === 'text' || node.kind === 'image' || node.kind === 'file') {
+      const appId = getAppForFile(node.name);
+      const appMeta = appMetadata[appId];
+      
+      if (appMeta && appId === 'file-viewer') {
+        // Open with file viewer
+        openWindow({
+          app: 'file-viewer',  // Use 'app' not 'appId'
+          title: `${node.name}`,
+          width: 900,
+          height: 700,
+          state: { 
+            fileId: node.id, 
+            fileName: node.name, 
+            fileContent: node.content,
+          },
+        });
+
+        pushNotification({
+          type: 'finder',
+          title: 'Opening file',
+          description: node.name,
+          source: 'finder',
+        });
+      }
     }
 
     previewNode(node.id);
@@ -132,12 +223,6 @@ const FinderApp = () => {
     pushNotification({ type: 'finder', title: 'Moved to Trash', description: selectedNode.name, source: 'finder' });
   };
 
-  const handleMoveToFolder = (folderId) => {
-    if (!selectedNode) return;
-    moveNode(selectedNode.id, folderId);
-    pushNotification({ type: 'finder', title: 'File moved', description: `${selectedNode.name} moved`, source: 'finder' });
-  };
-
   const handleDragStart = (event, node) => {
     event.dataTransfer.setData('text/plain', node.id);
     event.dataTransfer.effectAllowed = 'move';
@@ -153,159 +238,297 @@ const FinderApp = () => {
   const renderPreview = () => {
     if (!currentPreview) {
       return (
-        <div className="flex h-full items-center justify-center text-neutral-400">
-          Select an item and press Space for Quick Look.
+        <div className="flex h-full items-center justify-center text-neutral-400 text-sm">
+          No preview available
         </div>
       );
     }
 
     if (currentPreview.kind === 'image') {
       return (
-        <img src={currentPreview.icon} alt={currentPreview.name} className="max-h-full max-w-full rounded-2xl object-contain" />
+        <img
+          src={currentPreview.icon}
+          alt={currentPreview.name}
+          className="max-h-full max-w-full rounded-lg object-contain"
+        />
       );
     }
 
     if (currentPreview.kind === 'text' || currentPreview.kind === 'file' || currentPreview.kind === 'project') {
       return (
-        <div className="max-w-2xl rounded-3xl border border-white/10 bg-white/5 p-6 text-left text-neutral-200 shadow-2xl">
-          <div className="text-2xl font-semibold">{currentPreview.name}</div>
-          <div className="mt-3 whitespace-pre-wrap text-sm text-neutral-300">
-            {currentPreview.content || 'No preview content available.'}
+        <div className="rounded-lg border border-white/10 bg-white/5 p-4 text-left text-neutral-200 max-w-2xl max-h-96 overflow-auto">
+          <div className="text-sm font-semibold mb-2">{currentPreview.name}</div>
+          <div className="text-xs whitespace-pre-wrap text-neutral-400">
+            {currentPreview.content || '(empty file)'}
           </div>
         </div>
       );
     }
 
-    return <div className="text-neutral-300">Preview unavailable.</div>;
+    return <div className="text-neutral-300 text-sm">Preview unavailable.</div>;
   };
 
+  const SIDEBAR_ITEMS = [
+    { id: 'root', label: 'ArhanOS', icon: Home },
+    { id: 'documents', label: 'Documents', icon: Folder },
+    { id: 'downloads', label: 'Downloads', icon: Folder },
+    { id: 'media', label: 'Media', icon: ImageIcon },
+    { id: 'projects', label: 'Projects', icon: FolderOpen },
+  ];
+
   return (
-    <div className="flex h-full flex-col overflow-hidden bg-gradient-to-br from-neutral-950 via-neutral-900 to-neutral-950 text-neutral-100">
-      <div className="border-b border-white/10 bg-black/20 p-4 backdrop-blur-xl">
-        <div className="mb-3 flex items-center gap-2 overflow-x-auto text-sm text-neutral-400">
-          <button onClick={() => openFolder('root')} className="font-semibold text-cyan-300">Finder</button>
-          {breadcrumbs.slice(1).map((crumb, index) => (
-            <React.Fragment key={`${crumb}-${index}`}>
-              <ChevronRight size={14} />
-              <span>{crumb}</span>
-            </React.Fragment>
-          ))}
+    <div className="flex h-full flex-col overflow-hidden bg-neutral-950 text-neutral-100">
+      {/* Toolbar */}
+      <div className="border-b border-white/10 bg-neutral-950/95 px-3 sm:px-4 py-2 sm:py-3 backdrop-blur-xl overflow-y-auto">
+        {/* Navigation buttons */}
+        <div className="mb-2 sm:mb-3 flex items-center gap-2">
+          <button
+            onClick={goUp}
+            className="rounded-lg p-2 text-neutral-400 hover:bg-white/10 hover:text-white flex-shrink-0"
+            title="Go Up"
+          >
+            <ArrowUp size={16} />
+          </button>
+          
+          {/* Location/Path Bar */}
+          {editingLocation ? (
+            <input
+              type="text"
+              value={locationInput}
+              onChange={(e) => setLocationInput(e.target.value)}
+              onBlur={handleLocationSubmit}
+              onKeyDown={(e) => e.key === 'Enter' && handleLocationSubmit()}
+              autoFocus
+              className="flex-1 rounded-lg border border-cyan-400/50 bg-white/[0.08] px-3 py-2 text-sm text-white outline-none placeholder:text-neutral-500"
+              placeholder="Enter path..."
+            />
+          ) : (
+            <div
+              onClick={() => setEditingLocation(true)}
+              className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-neutral-300 hover:bg-white/10 cursor-pointer"
+            >
+              {locationInput || 'ArhanOS'}
+            </div>
+          )}
         </div>
 
+        {/* Action buttons */}
         <div className="flex flex-wrap gap-2">
-          <button onClick={goUp} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">
-            <ArrowUp size={12} className="inline-block" /> Up
+          <button
+            onClick={() => createFolder('New Folder')}
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-neutral-400 hover:bg-white/10 hover:text-white transition-colors"
+          >
+            <Plus size={14} className="inline mr-1" />
+            New Folder
           </button>
-          <button onClick={() => createFolder('New Folder')} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">
-            <Plus size={12} className="inline-block" /> Folder
+          <button
+            onClick={() => createTextFile('Untitled.txt', 'New text file')}
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-neutral-400 hover:bg-white/10 hover:text-white transition-colors"
+          >
+            <FileText size={14} className="inline mr-1" />
+            New File
           </button>
-          <button onClick={() => createTextFile('Untitled.txt', 'New note')} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">
-            <FileText size={12} className="inline-block" /> File
+          <button
+            onClick={handlePreview}
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-neutral-400 hover:bg-white/10 hover:text-white transition-colors"
+            disabled={!selectedNode}
+          >
+            <Eye size={14} className="inline mr-1" />
+            Preview
           </button>
-          <button onClick={handlePreview} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">
-            <Eye size={12} className="inline-block" /> Quick Look
+          <button
+            onClick={handleDuplicate}
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-neutral-400 hover:bg-white/10 hover:text-white transition-colors"
+            disabled={!selectedNode}
+          >
+            <Copy size={14} className="inline mr-1" />
+            Duplicate
           </button>
-          <button onClick={handleDuplicate} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">
-            <Copy size={12} className="inline-block" /> Duplicate
+          <button
+            onClick={handleDelete}
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-neutral-400 hover:bg-white/10 hover:text-white transition-colors"
+            disabled={!selectedNode}
+          >
+            <Trash2 size={14} className="inline mr-1" />
+            Trash
           </button>
-          <button onClick={handleDelete} className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-xs hover:bg-white/10">
-            <Trash2 size={12} className="inline-block" /> Trash
+          <div className="flex-1"></div>
+          <button
+            onClick={() => setShowSidebar(!showSidebar)}
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-neutral-400 hover:bg-white/10 hover:text-white transition-colors"
+            title={showSidebar ? 'Hide sidebar' : 'Show sidebar'}
+          >
+            {showSidebar ? '◀' : '▶'} Sidebar
+          </button>
+          <button
+            onClick={() => setShowPreviewPane(!showPreviewPane)}
+            className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs text-neutral-400 hover:bg-white/10 hover:text-white transition-colors"
+            title={showPreviewPane ? 'Hide details' : 'Show details'}
+          >
+            {showPreviewPane ? '▶' : '◀'} Details
           </button>
         </div>
       </div>
 
-      <div className="grid min-h-0 flex-1 grid-cols-1 gap-0 lg:grid-cols-[1fr_360px]">
-        <div className="min-h-0 overflow-auto p-4">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
-            {items.map((node) => {
-              const Icon = ICON_BY_KIND[node.kind] || FileText;
-              const isSelected = selectedIds.includes(node.id);
+      {/* Main content area - Responsive layout */}
+      <div className={`grid min-h-0 flex-1 gap-0 overflow-hidden ${
+        showSidebar && showPreviewPane 
+          ? 'grid-cols-[max(120px,15%)_1fr_max(200px,25%)]'
+          : showSidebar
+          ? 'grid-cols-[max(120px,15%)_1fr]'
+          : showPreviewPane
+          ? 'grid-cols-[1fr_max(200px,25%)]'
+          : 'grid-cols-1'
+      }`}>
+        {/* Left sidebar - Conditionally rendered */}
+        {showSidebar && (
+        <div className="border-r border-white/10 bg-neutral-950/50 overflow-y-auto">
+          <div className="p-3 space-y-1">
+            {SIDEBAR_ITEMS.map((item) => {
+              const ItemIcon = item.icon;
+              const isActive = currentFolderId === item.id;
               return (
-                <motion.button
-                  key={node.id}
-                  draggable
-                  onDragStart={(event) => handleDragStart(event, node)}
-                  onDragOver={(event) => event.preventDefault()}
-                  onDrop={(event) => node.kind === 'folder' && handleDrop(event, node.id)}
-                  onClick={(event) => handleSelect(node.id, event.metaKey || event.ctrlKey)}
-                  onDoubleClick={() => handleOpen(node)}
-                  className={`group rounded-2xl border p-3 text-left transition-all ${isSelected ? 'border-cyan-300/70 bg-cyan-400/15' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}
+                <button
+                  key={item.id}
+                  onClick={() => openFolder(item.id)}
+                  className={`w-full rounded-lg px-3 py-2 text-left text-sm flex items-center gap-3 transition-colors ${
+                    isActive
+                      ? 'bg-cyan-400/20 text-cyan-100'
+                      : 'text-neutral-300 hover:bg-white/10'
+                  }`}
                 >
-                  <div className="flex items-center justify-between">
-                    <Icon size={20} className="text-neutral-200" />
-                    <span className="text-[10px] uppercase tracking-[0.2em] text-neutral-500">{node.kind}</span>
-                  </div>
-                  <div className="mt-8 truncate text-sm font-medium text-white">{node.name}</div>
-                  <div className="mt-1 text-xs text-neutral-500">{node.kind === 'folder' ? `${node.children?.length || 0} items` : 'Preview available'}</div>
-                </motion.button>
+                  <ItemIcon size={16} />
+                  {item.label}
+                </button>
               );
             })}
           </div>
         </div>
+        )}
 
-        <AnimatePresence>
-          <motion.aside
-            className="border-t border-white/10 bg-neutral-950/90 p-5 lg:border-l lg:border-t-0"
-            initial={{ x: 30, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            exit={{ x: 30, opacity: 0 }}
-          >
-            <div className="mb-4 text-sm uppercase tracking-[0.3em] text-neutral-500">Quick Look</div>
-            <div className="flex h-[45vh] items-center justify-center rounded-3xl border border-white/10 bg-white/[0.03] p-4">
-              {renderPreview()}
-            </div>
-
-            {selectedNode && (
-              <div className="mt-4 space-y-3 text-sm text-neutral-300">
-                <div className="font-semibold text-white">{selectedNode.name}</div>
-                <div>Type: {selectedNode.kind}</div>
-                <div>Path: {getNodePath(selectedNode.id).join(' / ')}</div>
-                <input
-                  value={renameDraft}
-                  onChange={(event) => setRenameDraft(event.target.value)}
-                  placeholder={`Rename ${selectedNode.name}`}
-                  className="w-full rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-neutral-500"
-                />
-                <button onClick={handleRename} className="rounded-xl bg-cyan-400/20 px-3 py-2 text-sm text-cyan-100 hover:bg-cyan-400/30">
-                  Rename
-                </button>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-3 text-xs text-neutral-400">
-                  Drag this item onto another folder to move it. Use Space to preview, Esc to close preview.
+        {/* Main file browser */}
+        <div className="overflow-y-auto">
+          <div className="p-4">
+            {items.length === 0 ? (
+              <div className="flex h-full items-center justify-center text-neutral-500">
+                <div className="text-center">
+                  <FolderOpen size={48} className="mx-auto mb-4 opacity-50" />
+                  <p>This folder is empty</p>
                 </div>
-                {selectedNode.kind === 'folder' && (
-                  <div className="grid grid-cols-2 gap-2">
-                    {items
-                      .filter((node) => node.kind === 'folder' && node.id !== selectedNode.id)
-                      .map((folder) => (
-                        <button
-                          key={folder.id}
-                          onClick={() => handleMoveToFolder(folder.id)}
-                          className="rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-xs text-white hover:bg-white/10"
-                        >
-                          Move to {folder.name}
-                        </button>
-                      ))}
-                  </div>
-                )}
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+                {items.map((node) => {
+                  const Icon = ICON_BY_KIND[node.kind] || FileText;
+                  const isSelected = selectedIds.includes(node.id);
+                  return (
+                    <motion.button
+                      key={node.id}
+                      draggable
+                      onDragStart={(event) => handleDragStart(event, node)}
+                      onDragOver={(event) => event.preventDefault()}
+                      onDrop={(event) => node.kind === 'folder' && handleDrop(event, node.id)}
+                      onClick={(event) => handleSelect(node.id, event.ctrlKey || event.metaKey)}
+                      onDoubleClick={() => handleOpen(node)}
+                      className={`group rounded-2xl border-2 p-3 text-left transition-all ${
+                        isSelected
+                          ? 'border-cyan-400/70 bg-cyan-400/20'
+                          : 'border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20'
+                      }`}
+                      title={node.name}
+                    >
+                      <div className="flex items-center justify-center h-16 mb-2">
+                        <Icon size={24} className="text-neutral-300" />
+                      </div>
+                      <div className="truncate text-xs font-medium text-white">{node.name}</div>
+                      <div className="text-[10px] text-neutral-500 mt-1 truncate">
+                        {node.kind === 'folder' ? `${node.children?.length || 0} items` : node.kind}
+                      </div>
+                    </motion.button>
+                  );
+                })}
               </div>
             )}
-          </motion.aside>
-        </AnimatePresence>
+          </div>
+        </div>
+
+        {/* Right preview pane - Conditionally rendered */}
+        {showPreviewPane && (
+        <div className="border-l border-white/10 bg-neutral-950/50 overflow-y-auto">
+          {selectedNode ? (
+            <div className="p-4">
+              <div className="mb-4">
+                <div className="text-xs uppercase tracking-widest text-neutral-500 mb-2">Info</div>
+                <div className="rounded-xl border border-white/10 bg-white/5 p-3">
+                  <div className="text-sm font-semibold text-white mb-3">{selectedNode.name}</div>
+                  <div className="space-y-2 text-xs text-neutral-400">
+                    <div><span className="text-neutral-500">Type:</span> {selectedNode.kind}</div>
+                    <div><span className="text-neutral-500">Path:</span> {getNodePath(selectedNode.id).join(' / ')}</div>
+                    {selectedNode.updatedAt && (
+                      <div><span className="text-neutral-500">Modified:</span> {new Date(selectedNode.updatedAt).toLocaleDateString()}</div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Preview */}
+              <div className="mb-4">
+                <div className="text-xs uppercase tracking-widest text-neutral-500 mb-2">Preview</div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 h-40 flex items-center justify-center overflow-hidden">
+                  {renderPreview()}
+                </div>
+              </div>
+
+              {/* Rename */}
+              <div>
+                <label className="text-xs uppercase tracking-widest text-neutral-500 mb-2 block">Rename</label>
+                <input
+                  value={renameDraft}
+                  onChange={(e) => setRenameDraft(e.target.value)}
+                  placeholder={`Rename ${selectedNode.name}`}
+                  className="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-sm text-white outline-none placeholder:text-neutral-500 mb-2 focus:border-cyan-400/50"
+                />
+                <button
+                  onClick={handleRename}
+                  className="w-full rounded-lg bg-cyan-400/20 px-3 py-2 text-sm text-cyan-100 hover:bg-cyan-400/30 transition-colors"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex h-full items-center justify-center p-4">
+              <div className="text-center text-neutral-500 text-sm">
+                <p>Select a file to see details</p>
+              </div>
+            </div>
+          )}
+        </div>
+        )}
       </div>
 
+      {/* Full-screen preview modal */}
       {currentPreview && (
-        <div className="fixed inset-0 z-[7000] flex items-center justify-center bg-black/70 p-6 backdrop-blur-xl" onClick={closePreview}>
-          <div className="max-h-[90vh] max-w-[90vw] overflow-auto rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-2xl" onClick={(event) => event.stopPropagation()}>
+        <div
+          className="fixed inset-0 z-[7000] flex items-center justify-center bg-black/80 p-6 backdrop-blur-xl"
+          onClick={closePreview}
+        >
+          <div
+            className="max-h-[90vh] max-w-[90vw] overflow-auto rounded-3xl border border-white/10 bg-neutral-950/95 p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
             <div className="mb-4 flex items-center justify-between gap-4">
               <div>
                 <div className="text-lg font-semibold text-white">{currentPreview.name}</div>
                 <div className="text-xs uppercase tracking-[0.3em] text-neutral-500">Quick Look</div>
               </div>
               <button onClick={closePreview} className="rounded-full p-2 text-neutral-400 hover:bg-white/10 hover:text-white">
-                <X size={16} />
+                ✕
               </button>
             </div>
-            <div className="flex items-center justify-center">{renderPreview()}</div>
+            <div className="flex items-center justify-center max-h-[calc(90vh-100px)]">
+              {renderPreview()}
+            </div>
           </div>
         </div>
       )}

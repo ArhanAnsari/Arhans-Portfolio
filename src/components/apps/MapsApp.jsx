@@ -6,6 +6,23 @@ import { MapPin, Search, Navigation } from 'lucide-react';
  */
 const MapsApp = () => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [coords, setCoords] = useState({ latitude: 28.6139, longitude: 77.2090 });
+  const [loading, setLoading] = useState(false);
+
+  const geocode = async (q) => {
+    setLoading(true);
+    try {
+      const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=1`);
+      const json = await res.json();
+      if (json?.results?.length) {
+        const r = json.results[0];
+        setCoords({ latitude: r.latitude, longitude: r.longitude });
+      }
+    } catch (e) {
+      // ignore
+    }
+    setLoading(false);
+  };
 
   return (
     <div className="w-full h-full bg-neutral-50 dark:bg-neutral-900 flex flex-col">
@@ -29,10 +46,25 @@ const MapsApp = () => {
 
       {/* Map Area */}
       <div className="flex-1 relative">
-        <div className="w-full h-full bg-gradient-to-br from-blue-200 to-blue-300 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center">
-          <div className="text-center">
-            <Navigation size={48} className="mx-auto text-white mb-4" />
-            <p className="text-white font-semibold">Your Location</p>
+        <div className="p-4">
+          <div className="relative mb-3">
+            <Search size={16} className="absolute left-3 top-3 text-neutral-500" />
+            <input
+              type="text"
+              placeholder="Search location..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-neutral-100 dark:bg-neutral-700 rounded-lg text-neutral-900 dark:text-white placeholder-neutral-500 focus:outline-none"
+            />
+            <button onClick={() => geocode(searchQuery)} className="absolute right-2 top-2 px-3 py-1 rounded bg-white/10">Search</button>
+          </div>
+
+          <div className="w-full h-[60vh] bg-white/5 rounded-lg overflow-hidden">
+            <iframe
+              title="map"
+              src={`https://www.openstreetmap.org/export/embed.html?bbox=${coords.longitude - 0.02}%2C${coords.latitude - 0.02}%2C${coords.longitude + 0.02}%2C${coords.latitude + 0.02}&layer=mapnik&marker=${coords.latitude}%2C${coords.longitude}`}
+              className="w-full h-full border-0"
+            />
           </div>
         </div>
       </div>

@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useBrowserStore } from '../../store/browserStore';
 import { useNotificationStore } from '../../store/notificationStore';
+import { useSystemStateStore } from '../../store/systemStateStore';
 
 const INTERNAL_PAGE_RENDERERS = {
   about: {
@@ -117,11 +118,11 @@ const INTERNAL_PAGE_RENDERERS = {
 };
 
 const DEFAULT_BOOKMARKS = [
-  { id: 'github', title: 'GitHub', url: 'https://github.com', favicon: '🐙' },
+  { id: 'github', title: 'GitHub', url: 'https://github.com', favicon: '/icons/github.svg' },
   { id: 'youtube', title: 'YouTube', url: 'https://youtube.com', favicon: '📺' },
   { id: 'openai', title: 'OpenAI', url: 'https://openai.com', favicon: '🤖' },
   { id: 'vercel', title: 'Vercel', url: 'https://vercel.com', favicon: '▲' },
-  { id: 'codewitharhan', title: 'CodeWithArhan', url: 'https://youtube.com/@codewitharhanofficial', favicon: '🧠' },
+  { id: 'codewitharhan', title: 'CodeWithArhan', url: 'https://youtube.com/@codewitharhanofficial', favicon: '/icons/youtube.png' },
 ];
 
 const getOriginLabel = (url) => {
@@ -130,6 +131,14 @@ const getOriginLabel = (url) => {
   } catch {
     return url;
   }
+};
+
+// Helper to render favicon (image or emoji)
+const renderFavicon = (favicon) => {
+  if (favicon.startsWith('/') || favicon.endsWith('.svg') || favicon.endsWith('.png')) {
+    return <img src={favicon} alt="favicon" className="h-5 w-5 object-contain" />;
+  }
+  return <span className="text-lg">{favicon}</span>;
 };
 
 const SafariApp = () => {
@@ -151,6 +160,7 @@ const SafariApp = () => {
     removeBookmark,
   } = useBrowserStore();
   const { pushNotification } = useNotificationStore();
+  const wifiEnabled = useSystemStateStore((state) => state.wifiEnabled);
 
   const activeTab = getActiveTab();
   const [addressInput, setAddressInput] = useState('');
@@ -158,6 +168,7 @@ const SafariApp = () => {
   const [pendingAction, setPendingAction] = useState(null);
   const [loadProgress, setLoadProgress] = useState(0);
   const [iframeError, setIframeError] = useState(null);
+  const [proxyContent, setProxyContent] = useState(null);
   const progressRef = useRef(null);
   const currentTabId = activeTab?.id;
 
@@ -189,6 +200,19 @@ const SafariApp = () => {
     }
     setIframeError(null);
   }, [activeTab?.url]);
+
+  // Auto-detect blocked iframes by timeout - most external sites are blocked
+  useEffect(() => {
+    if (!activeTab?.url?.startsWith('http') || currentTabId !== activeTab.id) return;
+    
+    const timer = window.setTimeout(() => {
+      // Most external sites that try to load in iframe get blocked
+      // Show error after load completes (browserStore timeout is 5s)
+      setIframeError('Failed to load this site in the sandboxed browser frame.');
+    }, 5500);
+    
+    return () => clearTimeout(timer);
+  }, [activeTab?.url, activeTab?.id, currentTabId]);
 
   useEffect(() => {
   if (!activeTab) {
@@ -234,6 +258,25 @@ const SafariApp = () => {
       return null;
     }
 
+    // Check Wi-Fi state for internet pages
+    if (!wifiEnabled && (!activeTab.url || activeTab.url.startsWith('http') || activeTab.url.includes('.'))) {
+      return (
+        <div className="flex h-full flex-col items-center justify-center gap-4 text-neutral-100 p-6 text-center">
+          <ShieldAlert size={48} className="text-yellow-400 opacity-50" />
+          <div className="text-2xl font-medium">You are not connected to the Internet</div>
+          <p className="max-w-md text-neutral-400">
+            ArhanOS cannot connect to the server because you turned off Wi-Fi in the Control Center.
+          </p>
+          <button 
+            onClick={() => useSystemStateStore.getState().setWifiEnabled(true)}
+            className="mt-4 px-6 py-2 bg-primary-600 hover:bg-primary-500 rounded-full text-white transition-colors"
+          >
+            Turn On Wi-Fi
+          </button>
+        </div>
+      );
+    }
+
     if (activeTab.loading) {
       return (
         <div className="flex h-full items-center justify-center gap-3 text-neutral-200">
@@ -276,12 +319,41 @@ const SafariApp = () => {
           <ShieldAlert size={40} className="text-yellow-300" />
           <div className="text-lg font-semibold">Blocked by browser sandbox</div>
           <div className="max-w-xl text-center text-sm text-neutral-400">This website could not be embedded in the sandboxed iframe. Open it externally or try a different site.</div>
-          <button
-            onClick={() => window.open(activeTab.url, '_blank', 'noopener,noreferrer')}
-            className="rounded-full bg-cyan-400/20 px-4 py-2 text-sm text-cyan-100"
-          >
-            Open externally
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => window.open(activeTab.url, '_blank', 'noopener,noreferrer')}
+              className="rounded-full bg-cyan-400/20 px-4 py-2 text-sm text-cyan-100"
+            >
+              Open externally
+            </button>
+            <button
+              onClick={async () => {
+                try {
+                  setProxyContent('Loading...');
+                  const proxyUrl = `https://r.jina.ai/http://${activeTab.url.replace(/^https?:\/\//, '')}`;
+                  const res = await fetch(proxyUrl);
+                  const html = await res.text();
+                  setProxyContent(html);
+                } catch (err) {
+                  setProxyContent('Proxy fetch failed.');
+                }
+              }}
+              className="rounded-full bg-white/5 px-4 py-2 text-sm text-white"
+            >
+              Open via proxy (limited)
+            </button>
+          </div>
+          {proxyContent && (
+            <div className="w-full h-80 mt-4 overflow-auto bg-white/5 p-4 text-sm text-neutral-100">
+              {proxyContent === 'Loading...' ? (
+                <div>Loading proxied content...</div>
+              ) : proxyContent === 'Proxy fetch failed.' ? (
+                <div>Proxy failed to fetch this page.</div>
+              ) : (
+                <div dangerouslySetInnerHTML={{ __html: proxyContent }} />
+              )}
+            </div>
+          )}
         </div>
       );
     }
@@ -317,15 +389,8 @@ const SafariApp = () => {
   return (
     <div className="flex h-full flex-col overflow-hidden bg-neutral-950 text-white">
       <div className="border-b border-white/10 bg-neutral-950/95 px-3 py-2 backdrop-blur-xl">
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1 pr-2">
-            <button className="h-3.5 w-3.5 rounded-full bg-[#ff5f57] shadow-sm shadow-black/20" title="Close" />
-            <button className="h-3.5 w-3.5 rounded-full bg-[#febc2e] shadow-sm shadow-black/20" title="Minimize" />
-            <button className="h-3.5 w-3.5 rounded-full bg-[#28c840] shadow-sm shadow-black/20" title="Fullscreen" />
-          </div>
-
-          <div className="flex flex-1 items-center gap-1 overflow-x-auto">
-            {tabs.map((tab) => (
+        <div className="flex flex-1 items-center gap-1 overflow-x-auto">
+          {tabs.map((tab) => (
               <motion.div
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -362,7 +427,6 @@ const SafariApp = () => {
               <Plus size={16} />
             </button>
           </div>
-        </div>
 
         <div className="mt-3 flex items-center gap-2">
           <button
@@ -446,7 +510,9 @@ const SafariApp = () => {
                     onClick={() => openBookmark(bookmark)}
                     className="flex w-full items-center gap-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-left hover:bg-white/10"
                   >
-                    <span className="text-lg">{bookmark.favicon}</span>
+                    <div className="text-lg flex-shrink-0">
+                      {renderFavicon(bookmark.favicon)}
+                    </div>
                     <div className="min-w-0">
                       <div className="truncate text-sm font-medium">{bookmark.title}</div>
                       <div className="truncate text-xs text-neutral-500">{bookmark.url}</div>
@@ -485,9 +551,12 @@ const SafariApp = () => {
             <button
               key={bookmark.id}
               onClick={() => openBookmark(bookmark)}
-              className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-neutral-300 hover:bg-white/10"
+              className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-neutral-300 hover:bg-white/10 flex-shrink-0"
             >
-              {bookmark.title}
+              <div className="h-4 w-4 flex items-center justify-center">
+                {renderFavicon(bookmark.favicon)}
+              </div>
+              <span>{bookmark.title}</span>
             </button>
           ))}
           <button

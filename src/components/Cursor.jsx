@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
+import { useCursorStore } from "../store/cursorStore";
 
 // ─── Walk up the DOM tree to classify the interactive element type ─────────────
 const resolveType = (el) => {
@@ -9,11 +10,26 @@ const resolveType = (el) => {
     const tag  = node.tagName?.toLowerCase() ?? "";
     const dc   = node.dataset?.cursor; // explicit override via data-cursor="..."
     if (dc) return dc;
-    if (tag === "button" || node.getAttribute("role") === "button" || node.classList.contains("cursor-pointer")) return "button";
-    if (tag === "a") return "link";
+    if (tag === "button" || node.getAttribute("role") === "button" || node.classList.contains("cursor-pointer")) return "pointer";
+    if (tag === "a") return "pointer";
     if (tag === "input" || tag === "textarea" || node.contentEditable === "true") return "text";
-    if (tag === "img" || tag === "video") return "media";
-    if (tag === "canvas") return "canvas";
+    if (tag === "img" || tag === "video") return "pointer";
+    if (tag === "canvas") return "default";
+    // Check for window resize handles
+    if (node.classList?.contains("resize-handle")) {
+      const classes = node.className;
+      if (classes.includes("n") && classes.includes("s")) return "resize-ns";
+      if (classes.includes("e") && classes.includes("w")) return "resize-ew";
+      if (classes.includes("nw") || classes.includes("se")) return "resize-nwse";
+      if (classes.includes("ne") || classes.includes("sw")) return "resize-nesw";
+      if (classes.includes("n")) return "resize-n";
+      if (classes.includes("s")) return "resize-s";
+      if (classes.includes("e")) return "resize-e";
+      if (classes.includes("w")) return "resize-w";
+      return "resize-ns";
+    }
+    // Check for draggable windows
+    if (node.classList?.contains("draggable-window") || node.getAttribute("data-draggable")) return "grab";
     node = node.parentElement;
   }
   return "default";
@@ -21,12 +37,17 @@ const resolveType = (el) => {
 
 // ─── Per-state visual config ──────────────────────────────────────────────────
 const STATES = {
-  default: { ring: 32, dot: 8,  ringColor: "rgba(56,189,248,0.55)",   ringFill: "transparent",             label: null  },
-  button:  { ring: 58, dot: 0,  ringColor: "rgba(167,139,250,0.85)",  ringFill: "rgba(167,139,250,0.10)",  label: null  },
-  link:    { ring: 46, dot: 4,  ringColor: "rgba(56,189,248,0.90)",   ringFill: "rgba(56,189,248,0.06)",   label: null  },
-  text:    { ring: 3,  dot: 18, ringColor: "rgba(148,163,184,0.5)",   ringFill: "transparent",             label: null  },
-  media:   { ring: 70, dot: 0,  ringColor: "rgba(244,114,182,0.85)",  ringFill: "rgba(244,114,182,0.09)",  label: "View"},
-  canvas:  { ring: 44, dot: 5,  ringColor: "rgba(52,211,153,0.70)",   ringFill: "rgba(52,211,153,0.06)",   label: null  },
+  default:     { ring: 32, dot: 8,  ringColor: "rgba(56,189,248,0.55)",   ringFill: "transparent",             label: null  },
+  pointer:     { ring: 58, dot: 0,  ringColor: "rgba(167,139,250,0.85)",  ringFill: "rgba(167,139,250,0.10)",  label: null  },
+  text:        { ring: 3,  dot: 18, ringColor: "rgba(148,163,184,0.5)",   ringFill: "transparent",             label: null  },
+  move:        { ring: 48, dot: 0,  ringColor: "rgba(59,130,246,0.80)",   ringFill: "rgba(59,130,246,0.08)",   label: null  },
+  grab:        { ring: 48, dot: 0,  ringColor: "rgba(59,130,246,0.80)",   ringFill: "rgba(59,130,246,0.08)",   label: null  },
+  wait:        { ring: 48, dot: 0,  ringColor: "rgba(251,146,60,0.75)",   ringFill: "rgba(251,146,60,0.08)",   label: null  },
+  'not-allowed': { ring: 28, dot: 0, ringColor: "rgba(239,68,68,0.75)",   ringFill: "rgba(239,68,68,0.08)",    label: null  },
+  'resize-ns': { ring: 28, dot: 0,  ringColor: "rgba(251,146,60,0.75)",   ringFill: "rgba(251,146,60,0.08)",   label: null  },
+  'resize-ew': { ring: 28, dot: 0,  ringColor: "rgba(251,146,60,0.75)",   ringFill: "rgba(251,146,60,0.08)",   label: null  },
+  'resize-nwse': { ring: 28, dot: 0, ringColor: "rgba(251,146,60,0.75)",  ringFill: "rgba(251,146,60,0.08)",   label: null  },
+  'resize-nesw': { ring: 28, dot: 0, ringColor: "rgba(251,146,60,0.75)",  ringFill: "rgba(251,146,60,0.08)",   label: null  },
 };
 
 let uid = 0;
@@ -36,6 +57,9 @@ export const Cursor = () => {
   const [isTouch] = useState(
     () => typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches
   );
+
+  // Cursor store for asset management and watchdog
+  const { cursorType, isVisible: storeVisible, startWatchdog, stopWatchdog, updatePosition, setVisibility } = useCursorStore();
 
   // Shared motion values — source of truth for cursor position
   const mx = useMotionValue(-300);
@@ -53,11 +77,18 @@ export const Cursor = () => {
   const [visible, setVisible] = useState(false);
   const [pressed, setPressed] = useState(false);
   const [ripples, setRipples] = useState([]);
+  const watchdogRef = useRef(null);
 
   useEffect(() => {
     if (isTouch) return;
 
-    const move  = (e) => { mx.set(e.clientX); my.set(e.clientY); setVisible(true); };
+    const move  = (e) => { 
+      mx.set(e.clientX); 
+      my.set(e.clientY); 
+      setVisible(true);
+      setVisibility(true);
+      updatePosition(e.clientX, e.clientY);
+    };
     const over  = (e) => setType(resolveType(e.target));
     const leave = ()  => setVisible(false);
     const down  = (e) => {
@@ -73,14 +104,24 @@ export const Cursor = () => {
     document.addEventListener("mouseleave", leave);
     document.addEventListener("mousedown",  down);
     document.addEventListener("mouseup",    up);
+
+    // Start watchdog recovery system
+    startWatchdog();
+
     return () => {
       window.removeEventListener  ("mousemove",  move);
       document.removeEventListener("mouseover",  over);
       document.removeEventListener("mouseleave", leave);
       document.removeEventListener("mousedown",  down);
       document.removeEventListener("mouseup",    up);
+      stopWatchdog();
     };
-  }, [mx, my, isTouch]);
+  }, [mx, my, isTouch, startWatchdog, stopWatchdog, setVisibility, updatePosition]);
+
+  // Sync cursor type with store
+  useEffect(() => {
+    setType(cursorType);
+  }, [cursorType]);
 
   if (isTouch) return null;
 
@@ -203,6 +244,26 @@ export const Cursor = () => {
             height:  { type: "spring", stiffness: 500, damping: 28 },
             scale:   { type: "spring", stiffness: 700, damping: 20 },
             opacity: { duration: 0.1 },
+          }}
+        />
+      )}
+      {/* ── Custom SVG Cursor ──────────────────────────────────────────── */}
+      {useCursorStore.getState().getCursorAsset(type) && (
+        <motion.img
+          src={useCursorStore.getState().getCursorAsset(type).path}
+          alt=""
+          className="fixed pointer-events-none z-[10000]"
+          style={{
+            left: dotX,
+            top: dotY,
+            translateX: `-${useCursorStore.getState().getCursorAsset(type).hotspot[0]}px`,
+            translateY: `-${useCursorStore.getState().getCursorAsset(type).hotspot[1]}px`,
+          }}
+          animate={{
+            opacity: visible ? 1 : 0,
+          }}
+          transition={{
+            opacity: { duration: 0.1 }
           }}
         />
       )}
