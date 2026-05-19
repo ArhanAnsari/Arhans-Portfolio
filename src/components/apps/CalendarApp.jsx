@@ -22,15 +22,15 @@ const CalendarApp = () => {
   const [events, setEvents] = useState([]);
   const [creatingDate, setCreatingDate] = useState(null);
   const [newTitle, setNewTitle] = useState('');
-  const openWindow = useWindowStore((s) => s.openWindow);
+  // Note: openWindow removed - events now stay in calendar view
 
   const handleCreateEvent = (dateStr) => {
     const ev = { id: `ev-${Date.now()}`, title: newTitle || 'New Event', date: dateStr, description: '' };
     setEvents((es) => [...es, ev]);
     setCreatingDate(null);
     setNewTitle('');
-    // open event in its own window using file-viewer fallback (pass state)
-    openWindow({ app: 'file-viewer', title: ev.title, state: { fileId: null, fileName: ev.title, fileContent: `Event: ${ev.title}\nDate: ${ev.date}\n\n${ev.description}` } });
+    // Note: Event display would typically open in a notes or detail view
+    // Current file-viewer requires real filesystem node IDs, so event remains in calendar
   };
 
   return (

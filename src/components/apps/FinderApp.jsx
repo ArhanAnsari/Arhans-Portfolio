@@ -102,7 +102,7 @@ const FinderApp = () => {
   const appMetadata = useAppStore((state) => state.apps);
 
   const [selectedIds, setSelectedIds] = useState([]);
-  const [renameDraft, setRenameDraft] = useState([]);
+  const [renameDraft, setRenameDraft] = useState('');
   const [locationInput, setLocationInput] = useState('');
   const [editingLocation, setEditingLocation] = useState(false);
   const [showPreviewPane, setShowPreviewPane] = useState(true);

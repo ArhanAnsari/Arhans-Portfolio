@@ -140,6 +140,13 @@ export const useAppStore = create((set) => ({
       icon: "/images/photos.png",
       description: "Photo gallery",
     },
+    "about-os": {
+      id: "about-os",
+      name: "About This Mac",
+      title: "About ArhanOS",
+      icon: "/icons/info.svg",
+      description: "System information",
+    },
     mail: {
       id: "mail",
       name: "Mail",
