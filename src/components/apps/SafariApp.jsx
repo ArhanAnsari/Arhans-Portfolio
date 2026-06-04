@@ -450,7 +450,7 @@ const tabProgress = activeTab?.loading ? loadProgress : 100;
             <button type="button" onClick={handleBookmark} className="rounded-full p-1 text-neutral-400 hover:bg-white/10 hover:text-white" title="Add Bookmark">
               <BookmarkPlus size={14} />
             </button>
-            <button type="classNamelassName="rounded-full bg-cyan-400/20 px-3 py-1 text-xs font-medium text-cyan-100 hover:bg-cyan-400/30">
+            <button type="submit" className="rounded-full bg-cyan-400/20 px-3 py-1 text-xs font-medium text-cyan-100 hover:bg-cyan-400/30">
               Go
             </button>
           </form>
