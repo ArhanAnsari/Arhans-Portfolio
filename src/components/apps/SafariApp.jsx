@@ -253,138 +253,125 @@ const SafariApp = () => {
     navigate(bookmark.url);
   };
 
-  const renderActiveContent = () => {
-    if (!activeTab) {
-      return null;
-    }
+ const renderActiveContent = () => {
+  if (!activeTab) {
+    return null;
+  }
 
-    // Check Wi-Fi state for internet pages
-    if (!wifiEnabled && (!activeTab.url || activeTab.url.startsWith('http') || activeTab.url.includes('.'))) {
-      return (
-        <div className="flex h-full flex-col items-center justify-center gap-4 text-neutral-100 p-6 text-center">
-          <ShieldAlert size={48} className="text-yellow-400 opacity-50" />
-          <div className="text-2xl font-medium">You are not connected to the Internet</div>
-          <p className="max-w-md text-neutral-400">
-            ArhanOS cannot connect to the server because you turned off Wi-Fi in the Control Center.
-          </p>
-          <button 
-            onClick={() => useSystemStateStore.getState().setWifiEnabled(true)}
-            className="mt-4 px-6 py-2 bg-primary-600 hover:bg-primary-500 rounded-full text-white transition-colors"
-          >
-            Turn On Wi-Fi
-          </button>
-        </div>
-      );
-    }
+  // 1. Check Wi-Fi state for internet pages
+  if (!wifiEnabled && (!activeTab.url || activeTab.url.startsWith('http') || activeTab.url.includes('.'))) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-4 text-neutral-100 p-6 text-center">
+        <ShieldAlert size={48} className="text-yellow-400 opacity-50" />
+        <div className="text-2xl font-medium">You are not connected to the Internet</div>
+        <p className="max-w-md text-neutral-400">
+          ArhanOS cannot connect to the server because you turned off Wi-Fi in the Control Center.
+        </p>
+        <button 
+          onClick={() => useSystemStateStore.getState().setWifiEnabled(true)}
+          className="mt-4 px-6 py-2 bg-cyan-600 hover:bg-cyan-500 rounded-full text-white transition-colors"
+        >
+          Turn On Wi-Fi
+        </button>
+      </div>
+    );
+  }
 
-    if (activeTab.loading) {
-      return (
-        <div className="flex h-full items-center justify-center gap-3 text-neutral-200">
-          <Loader2 size={20} className="animate-spin text-cyan-300" />
-          Loading page...
-        </div>
-      );
-    }
+  // 2. Loading state animation
+  if (activeTab.loading) {
+    return (
+      <div className="flex h-full flex-col items-center justify-center gap-3 text-neutral-200">
+        <Loader2 size={24} className="animate-spin text-cyan-300" />
+        <span className="text-sm text-neutral-400 animate-pulse">Connecting to server...</span>
+      </div>
+    );
+  }
 
-    if (activeTab.error) {
-      return (
-        <div className="flex h-full flex-col items-center justify-center gap-3 text-neutral-100">
-          <ShieldAlert size={40} className="text-red-300" />
-          <div className="text-lg font-semibold">Page blocked or unavailable</div>
-          <div className="max-w-lg text-center text-sm text-neutral-400">{activeTab.error}</div>
-        </div>
-      );
-    }
+  // 3. Render Internal Portfolio Pages (About, Skills, etc.)
+  if (internalPage) {
+    const Page = internalPage.render;
+    return (
+      <div className="h-full overflow-auto bg-gradient-to-br from-neutral-950 via-slate-950 to-neutral-900 p-6">
+        <Page />
+      </div>
+    );
+  }
 
-    if (internalPage) {
-      const Page = internalPage.render;
-      return (
-        <div className="h-full overflow-auto bg-gradient-to-br from-neutral-950 via-slate-950 to-neutral-900 p-6">
-          <Page />
-        </div>
-      );
-    }
+  // 4. Default state if route is missing
+  if (!activeTab.url.startsWith('http')) {
+    return (
+      <div className="flex h-full items-center justify-center text-neutral-300">
+        Open a route or website to begin.
+      </div>
+    );
+  }
 
-    if (!activeTab.url.startsWith('http')) {
-      return (
-        <div className="flex h-full items-center justify-center text-neutral-300">
-          Open a route or website to begin.
-        </div>
-      );
-    }
-
-    if (iframeError) {
-      return (
-        <div className="flex h-full flex-col items-center justify-center gap-3 bg-neutral-950 text-neutral-100">
-          <ShieldAlert size={40} className="text-yellow-300" />
-          <div className="text-lg font-semibold">Blocked by browser sandbox</div>
-          <div className="max-w-xl text-center text-sm text-neutral-400">This website could not be embedded in the sandboxed iframe. Open it externally or try a different site.</div>
-          <div className="flex gap-2">
-            <button
-              onClick={() => window.open(activeTab.url, '_blank', 'noopener,noreferrer')}
-              className="rounded-full bg-cyan-400/20 px-4 py-2 text-sm text-cyan-100"
-            >
-              Open externally
-            </button>
-            <button
-              onClick={async () => {
-                try {
-                  setProxyContent('Loading...');
-                  const proxyUrl = `https://r.jina.ai/http://${activeTab.url.replace(/^https?:\/\//, '')}`;
-                  const res = await fetch(proxyUrl);
-                  const html = await res.text();
-                  setProxyContent(html);
-                } catch (err) {
-                  setProxyContent('Proxy fetch failed.');
-                }
-              }}
-              className="rounded-full bg-white/5 px-4 py-2 text-sm text-white"
-            >
-              Open via proxy (limited)
-            </button>
-          </div>
-          {proxyContent && (
-            <div className="w-full h-80 mt-4 overflow-auto bg-white/5 p-4 text-sm text-neutral-100">
-              {proxyContent === 'Loading...' ? (
-                <div>Loading proxied content...</div>
-              ) : proxyContent === 'Proxy fetch failed.' ? (
-                <div>Proxy failed to fetch this page.</div>
-              ) : (
-                <div dangerouslySetInnerHTML={{ __html: proxyContent }} />
-              )}
-            </div>
-          )}
-        </div>
-      );
-    }
+  // 5. If the frame fails/timeouts (Clipped by sandboxing/CSP protection)
+  if (iframeError) {
+    // Dynamic URL parsing to provide clean styling
+    const cleanDisplayUrl = activeTab.url.replace(/^https?:\/\/(www\.)?/, '');
 
     return (
-      <iframe
-        key={activeTab.id}
-        src={activeTab.url}
-        title={activeTab.title}
-        className="h-full w-full bg-white"
-        sandbox="allow-forms allow-scripts allow-popups allow-popups-to-escape-sandbox allow-downloads allow-top-navigation-by-user-activation"
-        referrerPolicy="no-referrer"
-        loading="eager"
-        onLoad={() => {
-          const store = useBrowserStore.getState();
-
-          if (store.tabs.some(tab => tab.id === activeTab.id)) {
-            store.finishTabLoad(activeTab.id);
-          }
-
-          setIframeError(null);
-        }}
-        onError={() => {
-          setIframeError('Failed to load this site in the sandboxed browser frame.');
-          useBrowserStore.getState().setTabError(activeTab.id, 'Failed to load this site in the sandboxed browser frame.');
-        }}
-      />
+      <div className="flex h-full flex-col items-center justify-center gap-4 bg-neutral-950 p-6 text-neutral-100">
+        <div className="relative">
+          <Globe size={48} className="text-neutral-600" />
+          <ShieldAlert size={20} className="absolute -bottom-1 -right-1 text-yellow-400 bg-neutral-950 rounded-full" />
+        </div>
+        <div className="text-xl font-semibold text-center">"{cleanDisplayUrl}" refused to connect.</div>
+        <p className="max-w-md text-center text-sm text-neutral-400">
+          Most modern sites prevent being viewed inside portfolo panels for security. You can open it in a clean native tab instead!
+        </p>
+        
+        <div className="flex gap-3 mt-2">
+          <button
+            onClick={() => window.open(activeTab.url, '_blank', 'noopener,noreferrer')}
+            className="flex items-center gap-2 rounded-full bg-cyan-500 hover:bg-cyan-400 px-5 py-2.5 text-sm font-medium text-neutral-950 transition-colors shadow-lg shadow-cyan-500/10"
+          >
+            Open in New Window <ExternalLink size={14} />
+          </button>
+          
+          <button
+            onClick={() => {
+              // Automatically reroute them to an open Google Search or alternative unblocked layout
+              const searchQuery = encodeURIComponent(cleanDisplayUrl);
+              navigate(`https://www.google.com/search?igu=1&q=${searchQuery}`);
+            }}
+            className="rounded-full bg-white/10 hover:bg-white/15 px-5 py-2.5 text-sm font-medium text-white transition-colors"
+          >
+            Search on Google
+          </button>
+        </div>
+      </div>
     );
-  };
+  }
 
-  const tabProgress = activeTab?.loading ? loadProgress : 100;
+  // 6. Active Live Website Iframe (with sandboxing fixes)
+  return (
+    <iframe
+      key={activeTab.id}
+      src={activeTab.url}
+      title={activeTab.title}
+      className="h-full w-full bg-white"
+      // Added allow-same-origin so unblocked endpoints (like Google Embeds) parse cleanly
+      sandbox="allow-same-origin allow-forms allow-scripts allow-popups allow-popups-to-escape-sandbox allow-downloads allow-top-navigation-by-user-activation"
+      referrerPolicy="no-referrer"
+      loading="eager"
+      onLoad={() => {
+        const store = useBrowserStore.getState();
+        if (store.tabs.some(tab => tab.id === activeTab.id)) {
+          store.finishTabLoad(activeTab.id);
+        }
+        setIframeError(null);
+      }}
+      onError={() => {
+        setIframeError('Failed to load site');
+        useBrowserStore.getState().setTabError(activeTab.id, 'Failed to embed.');
+      }}
+    />
+  );
+};
+  
+const tabProgress = activeTab?.loading ? loadProgress : 100;
 
   return (
     <div className="flex h-full flex-col overflow-hidden bg-neutral-950 text-white">
@@ -463,7 +450,7 @@ const SafariApp = () => {
             <button type="button" onClick={handleBookmark} className="rounded-full p-1 text-neutral-400 hover:bg-white/10 hover:text-white" title="Add Bookmark">
               <BookmarkPlus size={14} />
             </button>
-            <button type="submit" className="rounded-full bg-cyan-400/20 px-3 py-1 text-xs font-medium text-cyan-100 hover:bg-cyan-400/30">
+            <button type="classNamelassName="rounded-full bg-cyan-400/20 px-3 py-1 text-xs font-medium text-cyan-100 hover:bg-cyan-400/30">
               Go
             </button>
           </form>
