@@ -94,7 +94,8 @@ const normalizeUrlInput = (value) => {
     return `https://${input}`;
   }
 
-  return `https://www.google.com/search?q=${encodeURIComponent(input)}`;
+// NormalizeUrlInput function
+return `https://www.google.com/search?igu=1&q=${encodeURIComponent(input)}`;
 };
 
 const resolveTitle = (url) => {
